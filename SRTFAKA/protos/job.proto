@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package Job;
+
+// The Job service definition.
+service Job {
+  rpc GetAllJob (JobData) returns (JobList) {}
+  rpc CreateJob (JobData) returns (JobData) {}
+  rpc UpdateJob (JobData) returns (JobData) {}
+  rpc DeleteJob (JobId) returns (JobId) {}
+}
+
+// Message representing a single job record
+message JobData {
+  string name = 1;
+  string company = 2;
+  string jobId = 3;
+}
+
+// Response message containing a list of jobs
+message JobList {
+  repeated JobData jobs = 1;
+}
+
+message JobId{
+  string jobId = 1;
+}

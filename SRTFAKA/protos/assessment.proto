@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package Assessment;
+
+// The Assessment service definition.
+service Assessment {
+  rpc GetAllAssessment (AssessmentData) returns (AssessmentList) {}
+  rpc CreateAssessment (AssessmentData) returns (AssessmentData) {}
+  rpc UpdateAssessment (AssessmentData) returns (AssessmentData) {}
+  rpc DeleteAssessment (AssessmentId) returns (AssessmentId) {}
+}
+
+// Message representing a single assessment record
+message AssessmentData {
+  string name = 1;
+  string courseId = 2;
+  string assessmentId = 3;
+}
+
+// Response message containing a list of assessments
+message AssessmentList {
+  repeated AssessmentData assessments = 1;
+}
+
+message AssessmentId{
+  string assessmentId = 1;
+}

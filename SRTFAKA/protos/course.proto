@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package Course;
+
+// The Course service definition.
+service Course {
+  rpc GetAllCourse (CourseData) returns (CourseList) {}
+  rpc CreateCourse (CourseData) returns (CourseData) {}
+  rpc UpdateCourse (CourseData) returns (CourseData) {}
+  rpc DeleteCourse (CourseId) returns (CourseId) {}
+}
+
+// Message representing a single course record
+message CourseData {
+  string name = 1;
+  string instructor = 2;
+  string courseId = 3;
+}
+
+// Response message containing a list of courses
+message CourseList {
+  repeated CourseData courses = 1;
+}
+
+message CourseId{
+  string courseId = 1;
+}

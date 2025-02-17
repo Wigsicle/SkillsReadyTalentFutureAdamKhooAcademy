@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package Certificate;
+
+// The Certificate service definition.
+service Certificate {
+  rpc GetAllCertificate (CertificateData) returns (CertificateList) {}
+  rpc CreateCertificate (CertificateData) returns (CertificateData) {}
+  rpc UpdateCertificate (CertificateData) returns (CertificateData) {}
+  rpc DeleteCertificate (CertificateId) returns (CertificateId) {}
+}
+
+// Message representing a single certificate record
+message CertificateData {
+  string name = 1;
+  string courseId = 2;
+  string certificateId = 3;
+}
+
+// Response message containing a list of certificates
+message CertificateList {
+  repeated CertificateData certificates = 1;
+}
+
+message CertificateId{
+  string certificateId = 1;
+}
