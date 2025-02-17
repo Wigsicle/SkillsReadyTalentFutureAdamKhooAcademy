@@ -60,6 +60,8 @@ python -m grpc_tools.protoc -I protos --python_out=./generated --pyi_out=./gener
     ```python
      "from . import [service]_pb2 as [service]__pb2"
      ```
+## API Routes Documentation
+- Located at http://localhost:[port]/docs
 
 ## Services
 - Sign up (Darren) (AccountService)
