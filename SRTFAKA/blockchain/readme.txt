@@ -2,6 +2,10 @@ You will need Docker (Enable WSL2 integration), WSL2
 
 Go into WSL2 use Ubuntu-24.04 (I used this)
 
+Open powershell as administrator
+
+wsl -d Ubuntu-24.04
+
 navigate to your github repo. Mine was /mnt/c/Users/Wigsicle/Documents/GitHub/SkillsReadyTalentFutureAdamKhooAcademy/SRTFAKA/blockchain
 
 Probably just change after the username.
