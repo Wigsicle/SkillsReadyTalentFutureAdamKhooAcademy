@@ -31,7 +31,7 @@ async def getAccountByUsername(accountUsername: str) -> account_pb2.AccountRespo
             response = await stub.GetAccountByUsername(account_pb2.AccountRequestByUsername(username=accountUsername))
             return response
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
         
 async def createAccount(account: AccountCreation) -> account_pb2.AccountResponse:
     async with grpc.aio.insecure_channel(ACCOUNT_SERVICE_ADDRESS) as channel:

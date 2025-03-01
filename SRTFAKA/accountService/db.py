@@ -7,7 +7,7 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 class AccountDB:
     def __init__(self):
         # SQLite database file (creates a new file if it doesn't exist)
-        db_path = currentPath + '/accounts.db'
+        db_path = os.path.join(currentPath, 'accounts.db')  # Adjust the path as needed
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row  # To access rows as dictionaries
         self.cursor = self.conn.cursor()

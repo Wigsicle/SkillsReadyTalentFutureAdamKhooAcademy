@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException
 from ..models import AccountCreation, AccountUpdate, AccountResponse
 from ..auth import getCurrentUser
 from google.protobuf.json_format import MessageToDict
-from ..gRPCHandler import getAccountById, updateAccount, deleteAccount, createAccount
+from ..gRPCHandler import getAccountById, updateAccount, deleteAccount, createAccount, getAccountByUsername
 from ..utils import hashPassword
 
 MINIMUM_WALLET_AMOUNT = 5.00
@@ -19,7 +19,7 @@ async def create_account(name: str = Form, username: str = Form, password: str =
     accountObj = AccountCreation(name=name, username=username, password=hashPassword(password)) 
     newAccount = await createAccount(accountObj) 
     if newAccount is None:
-        raise HTTPException(status_code=500, detail="Error occured")
+        raise HTTPException(status_code=500, detail="Error occurred")
     return {"message": "Account created", "data": MessageToDict(newAccount)}
 
 @account.put("/accounts/")

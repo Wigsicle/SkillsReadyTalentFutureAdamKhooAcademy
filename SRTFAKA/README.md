@@ -61,6 +61,10 @@ python -m grpc_tools.protoc -I protos --python_out=./generated --pyi_out=./gener
      "from . import [service]_pb2 as [service]__pb2"
      ```
 
+## Frontend - webapp
+In the webapp, remember to invoke this code:
+```npm install```
+
 ## Services
 - Sign up (Darren) (AccountService)
 - Login (Darren) (AccountService)
