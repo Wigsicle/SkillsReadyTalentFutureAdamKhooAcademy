@@ -1,0 +1,418 @@
+/* Apply full height to the body and center content */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Main container */
+.container {
+    width: 100%;
+    max-width: 1200px;  /* Ensures it doesn't stretch too much on large screens */
+    padding: 20px;
+    text-align: center;
+}
+
+/* Header */
+h1 {
+    font-size: 42px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Responsive grid layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjusts dynamically */
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Card styling */
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: black;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background-color: #e8f0fe;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Courses Page Container */
+.courses-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Title */
+.courses-container h1 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.courses-container p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Category Navigation */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.category-btn {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.category-btn:hover {
+    background-color: #ddd;
+    transform: scale(1.05);
+}
+
+.category-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Course List */
+.course-list {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto; /* Horizontal scrolling */
+    padding-bottom: 10px;
+    white-space: nowrap;
+}
+
+/* Course Card */
+.course-card {
+    background: white;
+    border-radius: 10px;
+    width: 300px;
+    padding: 0px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    text-align: left;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.course-image {
+    width: 100%;
+    border-radius: 10px;
+    text-wrap: wrap;
+}
+
+.course-details {
+    padding: 10px;
+    padding-top: 40px;
+
+}
+
+.course-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 5px 0;
+    text-wrap: wrap;
+}
+
+.course-instructor {
+    font-size: 14px;
+    color: #777;
+}
+
+.course-rating {
+    font-size: 14px;
+    color: #f39c12;
+    margin: 5px 0;
+}
+
+/* View More Button */
+.view-more-btn {
+    margin-top: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.view-more-btn:hover {
+    background: #0056b3;
+}
+
+/* back to home button */
+.back-btn {
+    margin-top: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+/* Assessments Page Container */
+.assessments-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Title */
+.assessments-container h1 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.assessments-container p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Assessment List */
+.assessment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Assessment Card */
+.assessment-card {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.assessment-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Assessment Image */
+.assessment-image {
+    width: 250px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+/* Assessment Details */
+.assessment-details {
+    flex: 1;
+    padding-left: 15px;
+    text-align: left;
+}
+
+/* Title */
+.assessment-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Description */
+.assessment-description {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* Instructor Name */
+.assessment-instructor {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Rating */
+.assessment-rating {
+    font-size: 14px;
+    color: #f39c12;
+    margin: 5px 0;
+}
+
+/* Metadata (questions & level) */
+.assessment-meta {
+    font-size: 14px;
+    color: #444;
+}
+
+/* Back to Home Button */
+.back-to-home-btn {
+    margin-top: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.back-to-home-btn:hover {
+    background: #0056b3;
+}
+
+/* Job Portal Layout */
+.job-portal-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Job List Section */
+/* Job Portal Main Layout */
+.job-portal {
+    width: 1850px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 20px;
+}
+
+/* Search Bar */
+.job-search-bar {
+    display: flex;
+    width: 80%;
+    max-width: 1200px;
+    justify-content: space-between;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.job-search-bar input {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Job Portal Layout */
+.job-portal-container {
+    display: flex;
+    width: 80%;
+    max-width: 1200px;
+    gap: 20px;
+}
+
+/* Job List */
+.job-list {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    height: 600px;
+}
+
+/* Job Card */
+.job-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 10px;
+}
+
+.job-card:hover, .job-card.selected {
+    background: #f0f4ff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 255, 0.1);
+}
+
+/* Job Details */
+.job-details {
+    flex: 2;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 600px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.job-detail-image {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
