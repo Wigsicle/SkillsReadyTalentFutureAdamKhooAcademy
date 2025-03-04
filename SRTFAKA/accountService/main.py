@@ -31,10 +31,14 @@ class Account(account_pb2_grpc.AccountServicer):
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
             userId=account["accountId"],
-            name=account["name"],
             username=account["username"],
+            firstName=account["firstName"],
+            lastName=account["lastName"],
+            country=account["country"],
+            address=account["address"],
+            email=account["email"],
             password=account["password"],
-            accountStatus=account["accountStatus"],
+            type=account["type"]
         )
 
     async def GetAccountByUsername(self, request: account_pb2.AccountRequestByUsername, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
@@ -45,15 +49,19 @@ class Account(account_pb2_grpc.AccountServicer):
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
             userId=account["accountId"],
-            name=account["name"],
             username=account["username"],
+            firstName=account["firstName"],
+            lastName=account["lastName"],
+            country=account["country"],
+            address=account["address"],
+            email=account["email"],
             password=account["password"],
-            accountStatus=account["accountStatus"],
+            type=account["type"]
         )
     async def CreateAccount(self, request: account_pb2.CreateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         newUserId = generateRandomId()
         account = accountDB.createAccount(
-            (newUserId, request.name, request.username, request.password, True)
+            (newUserId, request.username, request.firstName, request.lastName, request.country, request.address, request.email, request.password, request.type)
         )
         if account is False:
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -64,13 +72,23 @@ class Account(account_pb2_grpc.AccountServicer):
     async def UpdateAccount(self, request: account_pb2.UpdateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         updated = accountDB.updateAccount(
             request.userId,
-            {"name": request.name, "password": request.password}
+            {
+                "username": request.username,
+                "firstName": request.firstName,
+                "lastName": request.lastName,
+                "country": request.country,
+                "address": request.address,
+                "email": request.email,
+                "password": request.password,
+                "type": request.type
+            }
         )
         if not updated:
             context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details("Account not found for update or error occured.")
+            context.set_details("Account not found for update or error occurred.")
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(userId=request.userId)
+
 
     async def DeleteAccount(self, request: account_pb2.AccountRequestById, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         deleted = accountDB.deleteAccount(request.userId)
