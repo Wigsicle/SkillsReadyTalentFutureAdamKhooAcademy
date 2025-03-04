@@ -3,7 +3,8 @@ SRC_PATH="$(pwd)"
 echo "$SRC_PATH"
 
 echo "Installing dependencies..."
-sudo apt update && sudo apt install -y jq golang-go
+sudo apt update 
+sudo apt-get install -y jq golang-go
 
 echo "Setting up Go workspace..."
 mkdir -p $HOME/go/src/github.com/SkillsReadyTalentFutureAdamKhooAcademy
