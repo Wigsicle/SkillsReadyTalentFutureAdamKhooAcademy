@@ -1,6 +1,110 @@
 import sqlite3
 from datetime import datetime
 import os
+from typing import Optional
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
+
+engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5432/platform_db")
+
+class Industry(DeclarativeBase):
+    """Industry the company is part of."""
+    __tablename__ = "industry"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    short_name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+class EmploymentType(DeclarativeBase):
+    """Full-Time/Part-Time/Intern"""
+    __tablename__ = "employment_type"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(String(255), nullable=False)
+    short_val: Mapped[str] = mapped_column(String(255), nullable=False)
+
+class Country(DeclarativeBase):
+    __tablename__ = "country"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    short_name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+class Company(DeclarativeBase):
+    __tablename__ = "company"
+    company_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    #FK
+    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey='industry.id')
+    country_id: Mapped[int] = mapped_column(Integer, ForeignKey='country_id')
+
+    listed_jobs: Mapped[list['JobListing']] = relationship("JobListing", foreign_keys='job_listing.company_id', back_populates="company")
+    industry: Mapped[Industry] = relationship(foreign_keys='industry.id')
+    country: Mapped[Country] = relationship("Country", foreign_keys='country.id')
+
+
+class JobListing(DeclarativeBase):
+    '''
+    Stores the value of a single job listing.
+
+    Attributes
+    ----------
+    name : str
+        name of job listing
+
+    '''
+    __tablename__ = "job_listing"
+
+    listing_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(String(255))
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
+    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    available_spot_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    
+    # FK dependency
+    company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.company_id'), nullable=False)
+    employment_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('employment_type.id', nullable=False)) # FT/PT/Intern
+
+    # Object Relations with Company and Applications
+    company: Mapped[Company] = relationship('Company', back_populates='listed_jobs')
+    applications: Mapped[list['Application']] = relationship('Application', back_populates='listing')
+
+    @hybrid_property
+    def status(self)->Mapped[bool]:
+        """
+        Status of job listing based on end_date value not exceeding current DT, 
+        Available = True, Not Available = False
+        """
+        return (self.end_date < datetime.now())
+    
+    @hybrid_property
+    def applicant_count(self)->Mapped[int]:
+        return self.applications.count
+
+
+
+
+
+class Application(DeclarativeBase):
+    '''
+    Stores details of user job application. Retrieve by applicant_id field (user_id)
+    '''
+    __tablename__ = "application"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    applicant_id: Mapped[int] = mapped_column(Integer, nullable=False) # MUST ensure write consistency here
+    applied_on: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now())  # if empty automatically assign right now
+    edited_on: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    resume_link: Mapped[str] = mapped_column(String(255), nullable=False)
+    additional_info: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # FK dependency
+    listing_id: Mapped[int] = mapped_column(Integer, ForeignKey('job_listing.listing_id'), nullable=False)
+
+    listing: Mapped[JobListing] = relationship('JobListing', back_populates='applications')
+
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class JobDB:
