@@ -38,9 +38,14 @@ async def createAccount(account: AccountCreation) -> account_pb2.AccountResponse
         stub = account_pb2_grpc.AccountStub(channel)
         try:
             response = await stub.CreateAccount(account_pb2.CreateAccountRequest(
-                name=account.name, 
-                username=account.username,
-                password=account.password
+                username=account.username, 
+                password=account.password,
+                firstname=account.firstname,
+                lastname=account.lastname,
+                country=account.country,
+                address=account.address,
+                email=account.email,
+                type=account.type
             ))
             return response
         except grpc.aio.AioRpcError as e:
@@ -52,7 +57,12 @@ async def updateAccount(accountId: str, account: AccountUpdate) -> account_pb2.A
         try:
             response = await stub.UpdateAccount(account_pb2.UpdateAccountRequest(
                 userId=accountId,
-                name=account.name,
+                username=account.username,
+                firstname=account.firstname,
+                lastname=account.lastname,
+                country=account.country,
+                address=account.address,
+                email=account.email,
                 password=account.password
             ))
             return response

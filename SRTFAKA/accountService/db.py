@@ -15,10 +15,14 @@ class AccountDB:
         create_table_sql = '''
         CREATE TABLE IF NOT EXISTS accounts (
             accountId TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            accountStatus BOOLEAN NOT NULL
+            country TEXT NOT NULL,
+            address TEXT NOT NULL,
+            email TEXT NOT NULL,
+            type TEXT NOT NULL
         );
         '''
         try:
@@ -56,8 +60,8 @@ class AccountDB:
     def createAccount(self, accountData):
         """Insert a new account into the database."""
         sql = '''
-            INSERT INTO accounts (accountId, name, username, password, accountStatus) 
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO accounts (accountId, firstName, lastName, username, password, country, address, email, type) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         try:
             self.cursor.execute(sql, accountData)
@@ -72,11 +76,11 @@ class AccountDB:
         """Update account information for the given accountId."""
         sql = '''
             UPDATE accounts 
-            SET name = ?, password = ?
+            SET firstName = ?, lastName = ?, password = ?, country = ?, address = ?, email = ?, type = ?
             WHERE accountId = ?
         '''
         try:
-            self.cursor.execute(sql, (updateData['name'], updateData['password'], accountId))
+            self.cursor.execute(sql, (updateData['firstName'], updateData['lastName'], updateData['password'], updateData['country'], updateData['address'], updateData['email'], updateData['type'], accountId))
             self.conn.commit()
             return self.cursor.rowcount > 0  # True if the account was updated
         except sqlite3.Error as e:

@@ -32,8 +32,8 @@ class Account(account_pb2_grpc.AccountServicer):
         return account_pb2.AccountResponse(
             userId=account["accountId"],
             username=account["username"],
-            firstName=account["firstName"],
-            lastName=account["lastName"],
+            firstname=account["firstname"],
+            lastname=account["lastname"],
             country=account["country"],
             address=account["address"],
             email=account["email"],
@@ -50,8 +50,8 @@ class Account(account_pb2_grpc.AccountServicer):
         return account_pb2.AccountResponse(
             userId=account["accountId"],
             username=account["username"],
-            firstName=account["firstName"],
-            lastName=account["lastName"],
+            firstname=account["firstname"],
+            lastname=account["lastname"],
             country=account["country"],
             address=account["address"],
             email=account["email"],
@@ -59,23 +59,37 @@ class Account(account_pb2_grpc.AccountServicer):
             type=account["type"]
         )
     async def CreateAccount(self, request: account_pb2.CreateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
-        newUserId = generateRandomId()
+        newUserId = generateRandomId()  # Generate a new user ID
+        # Insert the account data into the database
         account = accountDB.createAccount(
-            (newUserId, request.username, request.firstName, request.lastName, request.country, request.address, request.email, request.password, request.type)
+            (
+                newUserId,               # accountId
+                request.firstname,        # firstName
+                request.lastname,         # lastName
+                request.username,         # username
+                request.password,         # password
+                request.country,          # country
+                request.address,          # address
+                request.email,            # email
+                request.type              # type
+            )
         )
         if account is False:
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Account creation failed. Please try another username.")
             return account_pb2.AccountResponse()
+        
+        # Return the created account ID
         return account_pb2.AccountResponse(userId=newUserId)
+
 
     async def UpdateAccount(self, request: account_pb2.UpdateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         updated = accountDB.updateAccount(
             request.userId,
             {
                 "username": request.username,
-                "firstName": request.firstName,
-                "lastName": request.lastName,
+                "firstname": request.firstname,
+                "lastname": request.lastname,
                 "country": request.country,
                 "address": request.address,
                 "email": request.email,

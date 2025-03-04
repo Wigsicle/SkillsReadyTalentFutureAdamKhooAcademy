@@ -9,11 +9,17 @@ class TokenData(BaseModel):
     userId: str
     
 class Account(BaseModel):
-    name: str 
+    username: str 
     
 class AccountCreation(Account):
     password: str
     username: str
+    firstname: str
+    lastname: str
+    country: str
+    address: str
+    email: str
+    type: str
     
 class AccountUpdate(Account):
     password: str
@@ -21,7 +27,12 @@ class AccountUpdate(Account):
 class AccountResponse(Account):
     userId: str
     password: str
-    accountStatus: str
+    firstname: str
+    lastname: str
+    country: str
+    address: str
+    email: str
+    type: str
 
 class Course(BaseModel):
     name: str
