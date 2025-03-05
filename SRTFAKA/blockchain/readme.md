@@ -23,9 +23,14 @@ cd /mnt/c/[path to repo]/SkillsReadyTalentFutureAdamKhooAcademy/SRTFAKA/blockcha
 
 5. Run the Hyperledger setup shell script
 ```
-bash ./setup_hyperledger.sh 
-OR
 ./setup_hyperledger.sh 
+```
+
+6. Create a network bridge between the Docker containers 
+
+Go to *Docker Desktop* and execute the command in the docker terminal 
+```
+docker network create -d bridge fabric
 ```
 
 Still got the GRPC side to do (WIP)

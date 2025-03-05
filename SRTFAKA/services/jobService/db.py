@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, De
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 
-engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5432/platform_db")
+engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/jobs_db")
 
 class Industry(DeclarativeBase):
     """Industry the company is part of."""
@@ -62,6 +62,7 @@ class JobListing(DeclarativeBase):
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     available_spot_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    pay: Mapped[int] = mapped_column(Integer, nullable=False)
     
     # FK dependency
     company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.company_id'), nullable=False)
@@ -69,10 +70,11 @@ class JobListing(DeclarativeBase):
 
     # Object Relations with Company and Applications
     company: Mapped[Company] = relationship('Company', back_populates='listed_jobs')
+    employment: Mapped[EmploymentType] = relationship('Relationship', foreign_keys='employment_type.id')
     applications: Mapped[list['Application']] = relationship('Application', back_populates='listing')
 
     @hybrid_property
-    def status(self)->Mapped[bool]:
+    def available_status(self)->Mapped[bool]:
         """
         Status of job listing based on end_date value not exceeding current DT, 
         Available = True, Not Available = False
@@ -82,9 +84,14 @@ class JobListing(DeclarativeBase):
     @hybrid_property
     def applicant_count(self)->Mapped[int]:
         return self.applications.count
-
-
-
+    
+    @hybrid_property
+    def country_name(self)->Mapped[str]:
+        return self.company.country.name
+    
+    @hybrid_property
+    def industry_name(self)->Mapped[str]:
+        return self.company.industry.name
 
 
 class Application(DeclarativeBase):
@@ -94,7 +101,7 @@ class Application(DeclarativeBase):
     __tablename__ = "application"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    applicant_id: Mapped[int] = mapped_column(Integer, nullable=False) # MUST ensure write consistency here
+    applicant_id: Mapped[int] = mapped_column(Integer, nullable=False) # MUST ensure write consistency with User DB, let APIGate handle
     applied_on: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now())  # if empty automatically assign right now
     edited_on: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     resume_link: Mapped[str] = mapped_column(String(255), nullable=False)
