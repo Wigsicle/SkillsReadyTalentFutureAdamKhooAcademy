@@ -15,9 +15,9 @@
 import asyncio
 import logging
 import grpc
-from ..generated import job_pb2
-from ..generated import job_pb2_grpc
-from ..common.utils import generateRandomId
+from ...generated import job_pb2
+from ...generated import job_pb2_grpc
+from ...common.utils import generateRandomId
 from .db import JobDB
 
 jobDB = JobDB()

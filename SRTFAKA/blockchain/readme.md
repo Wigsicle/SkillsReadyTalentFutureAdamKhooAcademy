@@ -1,16 +1,32 @@
-You will need Docker (Enable WSL2 integration), WSL2
+# Blockchain Setup
+Prerequisites: You will need Docker (Enable WSL2 integration), WSL2
 
-Go into WSL2 use Ubuntu-24.04 (I used this)
+## Go into WSL2 use Ubuntu-24.04 (I used this)
 
-Open powershell as administrator
+1. Open powershell as administrator
 
+2. Install Ubuntu-24.04 on Windows Subsystem for Linux (WSL)
+
+For those without Ubuntu 24.04
+```
+wsl --install -d Ubuntu-24.04 
+```
+3. Launch Ubuntu on WSL
+```
 wsl -d Ubuntu-24.04
+```
 
-navigate to your github repo. Mine was /mnt/c/Users/Wigsicle/Documents/GitHub/SkillsReadyTalentFutureAdamKhooAcademy/SRTFAKA/blockchain
+4. In the WSL terminal, navigate to the location of the local repository with the following path
+```
+cd /mnt/c/[path to repo]/SkillsReadyTalentFutureAdamKhooAcademy/SRTFAKA/blockchain
+```
 
-Probably just change after the username.
-
-Then ./setup_hyperledger.sh
+5. Run the Hyperledger setup shell script
+```
+bash ./setup_hyperledger.sh 
+OR
+./setup_hyperledger.sh 
+```
 
 Still got the GRPC side to do (WIP)
 
