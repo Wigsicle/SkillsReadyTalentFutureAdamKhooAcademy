@@ -6,8 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from ...apiGateway.base import Base, Industry, Country
-from ...accountService.db import User
+from apiGateway.base import Base, Industry, Country
+from accountService.db import User
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 
@@ -25,8 +25,8 @@ class Company(Base):
     address: Mapped[str] = mapped_column(String(255), nullable=False)
 
     #FK
-    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey='industry.id')
-    country_id: Mapped[int] = mapped_column(Integer, ForeignKey='country_id')
+    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey('industry.id'))
+    country_id: Mapped[int] = mapped_column(Integer, ForeignKey('country.id'))
 
     listed_jobs: Mapped[list['JobListing']] = relationship("JobListing", foreign_keys='job_listing.company_id', back_populates="company")
     industry: Mapped[Industry] = relationship(foreign_keys='industry.id')
@@ -54,7 +54,7 @@ class JobListing(Base):
     
     # FK dependency
     company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.company_id'), nullable=False)
-    employment_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('employment_type.id', nullable=False)) # FT/PT/Intern
+    employment_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('employment_type.id'), nullable=False) # FT/PT/Intern
 
     # Object Relations with Company and Applications
     company: Mapped[Company] = relationship('Company', back_populates='listed_jobs')

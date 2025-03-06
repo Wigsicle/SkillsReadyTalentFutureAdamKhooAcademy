@@ -6,9 +6,9 @@ from sqlalchemy import pool
 from alembic import context
 
 # metadata of models will be stored in DeclarativeBase
-from ..apiGateway.base import Base, Country, Industry
-from ..services.jobService.db import Application, JobListing, Company, EmploymentType
-from ..accountService.db import User, UserType
+from apiGateway.base import Base, Country, Industry
+from services.jobService.db import Application, JobListing, Company, EmploymentType
+from accountService.db import User, UserType
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

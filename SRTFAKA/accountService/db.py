@@ -4,8 +4,8 @@ import pathlib
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from ..apiGateway.base import Base, Country
-from ..services.jobService.db import Application
+from apiGateway.base import Base, Country
+#from services.jobService.db import Application
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -26,12 +26,12 @@ class User(Base):
     address: Mapped[str] = mapped_column(String(255), nullable=False)
 
     #FK
-    country_id: Mapped[int] = mapped_column(Integer, ForeignKey='country.id')
+    country_id: Mapped[int] = mapped_column(Integer, ForeignKey('country.id'))
     user_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_type.id'))
     #RS
     country: Mapped[Country] = relationship("Country")
     user_type: Mapped[UserType] = relationship("UserType")
-    applications: Mapped[list['Application']] = relationship("Application", back_populates='applicant')
+    #applications: Mapped[list['Application']] = relationship("Application", back_populates='applicant')
 
 
 class AccountDB:
