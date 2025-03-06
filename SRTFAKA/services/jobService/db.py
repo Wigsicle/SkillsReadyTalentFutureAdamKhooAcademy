@@ -20,7 +20,7 @@ class EmploymentType(Base):
 
 class Company(Base):
     __tablename__ = "company"
-    company_id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -44,7 +44,7 @@ class JobListing(Base):
     '''
     __tablename__ = "job_listing"
 
-    listing_id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(255))
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
@@ -53,7 +53,7 @@ class JobListing(Base):
     pay: Mapped[int] = mapped_column(Integer, nullable=False)
     
     # FK dependency
-    company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.company_id'), nullable=False)
+    company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.id'), nullable=False)
     employment_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('employment_type.id'), nullable=False) # FT/PT/Intern
 
     # Object Relations with Company and Applications
@@ -95,9 +95,11 @@ class Application(Base):
     additional_info: Mapped[str] = mapped_column(String(255), nullable=True)
 
     # FK dependency
-    listing_id: Mapped[int] = mapped_column(Integer, ForeignKey('job_listing.listing_id'), nullable=False)
+    listing_id: Mapped[int] = mapped_column(Integer, ForeignKey('job_listing.id'), nullable=False)
+    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey('industry.id'))
 
     listing: Mapped[JobListing] = relationship('JobListing', back_populates='applications')
+    industry: Mapped[Industry] = relationship('Industry', foreign_keys='industry.id')
     applicant: Mapped[User] = relationship('User', back_populates='applications')
 
 
