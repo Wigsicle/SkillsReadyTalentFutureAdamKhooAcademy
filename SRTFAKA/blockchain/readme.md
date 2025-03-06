@@ -16,21 +16,32 @@ wsl --install -d Ubuntu-24.04
 wsl -d Ubuntu-24.04
 ```
 
-4. In the WSL terminal, navigate to the location of the local repository with the following path
+4. Link the WSL installation with Docker
+
+Go to the *Docker desktop* > Settings>Resources>WSL Integration
+![Link the docker to WSL installation](docker-wsl_integration.png)
+
+5. Create a network bridge between the Docker containers 
+
+In *Docker Desktop*, execute the command in the docker terminal 
+```
+docker network create -d bridge fabric_test
+```
+
+6. In the WSL terminal, navigate to the location of the local repository with the following path
 ```
 cd /mnt/c/[path to repo]/SkillsReadyTalentFutureAdamKhooAcademy/SRTFAKA/blockchain
 ```
 
-5. Run the Hyperledger setup shell script
+7. Use dos2unix utility to convert setup file from DOS to Unix file format.
+```
+sudo apt-get install dos2unix
+dos2unix ./setup_hyperledger.sh
+```
+
+8. Run the Hyperledger setup shell script
 ```
 ./setup_hyperledger.sh 
-```
-
-6. Create a network bridge between the Docker containers 
-
-Go to *Docker Desktop* and execute the command in the docker terminal 
-```
-docker network create -d bridge fabric
 ```
 
 Still got the GRPC side to do (WIP)

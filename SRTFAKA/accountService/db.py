@@ -1,8 +1,38 @@
 import sqlite3
 import os
 import pathlib
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
+from ..apiGateway.base import Base, Country
+from ..services.jobService.db import Application
 
+engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
+
+class UserType(Base):
+    __tablename__ = 'user_type'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(String(255), nullable=False)
+
+class User(Base):
+    """User profile"""
+    __tablename__ = 'user'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    #FK
+    country_id: Mapped[int] = mapped_column(Integer, ForeignKey='country.id')
+    user_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_type.id'))
+    #RS
+    country: Mapped[Country] = relationship("Country")
+    user_type: Mapped[UserType] = relationship("UserType")
+    applications: Mapped[list['Application']] = relationship("Application", back_populates='applicant')
+
 
 class AccountDB:
     def __init__(self):
