@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from . import job_pb2 as job__pb2
+import job_pb2 as job__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__
@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class JobStub(object):
+class JobServiceStub(object):
     """The Job service definition.
     """
 
@@ -35,33 +35,54 @@ class JobStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetAllJob = channel.unary_unary(
-                '/Job.Job/GetAllJob',
-                request_serializer=job__pb2.JobData.SerializeToString,
+        self.GetAllJobs = channel.unary_unary(
+                '/Job.JobService/GetAllJobs',
+                request_serializer=job__pb2.Empty.SerializeToString,
                 response_deserializer=job__pb2.JobList.FromString,
                 _registered_method=True)
+        self.GetJobDetails = channel.unary_unary(
+                '/Job.JobService/GetJobDetails',
+                request_serializer=job__pb2.JobId.SerializeToString,
+                response_deserializer=job__pb2.JobData.FromString,
+                _registered_method=True)
         self.CreateJob = channel.unary_unary(
-                '/Job.Job/CreateJob',
+                '/Job.JobService/CreateJob',
                 request_serializer=job__pb2.JobData.SerializeToString,
                 response_deserializer=job__pb2.JobData.FromString,
                 _registered_method=True)
         self.UpdateJob = channel.unary_unary(
-                '/Job.Job/UpdateJob',
+                '/Job.JobService/UpdateJob',
                 request_serializer=job__pb2.JobData.SerializeToString,
                 response_deserializer=job__pb2.JobData.FromString,
                 _registered_method=True)
         self.DeleteJob = channel.unary_unary(
-                '/Job.Job/DeleteJob',
+                '/Job.JobService/DeleteJob',
                 request_serializer=job__pb2.JobId.SerializeToString,
                 response_deserializer=job__pb2.JobId.FromString,
                 _registered_method=True)
+        self.ApplyJob = channel.unary_unary(
+                '/Job.JobService/ApplyJob',
+                request_serializer=job__pb2.ApplicationData.SerializeToString,
+                response_deserializer=job__pb2.ApplicationId.FromString,
+                _registered_method=True)
+        self.GetApplications = channel.unary_unary(
+                '/Job.JobService/GetApplications',
+                request_serializer=job__pb2.UserId.SerializeToString,
+                response_deserializer=job__pb2.ApplicationList.FromString,
+                _registered_method=True)
 
 
-class JobServicer(object):
+class JobServiceServicer(object):
     """The Job service definition.
     """
 
-    def GetAllJob(self, request, context):
+    def GetAllJobs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetJobDetails(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -85,13 +106,31 @@ class JobServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ApplyJob(self, request, context):
+        """Job applications
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
-def add_JobServicer_to_server(servicer, server):
+    def GetApplications(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_JobServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetAllJob': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAllJob,
-                    request_deserializer=job__pb2.JobData.FromString,
+            'GetAllJobs': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAllJobs,
+                    request_deserializer=job__pb2.Empty.FromString,
                     response_serializer=job__pb2.JobList.SerializeToString,
+            ),
+            'GetJobDetails': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetJobDetails,
+                    request_deserializer=job__pb2.JobId.FromString,
+                    response_serializer=job__pb2.JobData.SerializeToString,
             ),
             'CreateJob': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateJob,
@@ -108,20 +147,30 @@ def add_JobServicer_to_server(servicer, server):
                     request_deserializer=job__pb2.JobId.FromString,
                     response_serializer=job__pb2.JobId.SerializeToString,
             ),
+            'ApplyJob': grpc.unary_unary_rpc_method_handler(
+                    servicer.ApplyJob,
+                    request_deserializer=job__pb2.ApplicationData.FromString,
+                    response_serializer=job__pb2.ApplicationId.SerializeToString,
+            ),
+            'GetApplications': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetApplications,
+                    request_deserializer=job__pb2.UserId.FromString,
+                    response_serializer=job__pb2.ApplicationList.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'Job.Job', rpc_method_handlers)
+            'Job.JobService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('Job.Job', rpc_method_handlers)
+    server.add_registered_method_handlers('Job.JobService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Job(object):
+class JobService(object):
     """The Job service definition.
     """
 
     @staticmethod
-    def GetAllJob(request,
+    def GetAllJobs(request,
             target,
             options=(),
             channel_credentials=None,
@@ -134,9 +183,36 @@ class Job(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Job.Job/GetAllJob',
-            job__pb2.JobData.SerializeToString,
+            '/Job.JobService/GetAllJobs',
+            job__pb2.Empty.SerializeToString,
             job__pb2.JobList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetJobDetails(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Job.JobService/GetJobDetails',
+            job__pb2.JobId.SerializeToString,
+            job__pb2.JobData.FromString,
             options,
             channel_credentials,
             insecure,
@@ -161,7 +237,7 @@ class Job(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Job.Job/CreateJob',
+            '/Job.JobService/CreateJob',
             job__pb2.JobData.SerializeToString,
             job__pb2.JobData.FromString,
             options,
@@ -188,7 +264,7 @@ class Job(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Job.Job/UpdateJob',
+            '/Job.JobService/UpdateJob',
             job__pb2.JobData.SerializeToString,
             job__pb2.JobData.FromString,
             options,
@@ -215,9 +291,63 @@ class Job(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Job.Job/DeleteJob',
+            '/Job.JobService/DeleteJob',
             job__pb2.JobId.SerializeToString,
             job__pb2.JobId.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ApplyJob(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Job.JobService/ApplyJob',
+            job__pb2.ApplicationData.SerializeToString,
+            job__pb2.ApplicationId.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetApplications(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Job.JobService/GetApplications',
+            job__pb2.UserId.SerializeToString,
+            job__pb2.ApplicationList.FromString,
             options,
             channel_credentials,
             insecure,

@@ -142,34 +142,91 @@ async def deleteAssessment(assessmentId: str) -> assessment_pb2.AssessmentId:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
         
-async def getJob() -> job_pb2.JobList:
+async def getJobs(
+    industry: Optional[str] = None,
+    company: Optional[str] = None,
+    country: Optional[str] = None,
+    employment_type: Optional[str] = None,
+    min_salary: Optional[int] = None,
+    max_salary: Optional[int] = None
+) -> job_pb2.JobList:
+    """
+    Retrieves all jobs with optional filtering by industry, company, country, employment type, and salary range.
+    """
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            response = await stub.GetAllJob(job_pb2.JobData())
+            response = await stub.GetJobs(job_pb2.JobFilter(
+                industry=industry or "",
+                company=company or "",
+                country=country or "",
+                employment_type=employment_type or "",
+                min_salary=min_salary or 0,
+                max_salary=max_salary or 0
+            ))
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+
+async def getJobDetails(jobId: str) -> job_pb2.JobData:
+    """
+    Retrieves detailed job information by jobId.
+    """
+    async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
+        stub = job_pb2_grpc.JobStub(channel)
+        try:
+            response = await stub.GetJobDetails(job_pb2.JobId(jobId=jobId))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
 
 async def createJob(job: Job) -> job_pb2.JobData:
+    """
+    Creates a new job listing.
+    """
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            response = await stub.CreateJob(job_pb2.JobData(name=job.name, company=job.company))
+            response = await stub.CreateJob(job_pb2.JobData(
+                name=job.name,
+                description=job.description,
+                monthly_salary=job.monthly_salary,
+                start_date=job.start_date,
+                end_date=job.end_date,
+                available_spot_count=job.available_spot_count,
+                company_id=job.company_id,
+                employment_type_id=job.employment_type_id
+            ))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
 async def updateJob(jobId: str, job: Job) -> job_pb2.JobData:
+    """
+    Updates an existing job listing.
+    """
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            response = await stub.UpdateJob(job_pb2.JobData(jobId=jobId, name=job.name, company=job.company))
+            response = await stub.UpdateJob(job_pb2.JobData(
+                jobId=jobId,
+                name=job.name,
+                description=job.description,
+                monthly_salary=job.monthly_salary,
+                start_date=job.start_date,
+                end_date=job.end_date,
+                available_spot_count=job.available_spot_count,
+                company_id=job.company_id,
+                employment_type_id=job.employment_type_id
+            ))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
 async def deleteJob(jobId: str) -> job_pb2.JobId:
+    """
+    Deletes a job listing.
+    """
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
@@ -177,6 +234,47 @@ async def deleteJob(jobId: str) -> job_pb2.JobId:
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+
+async def applyForJob(application: Application) -> job_pb2.ApplicationData:
+    """
+    Allows a user to apply for a job.
+    """
+    async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
+        stub = job_pb2_grpc.JobStub(channel)
+        try:
+            response = await stub.ApplyForJob(job_pb2.ApplicationData(
+                applicant_id=application.applicant_id,
+                job_id=application.job_id,
+                resume_link=application.resume_link,
+                additional_info=application.additional_info
+            ))
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+
+async def getApplicationsByUser(applicant_id: str) -> job_pb2.ApplicationList:
+    """
+    Retrieves all job applications submitted by a specific user.
+    """
+    async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
+        stub = job_pb2_grpc.JobStub(channel)
+        try:
+            response = await stub.GetApplications(job_pb2.ApplicantId(applicant_id=applicant_id))
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+
+async def getApplicationDetails(application_id: str) -> job_pb2.ApplicationData:
+    """
+    Retrieves the details of a specific job application.
+    """
+    async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
+        stub = job_pb2_grpc.JobStub(channel)
+        try:
+            response = await stub.GetApplicationDetails(job_pb2.ApplicationId(application_id=application_id))
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
         
 async def getCertificate() -> certificate_pb2.CertificateList:
     async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:

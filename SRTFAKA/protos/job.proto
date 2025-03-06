@@ -3,18 +3,28 @@ syntax = "proto3";
 package Job;
 
 // The Job service definition.
-service Job {
-  rpc GetAllJob (JobData) returns (JobList) {}
-  rpc CreateJob (JobData) returns (JobData) {}
-  rpc UpdateJob (JobData) returns (JobData) {}
-  rpc DeleteJob (JobId) returns (JobId) {}
+service JobService {
+  rpc GetAllJobs (Empty) returns (JobList) {}   
+  rpc GetJobDetails (JobId) returns (JobData) {}  
+  rpc CreateJob (JobData) returns (JobData) {}    
+  rpc UpdateJob (JobData) returns (JobData) {}   
+  rpc DeleteJob (JobId) returns (JobId) {}        
+
+  // Job applications
+  rpc ApplyJob (ApplicationData) returns (ApplicationId) {}  
+  rpc GetApplications (UserId) returns (ApplicationList) {}  
 }
 
 // Message representing a single job record
 message JobData {
-  string name = 1;
-  string company = 2;
-  string jobId = 3;
+  string jobId = 1;
+  string name = 2;
+  string company = 3;
+  string description = 4;
+  int32 salary = 5;
+  string startDate = 6;
+  string endDate = 7;
+  string employmentType = 8;  // Full-time, Part-time, etc.
 }
 
 // Response message containing a list of jobs
@@ -22,6 +32,38 @@ message JobList {
   repeated JobData jobs = 1;
 }
 
-message JobId{
+// Job ID message
+message JobId {
   string jobId = 1;
+}
+
+// Empty message for requests with no parameters
+message Empty {}
+
+// =============== Job Applications ====================
+
+// Message representing a job application
+message ApplicationData {
+  string applicationId = 1;
+  string jobId = 2;
+  string jobName = 3;
+  string company = 4;
+  string appliedOn = 5;
+  string resumeLink = 6;
+  string additionalInfo = 7;
+}
+
+// Response message containing a list of applications
+message ApplicationList {
+  repeated ApplicationData applications = 1;
+}
+
+// Application ID message
+message ApplicationId {
+  string applicationId = 1;
+}
+
+// User ID message for retrieving applications
+message UserId {
+  string userId = 1;
 }
