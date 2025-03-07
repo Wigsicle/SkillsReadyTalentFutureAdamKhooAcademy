@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, De
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base, Industry, Country
-from accountService.db import User
 
+indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 
 class EmploymentType(Base):
@@ -25,11 +25,11 @@ class Company(Base):
     address: Mapped[str] = mapped_column(String(255), nullable=False)
 
     #FK
-    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey('industry.id'))
+    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey(indFKey))
     country_id: Mapped[int] = mapped_column(Integer, ForeignKey('country.id'))
 
     listed_jobs: Mapped[list['JobListing']] = relationship("JobListing", foreign_keys='job_listing.company_id', back_populates="company")
-    industry: Mapped[Industry] = relationship(foreign_keys='industry.id')
+    industry: Mapped[Industry] = relationship(foreign_keys=indFKey)
     country: Mapped[Country] = relationship("Country", foreign_keys='country.id')
 
 class JobListing(Base):
@@ -83,24 +83,26 @@ class JobListing(Base):
 
 class Application(Base):
     '''
-    Stores details of user job application. Retrieve by applicant_id field (user_id)
+    Stores details of user job application. 
     '''
     __tablename__ = "application"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    applicant_id: Mapped[int] = mapped_column(Integer, nullable=False) # MUST ensure write consistency with User DB, let APIGate handle
     applied_on: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now())  # if empty automatically assign right now
     edited_on: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     resume_link: Mapped[str] = mapped_column(String(255), nullable=False)
     additional_info: Mapped[str] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(255), nullable=False, default="Submitted") # Submitted/Under-Review/Accepted
 
     # FK dependency
+    applicant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     listing_id: Mapped[int] = mapped_column(Integer, ForeignKey('job_listing.id'), nullable=False)
-    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey('industry.id'))
+    industry_id: Mapped[int] = mapped_column(Integer, ForeignKey(indFKey))
 
+    #applicant: Mapped[User] = relationship(back_populates='applications')
     listing: Mapped[JobListing] = relationship('JobListing', back_populates='applications')
-    industry: Mapped[Industry] = relationship('Industry', foreign_keys='industry.id')
-    applicant: Mapped[User] = relationship('User', back_populates='applications')
+    industry: Mapped[Industry] = relationship('Industry', foreign_keys=indFKey)
+    
 
 
 currentPath = os.path.dirname(os.path.abspath(__file__))

@@ -38,6 +38,8 @@ In case you have issues with your migration, force one by changing the head
 ```
 alembic stamp head
 ```
+### Importing dummy data into DB
+
 
 ## Execution
 ### Powershell Script (Option 1)

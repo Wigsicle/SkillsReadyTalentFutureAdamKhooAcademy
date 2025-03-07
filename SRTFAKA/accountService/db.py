@@ -5,7 +5,9 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base, Country
-#from services.jobService.db import Application
+from services.jobService.db import Application
+from certificateService.db import UserCertificate
+from courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +33,11 @@ class User(Base):
     #RS
     country: Mapped[Country] = relationship("Country")
     user_type: Mapped[UserType] = relationship("UserType")
-    #applications: Mapped[list['Application']] = relationship("Application", back_populates='applicant')
+    
+    # RS objects connected from other classes
+    applications: Mapped[list['Application']] = relationship()  #jobService
+    certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
+    courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
 
 
 class AccountDB:
