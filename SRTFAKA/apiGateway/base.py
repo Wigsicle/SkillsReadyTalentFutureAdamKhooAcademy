@@ -1,11 +1,15 @@
 import os
-from sqlalchemy.orm import mapped_column, Mapped
-from sqlalchemy import Integer, String
+from typing import Any
+from sqlalchemy.orm import mapped_column, Mapped, DeclarativeBase
+from sqlalchemy.types import Integer, String, JSON
 from sqlalchemy.ext.declarative import declarative_base
 # this file holds any models that are accessed by multiple services 
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    type_annotation_map = {dict[str, Any]: JSON}
+    
 metadata = Base.metadata
 
 class Industry(Base):

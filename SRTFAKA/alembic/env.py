@@ -8,7 +8,10 @@ from alembic import context
 # metadata of models will be stored in DeclarativeBase
 from apiGateway.base import Base, Country, Industry
 from services.jobService.db import Application, JobListing, Company, EmploymentType
+from certificateService.db import Certificate, UserCertificate
 from accountService.db import User, UserType
+from courseService.db import Course, CourseProgress
+from services.assessmentService.db import Assessment, AssessmentAttempt
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

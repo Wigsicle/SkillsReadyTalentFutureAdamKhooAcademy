@@ -1,6 +1,47 @@
 import sqlite3
 from datetime import datetime
 import os
+from typing import Optional, Any
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
+from sqlalchemy.ext.hybrid import hybrid_property
+from apiGateway.base import Base
+
+
+class Assessment(Base):
+    __tablename__ = 'assessment'
+    id:Mapped[int] = mapped_column(primary_key=True)
+    name:Mapped[str] = mapped_column(String(255), nullable=False)
+    total_marks: Mapped[float] = mapped_column(nullable=False, default=0.0)
+    question_paper: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True)
+    
+    course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False) # Many assessments - 1 course, M:1
+    
+    # list of attempts that markers can mark
+     
+
+
+class AssessmentAttempt(Base):
+    __tablename__ = 'assessment_attempt'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    earned_marks: Mapped[Optional[float]] = mapped_column()    # marks given to an attempt of the assessment
+    attempted_on: Mapped[datetime] = mapped_column(default=datetime.now())
+    remarks: Mapped[Optional[str]] = mapped_column(String(255))
+    
+    @hybrid_property
+    def score_str(self) -> str:
+        result = ""
+        if self.earned_marks is not None:
+            result = f"{self.earned_marks}/{self.assessment.total_marks}"
+            
+        return result
+    
+    #FK
+    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
+    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
+    
+    assessment: Mapped[Assessment] = relationship
+    
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class AssessmentDB:
