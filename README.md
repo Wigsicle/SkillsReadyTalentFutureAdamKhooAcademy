@@ -17,6 +17,28 @@ cd ..
 .\myenv\Scripts\activate
 pip install -r requirements.txt
 ```
+
+## Setup Database
+### Start up DB Instance
+Using the docker-compose.yml file, start the db service.
+### Migrating DB Schema
+1. Change directory into the backend folder
+```
+cd SRTFAKA
+```
+2. Generate a migration from the Alembic env file
+```
+alembic revision --autogenerate -m "yourCommitMessage"
+```
+3. Update the migration into your database
+```
+alembic upgrade head
+```
+In case you have issues with your migration, force one by changing the head 
+```
+alembic stamp head
+```
+
 ## Execution
 ### Powershell Script (Option 1)
 1. Open a powershell terminal outside the root folder (Outside SRTFAKA)
