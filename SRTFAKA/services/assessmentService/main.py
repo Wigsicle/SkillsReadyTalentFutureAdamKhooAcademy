@@ -15,9 +15,9 @@
 import asyncio
 import logging
 import grpc
-from ..generated import assessment_pb2
-from ..generated import assessment_pb2_grpc
-from ..common.utils import generateRandomId
+from ...generated import assessment_pb2
+from ...generated import assessment_pb2_grpc
+from ...common.utils import generateRandomId
 from .db import AssessmentDB
 
 assessmentDB = AssessmentDB()
@@ -36,7 +36,6 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
         assessments = [assessment_pb2.AssessmentData(assessmentId=row["assessmentId"], name=row["name"],
                                            courseId=row["courseId"]) for row in rows]
         return assessment_pb2.AssessmentList(assessments=assessments)
-
 
     async def CreateAssessment(
                 self,

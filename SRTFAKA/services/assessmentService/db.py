@@ -1,12 +1,17 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
-from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
+from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON, text
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base
+from sqlalchemy.orm import sessionmaker
+from ...apiGateway.base import Base
 
+# PostgreSQL database connection
+db_url = os.getenv('DATABASE_URL', 'postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db')
+engine = create_engine(db_url)
+Session = sessionmaker(bind=engine)
 
 class Assessment(Base):
     __tablename__ = 'assessment'
@@ -18,8 +23,6 @@ class Assessment(Base):
     course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False) # Many assessments - 1 course, M:1
     
     # list of attempts that markers can mark
-     
-
 
 class AssessmentAttempt(Base):
     __tablename__ = 'assessment_attempt'
@@ -43,126 +46,64 @@ class AssessmentAttempt(Base):
     assessment: Mapped[Assessment] = relationship
     
 
-currentPath = os.path.dirname(os.path.abspath(__file__))
 class AssessmentDB:
     def __init__(self):
-        # SQLite database file
-        db_path = currentPath + '/assessments.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
+        self.session = Session()  # Create a new session
 
-        # SQL to create assessments table
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS assessments (
-            assessmentId TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL,
-            courseId TEXT NOT NULL
+        # Create assessments table if it doesn't exist
+        self.session.execute(text('''
+        CREATE TABLE IF NOT EXISTS assessment (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            total_marks FLOAT NOT NULL DEFAULT 0.0,
+            question_paper JSON,
+            course_id INTEGER NOT NULL REFERENCES course(id)
         )
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'assessments' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
-    
+        '''))
+        self.session.commit()
+        print("Table 'assessment' created successfully.")
+
     def createAssessment(self, assessmentObj):
         """Insert a new assessment into the database."""
-        sql = '''INSERT INTO assessments (assessmentId, name, courseId) 
-                 VALUES (?, ?, ?)'''
-        try:
-            self.cursor.execute(sql, assessmentObj)
-            self.conn.commit()
-            return assessmentObj[0]  # Return created assessment ID
-        except sqlite3.Error as e:
-            print(f"Database error during createAssessment: {e}")
-            self.conn.rollback()
-            return False
+        new_assessment = Assessment(name=assessmentObj['name'], total_marks=assessmentObj['total_marks'], course_id=assessmentObj['course_id'])
+        self.session.add(new_assessment)
+        self.session.commit()
+        return new_assessment.id  # Return created assessment ID
 
     def updateAssessment(self, assessmentObj):
-        """Update the amount of an existing assessment by assessmentId."""
-        sql = '''UPDATE assessments
-                 SET name = ?, courseId=?
-                 WHERE assessmentId = ?'''
-        try:
-            self.cursor.execute(sql, (assessmentObj['name'], assessmentObj['courseId'], assessmentObj['assessmentId']))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during updateAssessment: {e}")
-            self.conn.rollback()
-            return False
+        """Update an existing assessment by assessmentId."""
+        assessment = self.session.query(Assessment).filter_by(id=assessmentObj['id']).first()
+        if assessment:
+            assessment.name = assessmentObj['name']
+            assessment.total_marks = assessmentObj['total_marks']
+            assessment.course_id = assessmentObj['course_id']
+            self.session.commit()
+            return 1  # Number of rows affected
+        return 0
 
-    def getAllAssessment(self):
-        try:
-            sql = '''SELECT * FROM assessments'''
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
-            if not rows:
-                return None
+    def getAllAssessment(self) -> List[Assessment]:
+        assessments = self.session.query(Assessment).all()
+        return [dict(id=a.id, name=a.name, total_marks=a.total_marks, course_id=a.course_id) for a in assessments]
 
-            # Convert rows to a list of dictionaries with ISO 8601 timestamp strings
-            assessments = []
-            for row in rows:
-                row_dict = dict(row)
-                assessments.append(row_dict)
-            # sorted_rows = sorted(rows, key=lambda row: datetime.strptime(row['transactionDate'], "%d/%m/%Y"))
-            return assessments
-        except sqlite3.Error as e:
-            print(f"Database error during getAssessment: {e}")
-            return False
-        
+
     def getAssessment(self, name=None, courseid=None):
-        try:
-            # Start SQL query and parameters list
-            sql = "SELECT * FROM assessments WHERE 1=1"
-            params = []
-
-            # Dynamic conditions based on provided filters
-            if name:
-                sql += " AND name = ?"
-                params.append(name)
-            
-            if courseid:
-                sql += " AND courseId = ?"
-                params.append(courseid)
-        
-            
-            # Execute the query
-            self.cursor.execute(sql, tuple(params))
-            rows = self.cursor.fetchall()
-
-            # If no rows found, return None
-            if not rows:
-                return None
-
-            # Convert rows to a list of dictionaries
-            assessments = []
-            for row in rows:
-                row_dict = dict(row)
-                assessments.append(row_dict)
-
-            return assessments
-        
-        except sqlite3.Error as e:
-            print(f"Database error during getAssessment: {e}")
-            return False
+        query = self.session.query(Assessment)
+        if name:
+            query = query.filter(Assessment.name == name)
+        if courseid:
+            query = query.filter(Assessment.course_id == courseid)
+        assessments = query.all()
+        return [dict(id=a.id, name=a.name, total_marks=a.total_marks, course_id=a.course_id) for a in assessments]
 
     def deleteAssessment(self, assessmentId):
         """Delete an assessment by assessmentId."""
-        sql = '''DELETE FROM assessments WHERE assessmentId = ?'''
-        try:
-            self.cursor.execute(sql, (assessmentId,))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during deleteAssessment: {e}")
-            self.conn.rollback()
-            return False
+        assessment = self.session.query(Assessment).filter_by(id=assessmentId).first()
+        if assessment:
+            self.session.delete(assessment)
+            self.session.commit()
+            return 1  # Number of rows affected
+        return 0
 
     def close(self):
         """Close the database connection."""
-        self.cursor.close()
-        self.conn.close()
+        self.session.close()
