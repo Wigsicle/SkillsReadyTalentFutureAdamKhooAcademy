@@ -26,7 +26,8 @@ Using the docker-compose.yml file, start the db service.
 ```
 cd SRTFAKA
 ```
-2. Generate a migration from the Alembic env file
+2. IF THERE ARE NO MIGRATION FILES IN THE alembic/versions FOLDER. Generate a migration from the Alembic env file
+SKIP THIS IF HAVE 
 ```
 alembic revision --autogenerate -m "yourCommitMessage"
 ```
