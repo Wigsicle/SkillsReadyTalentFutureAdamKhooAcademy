@@ -1,6 +1,52 @@
 import sqlite3
 from datetime import datetime
 import os
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
+from apiGateway.base import Base, Industry
+from services.assessmentService.db import Assessment
+from certificateService.db import Certificate
+
+class Course(Base):
+    __tablename__ = 'course'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    details: Mapped[str] = mapped_column(String(255))
+    
+    # FK
+    industry_id: Mapped[int] = mapped_column(ForeignKey('industry.id'))
+    cert_id: Mapped[int] = mapped_column(nullable=False)    # 1 to 1 RS 
+    
+    students_enrolled: Mapped[list['CourseProgress']] = relationship(back_populates='course_info')
+    assessments: Mapped[list['Assessment']] = relationship()
+    certificate: Mapped['Certificate'] = relationship()
+    industry: Mapped['Industry'] = relationship()
+    
+class CourseProgress(Base):
+    """Tracks the progress of the student enrolled in the course.
+
+    Args:
+        Base (_type_): _description_
+        
+    Parameters:
+        course_info (Course): _Information about the course stored in the Course class obj_
+    """
+    __tablename__ = 'course_progress'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cleared: Mapped[bool] = mapped_column(nullable=False,default=False) # flip to true once they click through the screen, allows student eligibility to try assessment
+    
+    # FK
+    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+    course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False)
+    
+    course_info: Mapped['Course'] = relationship(back_populates='students_enrolled')
+    
+    
+    
+    
+    
+
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class CourseDB:

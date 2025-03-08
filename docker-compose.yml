@@ -1,16 +1,15 @@
 services:
-  database:
-    image: postgres
+  job_database:
+    image: citusdata/citus
     restart: always
-    container_name: academy_db
+    container_name: SRTFAKA_database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: platform_db
+      POSTGRES_DATABASE: academy_db
     volumes:
-      - db:/data/postgres
+      - acad_db:/data/postgres/jobs
     ports:
-      - 5432:5432
-
+      - 5433:5432
 volumes:
-  db:
+  acad_db:

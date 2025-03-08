@@ -1,7 +1,44 @@
 import sqlite3
 from datetime import datetime
 import os
+from typing import Optional, Any
+from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON
+from sqlalchemy.ext.hybrid import hybrid_property
+from apiGateway.base import Base
 
+class Certificate(Base):
+    """
+    _Holds the details of the generic certificate, not the specific one awarded to the user._
+    Args:
+        Base (_sqlalchemy.declarativebase_): _Link to the Base model class for declaring ORM models_
+    Parameters:
+        id (_int_): Unique ID of the Certificate Base
+    """
+    __tablename__ = 'certificate'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    validity_period: Mapped[datetime.time] = mapped_column(Time)
+    description: Mapped[Optional[str]] = mapped_column(nullable=True)
+    additional_info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True) # maps to a dictionary
+    
+    #FK
+    course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id')) # 1:1 
+    
+class UserCertificate(Base):
+    __tablename__ = 'user_cert'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    issued_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    expires_on: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    additional_info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True)
+    
+    #FK
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)    # Use this to access user obj
+    cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
+
+    cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
+    
+    
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class CertificateDB:
     def __init__(self):
