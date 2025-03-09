@@ -2,9 +2,16 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:8000/accounts";  // FastAPI API Gateway
 
+mockedUser = {
+    name: "testUser", 
+    username: "test", 
+    password: "test",
+    role: "student",
+    accountStatus: true,
+}
 // Fetch the logged-in user's account
 export const getAccount = async () => {
-    return { name: "John Doe", username: "johndoe", accountStatus: true };  // Mock user data
+    return mockedUser;  // Mock user data
 };
 
 export const createAccount = async (userData) => {
