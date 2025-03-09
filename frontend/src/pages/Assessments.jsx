@@ -1,43 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import "../styles.css"; // Import global styles
+import axios from 'axios'; // Import axios for making HTTP requests
 
 function Assessments() {
-    // Dummy assessment data
-    const assessments = [
-        {
-            id: 1,
-            title: "Data Science Fundamentals | Certification Exam",
-            description: "Test your knowledge on Python, Machine Learning, and Data Visualization. Includes 100+ questions with detailed explanations.",
-            instructor: "Prof. John Doe",
-            rating: 4.8,
-            reviews: 5234,
-            questions: 100,
-            level: "Intermediate",
-            image: "https://via.placeholder.com/300x200", // Placeholder image
-        },
-        {
-            id: 2,
-            title: "Cybersecurity & Ethical Hacking | Practice Test",
-            description: "Assess your skills in penetration testing, network security, and cryptography. Includes real-world scenarios.",
-            instructor: "Dr. Alice Smith",
-            rating: 4.6,
-            reviews: 4120,
-            questions: 150,
-            level: "Advanced",
-            image: "https://via.placeholder.com/300x200",
-        },
-        {
-            id: 3,
-            title: "Cloud Computing & AWS Certification Exam",
-            description: "Test your understanding of AWS, Azure, and GCP cloud services. Ideal for those preparing for AWS Certified Solutions Architect.",
-            instructor: "Eng. Mark Thompson",
-            rating: 4.9,
-            reviews: 2890,
-            questions: 120,
-            level: "Beginner",
-            image: "https://via.placeholder.com/300x200",
-        },
-    ];
+    const [assessments, setAssessments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchAssessments = async () => {
+            try {
+                const response = await axios.get('/assessment'); // Call the FastAPI endpoint to get assessments
+                console.log(response.data); // Log the entire response
+                // Check if response.data.data is an array
+                if (Array.isArray(response.data.data)) {
+                    setAssessments(response.data.data); // Adjust based on the response structure
+                } else {
+                    setError("Unexpected response structure");
+                }
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAssessments();
+    }, []);
+
+    if (loading) return <div>Loading assessments...</div>;
+    if (error) return <div>Error: {error}</div>;
 
     return (
         <div className="assessments-container">
@@ -46,22 +39,19 @@ function Assessments() {
 
             {/* Assessment List */}
             <div className="assessment-list">
-                {assessments.map((assessment) => (
-                    <div className="assessment-card" key={assessment.id}>
-                        <img src={assessment.image} alt={assessment.title} className="assessment-image" />
-                        <div className="assessment-details">
-                            <h3 className="assessment-title">{assessment.title}</h3>
-                            <p className="assessment-description">{assessment.description}</p>
-                            <p className="assessment-instructor">{assessment.instructor}</p>
-                            <div className="assessment-rating">
-                                ⭐ {assessment.rating} ({assessment.reviews} reviews)
+                {assessments.length > 0 ? (
+                    assessments.map((assessment) => (
+                        <Link to={`/assessments/${assessment.id}`} className="assessment-card" key={assessment.id}>
+                            <img src="https://via.placeholder.com/300x200" alt={assessment.name} className="assessment-image" />
+                            <div className="assessment-details">
+                                <h3 className="assessment-title">{assessment.name}</h3>
+                                <p className="assessment-course">Suitable for course: {assessment.course_id}</p>
                             </div>
-                            <div className="assessment-meta">
-                                {assessment.questions} questions • {assessment.level}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                        </Link>
+                    ))
+                ) : (
+                    <div>No assessments available.</div>
+                )}
             </div>
 
             {/* Back to Home Button */}

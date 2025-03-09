@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSO
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import sessionmaker
 from ...apiGateway.base import Base
+import json  # Add this import at the top of your file
 
 # PostgreSQL database connection
 db_url = os.getenv('DATABASE_URL', 'postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db')
@@ -107,3 +108,21 @@ class AssessmentDB:
     def close(self):
         """Close the database connection."""
         self.session.close()
+
+    def load_questions(self, file_path='data/questions.json'):
+        """Load assessment questions from a JSON file."""
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+                return data['assessments']  # Return the list of assessments
+        except Exception as e:
+            print(f"Error loading questions: {e}")
+            return []
+
+    def get_assessment_questions(self, assessment_id):
+        """Retrieve questions for a specific assessment."""
+        assessments = self.load_questions()
+        for assessment in assessments:
+            if assessment['id'] == assessment_id:
+                return assessment['questions']
+        return None  # Return None if no assessment found

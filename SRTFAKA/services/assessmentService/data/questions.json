@@ -1,0 +1,112 @@
+{
+    "assessments": [
+        {
+            "id": 1,
+            "name": "Web Development Fundamentals",
+            "questions": [
+                {
+                    "id": "q1",
+                    "question": "What does HTML stand for?",
+                    "options": ["Hyper Text Markup Language", "High Text Markup Language", "Hyper Tabular Markup Language", "None of these"],
+                    "answer": "Hyper Text Markup Language"
+                },
+                {
+                    "id": "q2",
+                    "question": "Which of the following is a JavaScript framework?",
+                    "options": ["Django", "Flask", "React", "Ruby on Rails"],
+                    "answer": "React"
+                },
+                {
+                    "id": "q3",
+                    "question": "What is the purpose of CSS?",
+                    "options": ["To style web pages", "To structure web pages", "To add interactivity", "To manage databases"],
+                    "answer": "To style web pages"
+                },
+                {
+                    "id": "q4",
+                    "question": "Which HTML element is used to define the title of a document?",
+                    "options": ["<title>", "<head>", "<meta>", "<link>"],
+                    "answer": "<title>"
+                },
+                {
+                    "id": "q5",
+                    "question": "What does API stand for?",
+                    "options": ["Application Programming Interface", "Application Programming Integration", "Application Programming Interaction", "None of these"],
+                    "answer": "Application Programming Interface"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Database Management Systems",
+            "questions": [
+                {
+                    "id": "q1",
+                    "question": "What is SQL used for?",
+                    "options": ["Data manipulation", "Data definition", "Data control", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "id": "q2",
+                    "question": "Which of the following is a NoSQL database?",
+                    "options": ["MySQL", "PostgreSQL", "MongoDB", "SQLite"],
+                    "answer": "MongoDB"
+                },
+                {
+                    "id": "q3",
+                    "question": "What does ACID stand for in database systems?",
+                    "options": ["Atomicity, Consistency, Isolation, Durability", "Atomicity, Consistency, Integrity, Durability", "Atomicity, Consistency, Isolation, Data", "None of these"],
+                    "answer": "Atomicity, Consistency, Isolation, Durability"
+                },
+                {
+                    "id": "q4",
+                    "question": "Which command is used to retrieve data from a database?",
+                    "options": ["SELECT", "GET", "FETCH", "RETRIEVE"],
+                    "answer": "SELECT"
+                },
+                {
+                    "id": "q5",
+                    "question": "What is a primary key?",
+                    "options": ["A unique identifier for a record", "A key used to encrypt data", "A key used to join tables", "None of these"],
+                    "answer": "A unique identifier for a record"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Cloud Computing Basics",
+            "questions": [
+                {
+                    "id": "q1",
+                    "question": "What is cloud computing?",
+                    "options": ["Storing and accessing data over the internet", "Storing data on local servers", "Using physical servers for data storage", "None of these"],
+                    "answer": "Storing and accessing data over the internet"
+                },
+                {
+                    "id": "q2",
+                    "question": "Which of the following is a cloud service model?",
+                    "options": ["IaaS", "PaaS", "SaaS", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "id": "q3",
+                    "question": "What does IaaS stand for?",
+                    "options": ["Infrastructure as a Service", "Information as a Service", "Integration as a Service", "None of these"],
+                    "answer": "Infrastructure as a Service"
+                },
+                {
+                    "id": "q4",
+                    "question": "Which of the following is a benefit of cloud computing?",
+                    "options": ["Scalability", "Cost efficiency", "Accessibility", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "id": "q5",
+                    "question": "What is a public cloud?",
+                    "options": ["A cloud service available to the general public", "A cloud service used by a single organization", "A cloud service that is free", "None of these"],
+                    "answer": "A cloud service available to the general public"
+                }
+            ]
+        }
+    ]
+}
