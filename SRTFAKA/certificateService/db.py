@@ -2,10 +2,23 @@ import sqlite3
 from datetime import datetime
 import os
 from typing import Optional, Any
-from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
-from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON
+from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base
+
+# Database Connection
+DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db"
+engine = create_engine(DATABASE_URL, echo=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def get_db():
+    """Dependency to get a database session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 class Certificate(Base):
     """
@@ -37,128 +50,55 @@ class UserCertificate(Base):
     cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
 
     cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
-    
-    
-currentPath = os.path.dirname(os.path.abspath(__file__))
-class CertificateDB:
-    def __init__(self):
-        # SQLite database file
-        db_path = currentPath + '/certificates.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
 
-        # SQL to create certificates table
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS certificates (
-            certificateId TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL,
-            courseId TEXT NOT NULL
-        )
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'certificates' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
-    
-    def createCertificate(self, certificateObj):
-        """Insert a new certificate into the database."""
-        sql = '''INSERT INTO certificates (certificateId, name, courseId) 
-                 VALUES (?, ?, ?)'''
-        try:
-            self.cursor.execute(sql, certificateObj)
-            self.conn.commit()
-            return certificateObj[0]  # Return created certificate ID
-        except sqlite3.Error as e:
-            print(f"Database error during createCertificate: {e}")
-            self.conn.rollback()
-            return False
+# =====================================
+#  **Helper Functions for Queries**
+# =====================================
 
-    def updateCertificate(self, certificateObj):
-        """Update the amount of an existing certificate by certificateId."""
-        sql = '''UPDATE certificates
-                 SET name = ?, courseId=?
-                 WHERE certificateId = ?'''
-        try:
-            self.cursor.execute(sql, (certificateObj['name'], certificateObj['courseId'], certificateObj['certificateId']))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during updateCertificate: {e}")
-            self.conn.rollback()
-            return False
+def create_certificate(db: Session, name: str, course_id: int, blockchain_tx_id: str = None, certificate_hash: str = None):
+    """Create and store a new certificate in the database."""
+    new_cert = Certificate(
+        name=name,
+        course_id=course_id,
+        blockchain_tx_id=blockchain_tx_id,
+        certificate_hash=certificate_hash
+    )
+    db.add(new_cert)
+    db.commit()
+    db.refresh(new_cert)
+    return new_cert
 
-    def getAllCertificate(self):
-        try:
-            sql = '''SELECT * FROM certificates'''
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
-            if not rows:
-                return None
+def get_all_certificates(db: Session):
+    """Fetch all certificates from the database."""
+    return db.query(Certificate).all()
 
-            # Convert rows to a list of dictionaries with ISO 8601 timestamp strings
-            certificates = []
-            for row in rows:
-                row_dict = dict(row)
-                certificates.append(row_dict)
-            # sorted_rows = sorted(rows, key=lambda row: datetime.strptime(row['transactionDate'], "%d/%m/%Y"))
-            return certificates
-        except sqlite3.Error as e:
-            print(f"Database error during getCertificate: {e}")
-            return False
-        
-    def getCertificate(self, name=None, courseId=None):
-        try:
-            # Start SQL query and parameters list
-            sql = "SELECT * FROM certificates WHERE 1=1"
-            params = []
+def get_certificate_by_id(db: Session, certificate_id: int):
+    """Fetch a specific certificate by its ID."""
+    return db.query(Certificate).filter(Certificate.id == certificate_id).first()
 
-            # Dynamic conditions based on provided filters
-            if name:
-                sql += " AND name = ?"
-                params.append(name)
-            
-            if courseId:
-                sql += " AND courseId = ?"
-                params.append(courseId)
-        
-            
-            # Execute the query
-            self.cursor.execute(sql, tuple(params))
-            rows = self.cursor.fetchall()
+def update_certificate(db: Session, certificate_id: int, name: str = None, course_id: int = None):
+    """Update an existing certificate in the database."""
+    certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
+    if not certificate:
+        return None
 
-            # If no rows found, return None
-            if not rows:
-                return None
+    if name:
+        certificate.name = name
+    if course_id:
+        certificate.course_id = course_id
 
-            # Convert rows to a list of dictionaries
-            certificates = []
-            for row in rows:
-                row_dict = dict(row)
-                certificates.append(row_dict)
+    db.commit()
+    return certificate
 
-            return certificates
-        
-        except sqlite3.Error as e:
-            print(f"Database error during getCertificate: {e}")
-            return False
+def delete_certificate(db: Session, certificate_id: int):
+    """Delete a certificate from the database."""
+    certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
+    if certificate:
+        db.delete(certificate)
+        db.commit()
+        return True
+    return False
 
-    def deleteCertificate(self, certificateId):
-        """Delete an certificate by certificateId."""
-        sql = '''DELETE FROM certificates WHERE certificateId = ?'''
-        try:
-            self.cursor.execute(sql, (certificateId,))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during deleteCertificate: {e}")
-            self.conn.rollback()
-            return False
-
-    def close(self):
-        """Close the database connection."""
-        self.cursor.close()
-        self.conn.close()
+def get_user_certificates(db: Session, user_id: int):
+    """Fetch all certificates belonging to a specific user."""
+    return db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
