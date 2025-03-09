@@ -6,10 +6,12 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session, Mapped
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base, Industry, Country
+from SRTFAKA.apiGateway.base import Base, Industry, Country
+from sqlalchemy.exc import SQLAlchemyError
 
 indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class EmploymentType(Base):
     """Full-Time/Part-Time/Intern"""
@@ -59,7 +61,7 @@ class JobListing(Base):
 
     # Object Relations with Company and Applications
     company: Mapped[Company] = relationship('Company', back_populates='listed_jobs')
-    employment: Mapped[EmploymentType] = relationship('Relationship', foreign_keys='employment_type.id')
+    employment: Mapped[EmploymentType] = relationship('EmploymentType', foreign_keys='employment_type.id')
     applications: Mapped[list['Application']] = relationship('Application', back_populates='listing')
 
     @hybrid_property
@@ -111,7 +113,6 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 class JobDB:
     def __init__(self):
         """Initialize the database session."""
-        self.engine = engine
         self.session = SessionLocal()
     
     def create_job(self, job_data: dict) -> Optional[int]:
@@ -126,10 +127,11 @@ class JobDB:
                 available_spot_count=job_data["available_spot_count"],
                 company_id=job_data["company_id"],
                 employment_type_id=job_data["employment_type_id"],
+                pay=job_data["pay"]
             )
             self.session.add(new_job)
             self.session.commit()
-            return new_job.listing_id
+            return new_job.id
         except SQLAlchemyError as e:
             self.session.rollback()
             print(f"Database error during create_job: {e}")
@@ -163,23 +165,23 @@ class JobDB:
     ) -> List[JobListing]:
         """Retrieve jobs filtered by country, company, industry, employment type, and salary range."""
         try:
-            query = self.session.query(JobListing).join(Company).join(EmploymentType).join(Industry).join(Country)
+            query = self.session.query(JobListing).join(Company).join(EmploymentType)
 
             if country:
-                query = query.filter(Country.name == country)
+                query = query.filter(Company.country.has(name=country))
             if company_name:
                 query = query.filter(Company.name == company_name)
             if industry_name:
-                query = query.filter(Industry.name == industry_name)
+                query = query.filter(Company.industry.has(name=industry_name))
             if employment_type:
                 query = query.filter(EmploymentType.value == employment_type)
             if min_salary:
-                query = query.filter(JobListing.monthly_salary >= min_salary)
+                query = query.filter(JobListing.pay >= min_salary)
             if max_salary:
-                query = query.filter(JobListing.monthly_salary <= max_salary)
+                query = query.filter(JobListing.pay <= max_salary)
 
-            # Only return jobs that are still available (status == True)
-            query = query.filter(JobListing.status == True)
+            # Only return jobs that are still available
+            query = query.filter(JobListing.available_status == True)
 
             return query.order_by(JobListing.start_date.desc()).all()
         
@@ -206,34 +208,29 @@ class JobDB:
             job = (
                 self.session.query(JobListing)
                 .join(Company)
-                .join(Industry)
-                .join(Country)
                 .join(EmploymentType)
-                .filter(JobListing.listing_id == job_id)
+                .filter(JobListing.id == job_id)
                 .first()
             )
-
             return job
-
         except SQLAlchemyError as e:
             print(f"Database error during get_job_details: {e}")
             return None
 
-
-    def delete_job(self, job_id: int) -> bool:
-        """Delete a job by jobId."""
-        try:
-            job = self.session.get(JobListing, job_id)
-            if not job:
-                return False
+    # def delete_job(self, job_id: int) -> bool:
+    #     """Delete a job by jobId."""
+    #     try:
+    #         job = self.session.get(JobListing, job_id)
+    #         if not job:
+    #             return False
             
-            self.session.delete(job)
-            self.session.commit()
-            return True
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            print(f"Database error during delete_job: {e}")
-            return False
+    #         self.session.delete(job)
+    #         self.session.commit()
+    #         return True
+    #     except SQLAlchemyError as e:
+    #         self.session.rollback()
+    #         print(f"Database error during delete_job: {e}")
+    #         return False
         
     def apply_job(
         self,
@@ -247,13 +244,9 @@ class JobDB:
         Prevents duplicate applications.
         """
         try:
-            # Check if the job exists and is still available
             job = self.session.get(JobListing, job_id)
-            if not job:
-                print(f"Error: Job ID {job_id} does not exist.")
-                return None
-            if not job.status:
-                print(f"Error: Job ID {job_id} is no longer available.")
+            if not job or not job.available_status:
+                print(f"Error: Job ID {job_id} is not available.")
                 return None
 
             # Prevent duplicate applications
@@ -266,26 +259,27 @@ class JobDB:
                 print("Error: User has already applied for this job.")
                 return None
 
+            # Retrieve industry ID from the job's company
+            industry_id = job.company.industry_id
+
             # Create a new application
             new_application = Application(
                 applicant_id=applicant_id,
                 listing_id=job_id,
+                industry_id=industry_id,
                 resume_link=resume_link,
                 additional_info=additional_info,
-                applied_on=datetime.now()
+                applied_on=func.now()
             )
 
-            # Add to session and commit
             self.session.add(new_application)
             self.session.commit()
-            
             return new_application.id  # Return the application ID
 
         except SQLAlchemyError as e:
             self.session.rollback()
             print(f"Database error during apply_for_job: {e}")
             return None
-
             
     def get_applications(self, applicant_id: int) -> List[Application]:
         """
@@ -298,13 +292,11 @@ class JobDB:
             applications = (
                 self.session.query(Application)
                 .join(JobListing)
-                .join(Company)
                 .filter(Application.applicant_id == applicant_id)
                 .all()
             )
 
             return applications
-
         except SQLAlchemyError as e:
             print(f"Database error during get_applications_by_user: {e}")
             return []
@@ -320,14 +312,10 @@ class JobDB:
             application = (
                 self.session.query(Application)
                 .join(JobListing)
-                .join(Company)
-                .join(Industry)
                 .filter(Application.id == application_id)
                 .first()
             )
-
             return application
-
         except SQLAlchemyError as e:
             print(f"Database error during get_application_details: {e}")
             return None

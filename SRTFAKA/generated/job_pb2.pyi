@@ -6,7 +6,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class JobData(_message.Message):
-    __slots__ = ("jobId", "name", "company", "description", "salary", "startDate", "endDate", "employmentType")
+    __slots__ = ("jobId", "name", "company", "description", "salary", "startDate", "endDate", "employmentType", "availableSpotCount", "industryId", "pay")
     JOBID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     COMPANY_FIELD_NUMBER: _ClassVar[int]
@@ -15,6 +15,9 @@ class JobData(_message.Message):
     STARTDATE_FIELD_NUMBER: _ClassVar[int]
     ENDDATE_FIELD_NUMBER: _ClassVar[int]
     EMPLOYMENTTYPE_FIELD_NUMBER: _ClassVar[int]
+    AVAILABLESPOTCOUNT_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
+    PAY_FIELD_NUMBER: _ClassVar[int]
     jobId: str
     name: str
     company: str
@@ -23,7 +26,10 @@ class JobData(_message.Message):
     startDate: str
     endDate: str
     employmentType: str
-    def __init__(self, jobId: _Optional[str] = ..., name: _Optional[str] = ..., company: _Optional[str] = ..., description: _Optional[str] = ..., salary: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., employmentType: _Optional[str] = ...) -> None: ...
+    availableSpotCount: int
+    industryId: str
+    pay: int
+    def __init__(self, jobId: _Optional[str] = ..., name: _Optional[str] = ..., company: _Optional[str] = ..., description: _Optional[str] = ..., salary: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., employmentType: _Optional[str] = ..., availableSpotCount: _Optional[int] = ..., industryId: _Optional[str] = ..., pay: _Optional[int] = ...) -> None: ...
 
 class JobList(_message.Message):
     __slots__ = ("jobs",)
@@ -42,7 +48,7 @@ class Empty(_message.Message):
     def __init__(self) -> None: ...
 
 class ApplicationData(_message.Message):
-    __slots__ = ("applicationId", "jobId", "jobName", "company", "appliedOn", "resumeLink", "additionalInfo")
+    __slots__ = ("applicationId", "jobId", "jobName", "company", "appliedOn", "resumeLink", "additionalInfo", "industryId")
     APPLICATIONID_FIELD_NUMBER: _ClassVar[int]
     JOBID_FIELD_NUMBER: _ClassVar[int]
     JOBNAME_FIELD_NUMBER: _ClassVar[int]
@@ -50,6 +56,7 @@ class ApplicationData(_message.Message):
     APPLIEDON_FIELD_NUMBER: _ClassVar[int]
     RESUMELINK_FIELD_NUMBER: _ClassVar[int]
     ADDITIONALINFO_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
     applicationId: str
     jobId: str
     jobName: str
@@ -57,7 +64,8 @@ class ApplicationData(_message.Message):
     appliedOn: str
     resumeLink: str
     additionalInfo: str
-    def __init__(self, applicationId: _Optional[str] = ..., jobId: _Optional[str] = ..., jobName: _Optional[str] = ..., company: _Optional[str] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ...) -> None: ...
+    industryId: str
+    def __init__(self, applicationId: _Optional[str] = ..., jobId: _Optional[str] = ..., jobName: _Optional[str] = ..., company: _Optional[str] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ..., industryId: _Optional[str] = ...) -> None: ...
 
 class ApplicationList(_message.Message):
     __slots__ = ("applications",)

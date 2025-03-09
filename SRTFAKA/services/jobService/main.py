@@ -16,14 +16,12 @@ import asyncio
 import logging
 import grpc
 from datetime import datetime
-from ...generated import job_pb2
-from ...generated import job_pb2_grpc
-from ...common.utils import generateRandomId
+from SRTFAKA.generated import job_pb2, job_pb2_grpc
 from .db import JobDB
 
 jobDB = JobDB()
 
-class Job(job_pb2_grpc.JobServicer):
+class Job(job_pb2_grpc.JobServiceServicer):
     async def GetAllJobs(self, request: job_pb2.Empty, context: grpc.aio.ServicerContext) -> job_pb2.JobList:
         """Retrieve all jobs (filtered by availability)."""
         jobs = jobDB.get_job()
@@ -35,15 +33,15 @@ class Job(job_pb2_grpc.JobServicer):
         return job_pb2.JobList(
             jobs=[
                 job_pb2.JobData(
-                    jobId=str(job.listing_id),
+                    jobId=str(job.id),
                     name=job.name,
                     company=job.company.name,
                     description=job.description or "",
                     salary=job.monthly_salary or 0,
                     startDate=job.start_date.strftime("%Y-%m-%d"),
                     endDate=job.end_date.strftime("%Y-%m-%d"),
-                    status=job.status,
-                    employmentType=job.employment_type.value
+                    status=job.available_status,
+                    employmentType=job.employment.value
                 )
                 for job in jobs
             ]
@@ -58,15 +56,15 @@ class Job(job_pb2_grpc.JobServicer):
             return job_pb2.JobData()
         
         return job_pb2.JobData(
-            jobId=str(job.listing_id),
+            jobId=str(job.id),
             name=job.name,
             company=job.company.name,
             description=job.description or "",
             salary=job.monthly_salary or 0,
             startDate=job.start_date.strftime("%Y-%m-%d"),
             endDate=job.end_date.strftime("%Y-%m-%d"),
-            status=job.status,
-            employmentType=job.employment_type.value
+            status=job.available_status,
+            employmentType=job.employment.value
         )
 
     async def CreateJob(self, request: job_pb2.JobData, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
@@ -79,7 +77,8 @@ class Job(job_pb2_grpc.JobServicer):
             "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
             "available_spot_count": request.availableSpotCount,
             "company_id": request.companyId,
-            "employment_type_id": request.employmentTypeId
+            "employment_type_id": request.employmentTypeId,
+            "pay": request.salary
         }
         
         job_id = jobDB.create_job(job_data)
@@ -99,7 +98,8 @@ class Job(job_pb2_grpc.JobServicer):
             "start_date": datetime.strptime(request.startDate, "%Y-%m-%d"),
             "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
             "available_spot_count": request.availableSpotCount,
-            "employment_type_id": request.employmentTypeId
+            "employment_type_id": request.employmentTypeId,
+            "pay": request.salary
         }
 
         updated = jobDB.update_job(request.jobId, update_data)
@@ -147,7 +147,7 @@ class Job(job_pb2_grpc.JobServicer):
             applications=[
                 job_pb2.ApplicationData(
                     applicationId=str(app.id),
-                    jobId=str(app.listing.listing_id),
+                    jobId=str(app.listing.id),
                     jobName=app.listing.name,
                     company=app.listing.company.name,
                     appliedOn=app.applied_on.strftime("%Y-%m-%d"),
@@ -161,7 +161,7 @@ class Job(job_pb2_grpc.JobServicer):
 async def serve() -> None:
     """Start the gRPC server."""
     server = grpc.aio.server()
-    job_pb2_grpc.add_JobServiceServicer_to_server(JobService(), server)
+    job_pb2_grpc.add_JobServiceServicer_to_server(Job(), server)
     
     listen_addr = "[::]:50054"
     server.add_insecure_port(listen_addr)

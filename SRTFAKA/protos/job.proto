@@ -25,6 +25,9 @@ message JobData {
   string startDate = 6;
   string endDate = 7;
   string employmentType = 8;  // Full-time, Part-time, etc.
+  int32 availableSpotCount = 9;  // Added
+  string industryId = 10;        // Added
+  int32 pay = 11;                // Added
 }
 
 // Response message containing a list of jobs
@@ -51,6 +54,7 @@ message ApplicationData {
   string appliedOn = 5;
   string resumeLink = 6;
   string additionalInfo = 7;
+  string industryId = 8;  // Added
 }
 
 // Response message containing a list of applications

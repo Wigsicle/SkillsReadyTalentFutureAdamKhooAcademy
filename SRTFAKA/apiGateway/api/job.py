@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from ..gRPCHandler import getJob, createJob, updateJob, deleteJob
+from ..gRPCHandler import getJobs, createJob, updateJob, deleteJob
 from google.protobuf.json_format import MessageToDict
 from ..models import JobResponse, Job
 from ..auth import getCurrentUser
@@ -8,7 +8,7 @@ job = APIRouter()
 
 @job.get("/job")
 async def get_job():
-    jobs = MessageToDict(await getJob())
+    jobs = MessageToDict(await getJobs())
     return {"message": "Jobs retrieved", "data": jobs}
     
 @job.post("/job/create") 
