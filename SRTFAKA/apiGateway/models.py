@@ -25,7 +25,9 @@ class AccountResponse(Account):
 
 class Course(BaseModel):
     name: str
-    instructor: str
+    details: str
+    industry_id: int
+    cert_id: int
     
 class CourseResponse(Course):
     courseId: str

@@ -13,8 +13,9 @@ service Course {
 // Message representing a single course record
 message CourseData {
   string name = 1;
-  string instructor = 2;
-  string courseId = 3;
+  string details = 2;
+  int32 industry_id = 3;
+  int32 cert_id = 4;
 }
 
 // Response message containing a list of courses

@@ -1,12 +1,14 @@
 import sqlite3
 from datetime import datetime
 import os
-from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, Session, sessionmaker
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base, Industry
-from services.assessmentService.db import Assessment
-from certificateService.db import Certificate
+from SRTFAKA.apiGateway.base import Base, Industry
+from SRTFAKA.services.assessmentService.db import Assessment
+from SRTFAKA.certificateService.db import Certificate
+from SRTFAKA.common.utils import generateRandomId
+from contextlib import contextmanager
 
 class Course(Base):
     __tablename__ = 'course'
@@ -49,34 +51,39 @@ class CourseProgress(Base):
 
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
+
 class CourseDB:
     def __init__(self):
         # SQLite database file
-        db_path = currentPath + '/courses.db'
+        db_path = currentPath + '/course.db'
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
         self.cursor = self.conn.cursor()
 
         # SQL to create courses table
         create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS courses (
-            courseId TEXT PRIMARY KEY NOT NULL,
+        CREATE TABLE IF NOT EXISTS course (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            instructor TEXT NOT NULL
+            details TEXT NOT NULL,
+            industry_id INTEGER,
+            cert_id INTEGER,
+            FOREIGN KEY (industry_id) REFERENCES industry(id),
+            FOREIGN KEY (cert_id) REFERENCES certificate(id)
         )
         '''
         try:
             self.cursor.execute(create_table_sql)
             self.conn.commit()
-            print("Table 'courses' created successfully.")
+            print("Table 'course' created successfully.")
         except sqlite3.Error as e:
             print(f"Database error during table creation: {e}")
             self.conn.rollback()
     
     def createCourse(self, courseObj):
         """Insert a new course into the database."""
-        sql = '''INSERT INTO courses (courseId, name, instructor) 
-                 VALUES (?, ?, ?)'''
+        sql = '''INSERT INTO course (name, details, industry_id, cert_id) 
+                 VALUES (?, ?, ?, ?)'''
         try:
             self.cursor.execute(sql, courseObj)
             self.conn.commit()

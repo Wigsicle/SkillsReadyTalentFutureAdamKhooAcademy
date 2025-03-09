@@ -15,9 +15,8 @@
 import asyncio
 import logging
 import grpc
-from ..generated import course_pb2
-from ..generated import course_pb2_grpc
-from ..common.utils import generateRandomId
+from SRTFAKA.generated import course_pb2
+from SRTFAKA.generated import course_pb2_grpc
 from .db import CourseDB
 
 courseDB = CourseDB()
@@ -39,18 +38,37 @@ class Course(course_pb2_grpc.CourseServicer):
 
 
     async def CreateCourse(
-                self,
-                request: course_pb2.CourseData,
-                context: grpc.aio.ServicerContext,
-            ) -> course_pb2.CourseData:
-                newCourseId = generateRandomId()
-                print(f"GRPC Server: {request}")
-                course = courseDB.createCourse((newCourseId, request.name, request.instructor))
-                if course is None:
-                    context.set_code(grpc.StatusCode.INTERNAL)
-                    context.set_details("Course creation failed or error occured.")
-                    return course_pb2.CourseData()
-                return course_pb2.CourseData(courseId=newCourseId, name=request.name, instructor=request.instructor)
+        self,
+        request: course_pb2.CourseData,
+        context: grpc.aio.ServicerContext,
+    ) -> course_pb2.CourseData:
+        try:
+            print(f"GRPC Server: {request}")
+
+            # Creating the course object using the data from the request
+            courseObj = (
+                request.name,       # name
+                request.details,    # details (updated to reflect correct field)
+                request.industry_id, # industry_id
+                request.cert_id      # cert_id
+            )
+
+            # Call the createCourse method to insert the course into the database
+            courseDB = CourseDB()  # Ensure this is initialized properly in your class
+            created_course_id = courseDB.createCourse(courseObj)
+
+            if not created_course_id:
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details("Course creation failed or error occurred.")
+                return course_pb2.CourseData()
+
+            return course_pb2.CourseData(name=request.name, details=request.details, industry_id=request.industry_id, cert_id=request.cert_id)
+
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error during course creation: {e}")
+            return course_pb2.CourseData()
+
 
     async def UpdateCourse(self, request: course_pb2.CourseData, context: grpc.aio.ServicerContext) -> course_pb2.CourseData:
         updated = courseDB.updateCourse(
