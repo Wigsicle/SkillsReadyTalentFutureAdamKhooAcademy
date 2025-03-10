@@ -3,7 +3,7 @@ syntax = "proto3";
 package Job;
 
 // The Job service definition.
-service JobService {
+service Job {
   rpc GetAllJobs (Empty) returns (JobList) {}   
   rpc GetJobDetails (JobId) returns (JobData) {}  
   rpc CreateJob (JobData) returns (JobData) {}    
@@ -13,21 +13,21 @@ service JobService {
   // Job applications
   rpc ApplyJob (ApplicationData) returns (ApplicationId) {}  
   rpc GetApplications (UserId) returns (ApplicationList) {}  
+  rpc GetApplicationDetails (ApplicationId) returns (ApplicationData) {}  
 }
 
 // Message representing a single job record
 message JobData {
-  string jobId = 1;
+  int32 jobId = 1;
   string name = 2;
-  string company = 3;
-  string description = 4;
-  int32 salary = 5;
+  string description = 3;
+  int32 companyId = 4;
+  int32 employmentTypeId = 5;  
   string startDate = 6;
   string endDate = 7;
-  string employmentType = 8;  // Full-time, Part-time, etc.
-  int32 availableSpotCount = 9;  // Added
-  string industryId = 10;        // Added
-  int32 pay = 11;                // Added
+  int32 availableSpotCount = 8;  
+  int32 industryId = 9;        
+  int32 pay = 10;                
 }
 
 // Response message containing a list of jobs
@@ -37,7 +37,7 @@ message JobList {
 
 // Job ID message
 message JobId {
-  string jobId = 1;
+  int32 jobId = 1;
 }
 
 // Empty message for requests with no parameters
@@ -45,16 +45,15 @@ message Empty {}
 
 // =============== Job Applications ====================
 
-// Message representing a job application
 message ApplicationData {
-  string applicationId = 1;
-  string jobId = 2;
+  int32 applicationId = 1;
+  int32 jobId = 2;
   string jobName = 3;
-  string company = 4;
+  int32 companyId = 4;
   string appliedOn = 5;
   string resumeLink = 6;
   string additionalInfo = 7;
-  string industryId = 8;  // Added
+  int32 industryId = 8;
 }
 
 // Response message containing a list of applications
@@ -64,10 +63,10 @@ message ApplicationList {
 
 // Application ID message
 message ApplicationId {
-  string applicationId = 1;
+  int32 applicationId = 1;
 }
 
 // User ID message for retrieving applications
 message UserId {
-  string userId = 1;
+  int32 userId = 1;
 }

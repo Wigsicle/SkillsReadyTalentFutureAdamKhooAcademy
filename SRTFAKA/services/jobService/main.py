@@ -15,40 +15,36 @@
 import asyncio
 import logging
 import grpc
-from datetime import datetime
-from SRTFAKA.generated import job_pb2, job_pb2_grpc
+from SRTFAKA.generated import job_pb2_grpc
+from SRTFAKA.generated import job_pb2
 from .db import JobDB
 
 jobDB = JobDB()
 
-class Job(job_pb2_grpc.JobServiceServicer):
+class Job(job_pb2_grpc.JobServicer):
+    """gRPC Servicer for Job Service"""
+
     async def GetAllJobs(self, request: job_pb2.Empty, context: grpc.aio.ServicerContext) -> job_pb2.JobList:
-        """Retrieve all jobs (filtered by availability)."""
-        jobs = jobDB.get_job()
-        if not jobs:
+        """Retrieve all job listings"""
+        rows = jobDB.get_job()
+        if not rows:
             context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details("No jobs found.")
             return job_pb2.JobList()
-        
-        return job_pb2.JobList(
-            jobs=[
-                job_pb2.JobData(
-                    jobId=str(job.id),
-                    name=job.name,
-                    company=job.company.name,
-                    description=job.description or "",
-                    salary=job.monthly_salary or 0,
-                    startDate=job.start_date.strftime("%Y-%m-%d"),
-                    endDate=job.end_date.strftime("%Y-%m-%d"),
-                    status=job.available_status,
-                    employmentType=job.employment.value
-                )
-                for job in jobs
-            ]
-        )
+
+        jobs = [
+            job_pb2.JobData(
+                jobId=str(row["id"]),  
+                name=row["name"],
+                company=row["company"],
+                employmentType=row["value"],  
+                pay=row["pay"]
+            ) 
+            for row in rows
+        ]
+        return job_pb2.JobList(jobs=jobs)
 
     async def GetJobDetails(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
-        """Retrieve full job details."""
+        """Retrieve full job details"""
         job = jobDB.get_job_details(request.jobId)
         if not job:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -56,19 +52,18 @@ class Job(job_pb2_grpc.JobServiceServicer):
             return job_pb2.JobData()
         
         return job_pb2.JobData(
-            jobId=str(job.id),
-            name=job.name,
-            company=job.company.name,
-            description=job.description or "",
-            salary=job.monthly_salary or 0,
-            startDate=job.start_date.strftime("%Y-%m-%d"),
-            endDate=job.end_date.strftime("%Y-%m-%d"),
-            status=job.available_status,
-            employmentType=job.employment.value
+            jobId=str(job["id"]),
+            name=job["name"],
+            company=job["company"],
+            description=job["description"] or "",
+            salary=job["pay"],
+            startDate=job["start_date"],
+            endDate=job["end_date"],
+            employmentType=job["value"]
         )
 
     async def CreateJob(self, request: job_pb2.JobData, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
-        """Create a new job listing."""
+        """Create a new job listing"""
         job_data = {
             "name": request.name,
             "description": request.description,
@@ -90,7 +85,7 @@ class Job(job_pb2_grpc.JobServiceServicer):
         return job_pb2.JobData(jobId=str(job_id), name=request.name, company=str(request.companyId))
 
     async def UpdateJob(self, request: job_pb2.JobData, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
-        """Update an existing job listing."""
+        """Update an existing job listing"""
         update_data = {
             "name": request.name,
             "description": request.description,
@@ -111,7 +106,7 @@ class Job(job_pb2_grpc.JobServiceServicer):
         return job_pb2.JobData(jobId=request.jobId)
 
     async def DeleteJob(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobId:
-        """Delete a job by its ID."""
+        """Delete a job by its ID"""
         deleted = jobDB.delete_job(request.jobId)
         if not deleted:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -120,7 +115,7 @@ class Job(job_pb2_grpc.JobServiceServicer):
         return job_pb2.JobId(jobId=request.jobId)
 
     async def ApplyJob(self, request: job_pb2.ApplicationData, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationId:
-        """Allows a user to apply for a job."""
+        """Allows a user to apply for a job"""
         application_id = jobDB.apply_job(
             applicant_id=request.applicantId,
             job_id=request.jobId,
@@ -136,7 +131,7 @@ class Job(job_pb2_grpc.JobServiceServicer):
         return job_pb2.ApplicationId(applicationId=str(application_id))
 
     async def GetApplications(self, request: job_pb2.UserId, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationList:
-        """Retrieve all job applications by a user."""
+        """Retrieve all job applications by a user"""
         applications = jobDB.get_applications(request.userId)
         if not applications:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -146,16 +141,34 @@ class Job(job_pb2_grpc.JobServiceServicer):
         return job_pb2.ApplicationList(
             applications=[
                 job_pb2.ApplicationData(
-                    applicationId=str(app.id),
-                    jobId=str(app.listing.id),
-                    jobName=app.listing.name,
-                    company=app.listing.company.name,
-                    appliedOn=app.applied_on.strftime("%Y-%m-%d"),
-                    resumeLink=app.resume_link,
-                    additionalInfo=app.additional_info or ""
+                    applicationId=str(app["id"]),
+                    jobId=str(app["job_id"]),
+                    jobName=app["job_name"],
+                    company=app["company"],
+                    appliedOn=app["applied_on"],
+                    resumeLink=app["resume_link"],
+                    additionalInfo=app["additional_info"] or ""
                 )
                 for app in applications
             ]
+        )
+
+    async def GetApplicationDetails(self, request: job_pb2.ApplicationId, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationData:
+        """Retrieve full details of a specific job application"""
+        application = jobDB.get_application_details(request.applicationId)
+        if not application:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details("Application not found.")
+            return job_pb2.ApplicationData()
+        
+        return job_pb2.ApplicationData(
+            applicationId=str(application["id"]),
+            jobId=str(application["job_id"]),
+            jobName=application["job_name"],
+            company=application["company"],
+            appliedOn=application["applied_on"],
+            resumeLink=application["resume_link"],
+            additionalInfo=application["additional_info"] or ""
         )
 
 async def serve() -> None:
@@ -165,7 +178,7 @@ async def serve() -> None:
     
     listen_addr = "[::]:50054"
     server.add_insecure_port(listen_addr)
-    logging.info("Starting server on %s", listen_addr)
+    logging.info("Starting Job Service on %s", listen_addr)
     
     await server.start()
     await server.wait_for_termination()

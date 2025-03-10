@@ -6,30 +6,28 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class JobData(_message.Message):
-    __slots__ = ("jobId", "name", "company", "description", "salary", "startDate", "endDate", "employmentType", "availableSpotCount", "industryId", "pay")
+    __slots__ = ("jobId", "name", "description", "companyId", "employmentTypeId", "startDate", "endDate", "availableSpotCount", "industryId", "pay")
     JOBID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    COMPANY_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    SALARY_FIELD_NUMBER: _ClassVar[int]
+    COMPANYID_FIELD_NUMBER: _ClassVar[int]
+    EMPLOYMENTTYPEID_FIELD_NUMBER: _ClassVar[int]
     STARTDATE_FIELD_NUMBER: _ClassVar[int]
     ENDDATE_FIELD_NUMBER: _ClassVar[int]
-    EMPLOYMENTTYPE_FIELD_NUMBER: _ClassVar[int]
     AVAILABLESPOTCOUNT_FIELD_NUMBER: _ClassVar[int]
     INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
     PAY_FIELD_NUMBER: _ClassVar[int]
-    jobId: str
+    jobId: int
     name: str
-    company: str
     description: str
-    salary: int
+    companyId: int
+    employmentTypeId: int
     startDate: str
     endDate: str
-    employmentType: str
     availableSpotCount: int
-    industryId: str
+    industryId: int
     pay: int
-    def __init__(self, jobId: _Optional[str] = ..., name: _Optional[str] = ..., company: _Optional[str] = ..., description: _Optional[str] = ..., salary: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., employmentType: _Optional[str] = ..., availableSpotCount: _Optional[int] = ..., industryId: _Optional[str] = ..., pay: _Optional[int] = ...) -> None: ...
+    def __init__(self, jobId: _Optional[int] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., companyId: _Optional[int] = ..., employmentTypeId: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., availableSpotCount: _Optional[int] = ..., industryId: _Optional[int] = ..., pay: _Optional[int] = ...) -> None: ...
 
 class JobList(_message.Message):
     __slots__ = ("jobs",)
@@ -40,32 +38,32 @@ class JobList(_message.Message):
 class JobId(_message.Message):
     __slots__ = ("jobId",)
     JOBID_FIELD_NUMBER: _ClassVar[int]
-    jobId: str
-    def __init__(self, jobId: _Optional[str] = ...) -> None: ...
+    jobId: int
+    def __init__(self, jobId: _Optional[int] = ...) -> None: ...
 
 class Empty(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
 
 class ApplicationData(_message.Message):
-    __slots__ = ("applicationId", "jobId", "jobName", "company", "appliedOn", "resumeLink", "additionalInfo", "industryId")
+    __slots__ = ("applicationId", "jobId", "jobName", "companyId", "appliedOn", "resumeLink", "additionalInfo", "industryId")
     APPLICATIONID_FIELD_NUMBER: _ClassVar[int]
     JOBID_FIELD_NUMBER: _ClassVar[int]
     JOBNAME_FIELD_NUMBER: _ClassVar[int]
-    COMPANY_FIELD_NUMBER: _ClassVar[int]
+    COMPANYID_FIELD_NUMBER: _ClassVar[int]
     APPLIEDON_FIELD_NUMBER: _ClassVar[int]
     RESUMELINK_FIELD_NUMBER: _ClassVar[int]
     ADDITIONALINFO_FIELD_NUMBER: _ClassVar[int]
     INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
-    applicationId: str
-    jobId: str
+    applicationId: int
+    jobId: int
     jobName: str
-    company: str
+    companyId: int
     appliedOn: str
     resumeLink: str
     additionalInfo: str
-    industryId: str
-    def __init__(self, applicationId: _Optional[str] = ..., jobId: _Optional[str] = ..., jobName: _Optional[str] = ..., company: _Optional[str] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ..., industryId: _Optional[str] = ...) -> None: ...
+    industryId: int
+    def __init__(self, applicationId: _Optional[int] = ..., jobId: _Optional[int] = ..., jobName: _Optional[str] = ..., companyId: _Optional[int] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ..., industryId: _Optional[int] = ...) -> None: ...
 
 class ApplicationList(_message.Message):
     __slots__ = ("applications",)
@@ -76,11 +74,11 @@ class ApplicationList(_message.Message):
 class ApplicationId(_message.Message):
     __slots__ = ("applicationId",)
     APPLICATIONID_FIELD_NUMBER: _ClassVar[int]
-    applicationId: str
-    def __init__(self, applicationId: _Optional[str] = ...) -> None: ...
+    applicationId: int
+    def __init__(self, applicationId: _Optional[int] = ...) -> None: ...
 
 class UserId(_message.Message):
     __slots__ = ("userId",)
     USERID_FIELD_NUMBER: _ClassVar[int]
-    userId: str
-    def __init__(self, userId: _Optional[str] = ...) -> None: ...
+    userId: int
+    def __init__(self, userId: _Optional[int] = ...) -> None: ...

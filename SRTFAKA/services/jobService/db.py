@@ -11,7 +11,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class EmploymentType(Base):
     """Full-Time/Part-Time/Intern"""
@@ -112,241 +111,173 @@ class Application(Base):
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class JobDB:
     def __init__(self):
-        """Initialize the database session."""
-        self.session = SessionLocal()
+        """Initialize the database connection like Course Service."""
+        db_path = os.path.join(currentPath, "jobs.db")  # Using SQLite
+        self.conn = sqlite3.connect(db_path)
+        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
+        self.cursor = self.conn.cursor()
     
     def create_job(self, job_data: dict) -> Optional[int]:
-        """Insert a new job into the database."""
+        """Insert a new job into the database using raw SQL."""
+        sql = """
+        INSERT INTO job_listing (name, description, monthly_salary, start_date, end_date, available_spot_count, company_id, employment_type_id, pay) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        values = (
+            job_data["name"],
+            job_data["description"],
+            job_data["monthly_salary"],
+            job_data["start_date"],
+            job_data["end_date"],
+            job_data["available_spot_count"],
+            job_data["company_id"],
+            job_data["employment_type_id"],
+            job_data["pay"]
+        )
+
         try:
-            new_job = JobListing(
-                name=job_data["name"],
-                description=job_data["description"],
-                monthly_salary=job_data["monthly_salary"],
-                start_date=job_data["start_date"],
-                end_date=job_data["end_date"],
-                available_spot_count=job_data["available_spot_count"],
-                company_id=job_data["company_id"],
-                employment_type_id=job_data["employment_type_id"],
-                pay=job_data["pay"]
-            )
-            self.session.add(new_job)
-            self.session.commit()
-            return new_job.id
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            print(f"Database error during create_job: {e}")
+            self.cursor.execute(sql, values)
+            self.conn.commit()
+            return self.cursor.lastrowid  # Return created job ID
+        except sqlite3.Error as e:
+            print(f"ERROR in create_job: {e}")
+            self.conn.rollback()
             return None
+
+
 
     def update_job(self, job_id: int, update_data: dict) -> bool:
-        """Update an existing job listing."""
+        """Update an existing job listing using raw SQL."""
+        sql = "UPDATE job_listing SET "
+        updates = []
+        values = []
+
+        for key, value in update_data.items():
+            updates.append(f"{key} = ?")
+            values.append(value)
+
+        sql += ", ".join(updates)
+        sql += " WHERE id = ?"
+        values.append(job_id)
+
         try:
-            job = self.session.get(JobListing, job_id)
-            if not job:
-                return False
-            
-            for key, value in update_data.items():
-                setattr(job, key, value)
-            
-            self.session.commit()
-            return True
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            print(f"Database error during update_job: {e}")
+            self.cursor.execute(sql, tuple(values))
+            self.conn.commit()
+            return self.cursor.rowcount > 0  # True if at least one row was updated
+        except sqlite3.Error as e:
+            print(f"ERROR in update_job: {e}")
+            self.conn.rollback()
             return False
+
         
-    def get_job(
-        self,
-        country: Optional[str] = None,
-        company_name: Optional[str] = None,
-        industry_name: Optional[str] = None,
-        employment_type: Optional[str] = None,
-        min_salary: Optional[int] = None,
-        max_salary: Optional[int] = None
-    ) -> List[JobListing]:
-        """Retrieve jobs filtered by country, company, industry, employment type, and salary range."""
+    def get_job(self):
+        """Retrieve all job listings using raw SQL (like Course Service)."""
         try:
-            query = self.session.query(JobListing).join(Company).join(EmploymentType)
-
-            if country:
-                query = query.filter(Company.country.has(name=country))
-            if company_name:
-                query = query.filter(Company.name == company_name)
-            if industry_name:
-                query = query.filter(Company.industry.has(name=industry_name))
-            if employment_type:
-                query = query.filter(EmploymentType.value == employment_type)
-            if min_salary:
-                query = query.filter(JobListing.pay >= min_salary)
-            if max_salary:
-                query = query.filter(JobListing.pay <= max_salary)
-
-            # Only return jobs that are still available
-            query = query.filter(JobListing.available_status == True)
-
-            return query.order_by(JobListing.start_date.desc()).all()
-        
+            sql = """
+            SELECT job_listing.id, job_listing.name, company.name, employment_type.value, job_listing.pay
+            FROM job_listing
+            JOIN company ON job_listing.company_id = company.id
+            JOIN employment_type ON job_listing.employment_type_id = employment_type.id
+            """
+            
+            print(f"DEBUG: Running SQL Query:\n{sql}")  # Debugging Step
+            
+            result = self.session.execute(sql)
+            rows = result.fetchall()
+            
+            print(f"DEBUG: Jobs Retrieved: {len(rows)}")  # Debugging Step
+            
+            return rows
         except SQLAlchemyError as e:
-            print(f"Database error during get_jobs: {e}")
+            print(f"ERROR in get_job: {e}")
             return []
+
 
     def get_total_jobs_count(self) -> int:
-        """Returns the total number of job listings."""
+        """Returns the total number of job listings using raw SQL."""
         try:
-            return self.session.query(JobListing).count()
-        except SQLAlchemyError as e:
-            print(f"Database error during get_total_jobs_count: {e}")
+            sql = "SELECT COUNT(*) FROM job_listing"
+            self.cursor.execute(sql)
+            count = self.cursor.fetchone()[0]
+            return count
+        except sqlite3.Error as e:
+            print(f"ERROR in get_total_jobs_count: {e}")
             return 0
 
-    def get_job_details(self, job_id: int) -> Optional[JobListing]:
-        """
-        Retrieve full job details when a user clicks on a job.
 
-        :param job_id: The ID of the job.
-        :return: The job details or None if not found.
+    def get_job_details(self, job_id: int) -> Optional[dict]:
+        """Retrieve full job details using raw SQL."""
+        sql = """
+        SELECT job_listing.id, job_listing.name, job_listing.description, company.name, employment_type.value, job_listing.pay
+        FROM job_listing
+        JOIN company ON job_listing.company_id = company.id
+        JOIN employment_type ON job_listing.employment_type_id = employment_type.id
+        WHERE job_listing.id = ?
         """
         try:
-            job = (
-                self.session.query(JobListing)
-                .join(Company)
-                .join(EmploymentType)
-                .filter(JobListing.id == job_id)
-                .first()
-            )
-            return job
-        except SQLAlchemyError as e:
-            print(f"Database error during get_job_details: {e}")
+            self.cursor.execute(sql, (job_id,))
+            job = self.cursor.fetchone()
+            if job:
+                return dict(job)  # Convert to dictionary
+            return None
+        except sqlite3.Error as e:
+            print(f"ERROR in get_job_details: {e}")
             return None
 
-    # def delete_job(self, job_id: int) -> bool:
-    #     """Delete a job by jobId."""
-    #     try:
-    #         job = self.session.get(JobListing, job_id)
-    #         if not job:
-    #             return False
-            
-    #         self.session.delete(job)
-    #         self.session.commit()
-    #         return True
-    #     except SQLAlchemyError as e:
-    #         self.session.rollback()
-    #         print(f"Database error during delete_job: {e}")
-    #         return False
-        
-    def apply_job(
-        self,
-        applicant_id: int,
-        job_id: int,
-        resume_link: str,
-        additional_info: Optional[str] = None
-    ) -> Optional[int]:
-        """
-        Allows a user to apply for a specific job.
-        Prevents duplicate applications.
-        """
+
+    def delete_job(self, job_id: int) -> bool:
+        """Delete a job by jobId using raw SQL."""
+        sql = "DELETE FROM job_listing WHERE id = ?"
+
         try:
-            job = self.session.get(JobListing, job_id)
-            if not job or not job.available_status:
-                print(f"Error: Job ID {job_id} is not available.")
-                return None
+            self.cursor.execute(sql, (job_id,))
+            self.conn.commit()
+            return self.cursor.rowcount > 0  # True if a row was deleted
+        except sqlite3.Error as e:
+            print(f"ERROR in delete_job: {e}")
+            self.conn.rollback()
+            return False
 
-            # Prevent duplicate applications
-            existing_application = (
-                self.session.query(Application)
-                .filter(Application.applicant_id == applicant_id, Application.listing_id == job_id)
-                .first()
-            )
-            if existing_application:
-                print("Error: User has already applied for this job.")
-                return None
-
-            # Retrieve industry ID from the job's company
-            industry_id = job.company.industry_id
-
-            # Create a new application
-            new_application = Application(
-                applicant_id=applicant_id,
-                listing_id=job_id,
-                industry_id=industry_id,
-                resume_link=resume_link,
-                additional_info=additional_info,
-                applied_on=func.now()
-            )
-
-            self.session.add(new_application)
-            self.session.commit()
-            return new_application.id  # Return the application ID
-
-        except SQLAlchemyError as e:
-            self.session.rollback()
-            print(f"Database error during apply_for_job: {e}")
-            return None
-            
-    def get_applications(self, applicant_id: int) -> List[Application]:
-        """
-        Retrieve all job applications submitted by a user.
         
-        :param applicant_id: The ID of the user.
-        :return: A list of job applications.
+    def apply_job(self, applicant_id: int, job_id: int, resume_link: str, additional_info: Optional[str] = None) -> Optional[int]:
+        """Allows a user to apply for a job using raw SQL."""
+        sql = """
+        INSERT INTO application (applicant_id, listing_id, resume_link, additional_info, applied_on) 
+        VALUES (?, ?, ?, ?, ?)
         """
+        values = (applicant_id, job_id, resume_link, additional_info or "", datetime.now())
+
         try:
-            applications = (
-                self.session.query(Application)
-                .join(JobListing)
-                .filter(Application.applicant_id == applicant_id)
-                .all()
-            )
-
-            return applications
-        except SQLAlchemyError as e:
-            print(f"Database error during get_applications_by_user: {e}")
-            return []
-        
-    def get_application_details(self, application_id: int) -> Optional[Application]:
-        """
-        Retrieve full details of a specific job application.
-        
-        :param application_id: The ID of the application.
-        :return: The application details or None if not found.
-        """
-        try:
-            application = (
-                self.session.query(Application)
-                .join(JobListing)
-                .filter(Application.id == application_id)
-                .first()
-            )
-            return application
-        except SQLAlchemyError as e:
-            print(f"Database error during get_application_details: {e}")
+            self.cursor.execute(sql, values)
+            self.conn.commit()
+            return self.cursor.lastrowid
+        except sqlite3.Error as e:
+            print(f"ERROR in apply_job: {e}")
+            self.conn.rollback()
             return None
 
-    """ If user is allowed to withdraw their application, uncomment this function """
-    # def withdraw_application(self, application_id: int, applicant_id: int) -> bool:
-    #     """
-    #     Allows a user to withdraw (delete) a job application.
         
-    #     :param application_id: The ID of the application to be withdrawn.
-    #     :param applicant_id: The ID of the user (to prevent unauthorized deletion).
-    #     :return: True if successful, False otherwise.
-    #     """
-    #     try:
-    #         application = self.session.query(Application).filter(
-    #             Application.id == application_id, Application.applicant_id == applicant_id
-    #         ).first()
-
-    #         if not application:
-    #             print("Application not found or user is unauthorized.")
-    #             return False
-
-    #         self.session.delete(application)
-    #         self.session.commit()
-    #         return True
-
-    #     except SQLAlchemyError as e:
-    #         self.session.rollback()
-    #         print(f"Database error during withdraw_application: {e}")
-    #         return False
+    def get_application_details(self, application_id: int) -> Optional[dict]:
+        """Retrieve full details of a specific job application using raw SQL."""
+        sql = """
+        SELECT application.id, user.id AS applicant_id, job_listing.id AS job_id, 
+            application.resume_link, application.additional_info, application.applied_on
+        FROM application
+        JOIN user ON application.applicant_id = user.id
+        JOIN job_listing ON application.listing_id = job_listing.id
+        WHERE application.id = ?
+        """
+        try:
+            self.cursor.execute(sql, (application_id,))
+            application = self.cursor.fetchone()
+            if application:
+                return dict(application)  # Convert result into a dictionary
+            return None
+        except sqlite3.Error as e:
+            print(f"ERROR in get_application_details: {e}")
+            return None
 
     def close(self):
-        """Close the database session."""
-        self.session.close()
+        """Close the database connection."""
+        self.cursor.close()
+        self.conn.close()

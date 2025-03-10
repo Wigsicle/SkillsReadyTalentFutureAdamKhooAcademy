@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tjob.proto\x12\x03Job\"\xd5\x01\n\x07JobData\x12\r\n\x05jobId\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07\x63ompany\x18\x03 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\x12\x0e\n\x06salary\x18\x05 \x01(\x05\x12\x11\n\tstartDate\x18\x06 \x01(\t\x12\x0f\n\x07\x65ndDate\x18\x07 \x01(\t\x12\x16\n\x0e\x65mploymentType\x18\x08 \x01(\t\x12\x1a\n\x12\x61vailableSpotCount\x18\t \x01(\x05\x12\x12\n\nindustryId\x18\n \x01(\t\x12\x0b\n\x03pay\x18\x0b \x01(\x05\"%\n\x07JobList\x12\x1a\n\x04jobs\x18\x01 \x03(\x0b\x32\x0c.Job.JobData\"\x16\n\x05JobId\x12\r\n\x05jobId\x18\x01 \x01(\t\"\x07\n\x05\x45mpty\"\xac\x01\n\x0f\x41pplicationData\x12\x15\n\rapplicationId\x18\x01 \x01(\t\x12\r\n\x05jobId\x18\x02 \x01(\t\x12\x0f\n\x07jobName\x18\x03 \x01(\t\x12\x0f\n\x07\x63ompany\x18\x04 \x01(\t\x12\x11\n\tappliedOn\x18\x05 \x01(\t\x12\x12\n\nresumeLink\x18\x06 \x01(\t\x12\x16\n\x0e\x61\x64\x64itionalInfo\x18\x07 \x01(\t\x12\x12\n\nindustryId\x18\x08 \x01(\t\"=\n\x0f\x41pplicationList\x12*\n\x0c\x61pplications\x18\x01 \x03(\x0b\x32\x14.Job.ApplicationData\"&\n\rApplicationId\x12\x15\n\rapplicationId\x18\x01 \x01(\t\"\x18\n\x06UserId\x12\x0e\n\x06userId\x18\x01 \x01(\t2\xd0\x02\n\nJobService\x12(\n\nGetAllJobs\x12\n.Job.Empty\x1a\x0c.Job.JobList\"\x00\x12+\n\rGetJobDetails\x12\n.Job.JobId\x1a\x0c.Job.JobData\"\x00\x12)\n\tCreateJob\x12\x0c.Job.JobData\x1a\x0c.Job.JobData\"\x00\x12)\n\tUpdateJob\x12\x0c.Job.JobData\x1a\x0c.Job.JobData\"\x00\x12%\n\tDeleteJob\x12\n.Job.JobId\x1a\n.Job.JobId\"\x00\x12\x36\n\x08\x41pplyJob\x12\x14.Job.ApplicationData\x1a\x12.Job.ApplicationId\"\x00\x12\x36\n\x0fGetApplications\x12\x0b.Job.UserId\x1a\x14.Job.ApplicationList\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tjob.proto\x12\x03Job\"\xc9\x01\n\x07JobData\x12\r\n\x05jobId\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x11\n\tcompanyId\x18\x04 \x01(\x05\x12\x18\n\x10\x65mploymentTypeId\x18\x05 \x01(\x05\x12\x11\n\tstartDate\x18\x06 \x01(\t\x12\x0f\n\x07\x65ndDate\x18\x07 \x01(\t\x12\x1a\n\x12\x61vailableSpotCount\x18\x08 \x01(\x05\x12\x12\n\nindustryId\x18\t \x01(\x05\x12\x0b\n\x03pay\x18\n \x01(\x05\"%\n\x07JobList\x12\x1a\n\x04jobs\x18\x01 \x03(\x0b\x32\x0c.Job.JobData\"\x16\n\x05JobId\x12\r\n\x05jobId\x18\x01 \x01(\x05\"\x07\n\x05\x45mpty\"\xae\x01\n\x0f\x41pplicationData\x12\x15\n\rapplicationId\x18\x01 \x01(\x05\x12\r\n\x05jobId\x18\x02 \x01(\x05\x12\x0f\n\x07jobName\x18\x03 \x01(\t\x12\x11\n\tcompanyId\x18\x04 \x01(\x05\x12\x11\n\tappliedOn\x18\x05 \x01(\t\x12\x12\n\nresumeLink\x18\x06 \x01(\t\x12\x16\n\x0e\x61\x64\x64itionalInfo\x18\x07 \x01(\t\x12\x12\n\nindustryId\x18\x08 \x01(\x05\"=\n\x0f\x41pplicationList\x12*\n\x0c\x61pplications\x18\x01 \x03(\x0b\x32\x14.Job.ApplicationData\"&\n\rApplicationId\x12\x15\n\rapplicationId\x18\x01 \x01(\x05\"\x18\n\x06UserId\x12\x0e\n\x06userId\x18\x01 \x01(\x05\x32\x8e\x03\n\x03Job\x12(\n\nGetAllJobs\x12\n.Job.Empty\x1a\x0c.Job.JobList\"\x00\x12+\n\rGetJobDetails\x12\n.Job.JobId\x1a\x0c.Job.JobData\"\x00\x12)\n\tCreateJob\x12\x0c.Job.JobData\x1a\x0c.Job.JobData\"\x00\x12)\n\tUpdateJob\x12\x0c.Job.JobData\x1a\x0c.Job.JobData\"\x00\x12%\n\tDeleteJob\x12\n.Job.JobId\x1a\n.Job.JobId\"\x00\x12\x36\n\x08\x41pplyJob\x12\x14.Job.ApplicationData\x1a\x12.Job.ApplicationId\"\x00\x12\x36\n\x0fGetApplications\x12\x0b.Job.UserId\x1a\x14.Job.ApplicationList\"\x00\x12\x43\n\x15GetApplicationDetails\x12\x12.Job.ApplicationId\x1a\x14.Job.ApplicationData\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,21 +32,21 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'job_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_JOBDATA']._serialized_start=19
-  _globals['_JOBDATA']._serialized_end=232
-  _globals['_JOBLIST']._serialized_start=234
-  _globals['_JOBLIST']._serialized_end=271
-  _globals['_JOBID']._serialized_start=273
-  _globals['_JOBID']._serialized_end=295
-  _globals['_EMPTY']._serialized_start=297
-  _globals['_EMPTY']._serialized_end=304
-  _globals['_APPLICATIONDATA']._serialized_start=307
-  _globals['_APPLICATIONDATA']._serialized_end=479
-  _globals['_APPLICATIONLIST']._serialized_start=481
-  _globals['_APPLICATIONLIST']._serialized_end=542
-  _globals['_APPLICATIONID']._serialized_start=544
-  _globals['_APPLICATIONID']._serialized_end=582
-  _globals['_USERID']._serialized_start=584
-  _globals['_USERID']._serialized_end=608
-  _globals['_JOBSERVICE']._serialized_start=611
-  _globals['_JOBSERVICE']._serialized_end=947
+  _globals['_JOBDATA']._serialized_end=220
+  _globals['_JOBLIST']._serialized_start=222
+  _globals['_JOBLIST']._serialized_end=259
+  _globals['_JOBID']._serialized_start=261
+  _globals['_JOBID']._serialized_end=283
+  _globals['_EMPTY']._serialized_start=285
+  _globals['_EMPTY']._serialized_end=292
+  _globals['_APPLICATIONDATA']._serialized_start=295
+  _globals['_APPLICATIONDATA']._serialized_end=469
+  _globals['_APPLICATIONLIST']._serialized_start=471
+  _globals['_APPLICATIONLIST']._serialized_end=532
+  _globals['_APPLICATIONID']._serialized_start=534
+  _globals['_APPLICATIONID']._serialized_end=572
+  _globals['_USERID']._serialized_start=574
+  _globals['_USERID']._serialized_end=598
+  _globals['_JOB']._serialized_start=601
+  _globals['_JOB']._serialized_end=999
 # @@protoc_insertion_point(module_scope)
