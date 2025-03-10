@@ -23,7 +23,7 @@ function Login() {
 
     useEffect(() => {
         if (loggedIn) {
-            navigate("/profile", { replace: true });
+            navigate("/", { replace: true });
             window.location.reload();
         }
     }, [loggedIn, navigate]);
