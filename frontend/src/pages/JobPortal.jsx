@@ -79,7 +79,8 @@ function JobPortal() {
             {/* Search Bar */}
 
             <div className="job-portal-container">
-                <h2>Available Jobs</h2>
+                <h1>Available Jobs</h1>
+                <p>A sea of opportunites awaits.</p>
 
                 <div class="mb-3">
                 <input

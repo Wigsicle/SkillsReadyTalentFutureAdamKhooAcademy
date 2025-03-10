@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 function Register() {
     const [username, setUsername] = useState("");
@@ -34,7 +35,7 @@ function Register() {
                 {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                 <form onSubmit={handleRegister}>
                     <div className="mb-3">
-                        <label htmlFor="usernameField" className="form-label">Username</label>
+                        <label htmlFor="usernameField" className="form-label"><strong>Username</strong></label>
                         <input
                             type="text"
                             className="form-control"
@@ -45,7 +46,7 @@ function Register() {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="passwordField" className="form-label">Password</label>
+                        <label htmlFor="passwordField" className="form-label"><strong>Password</strong></label>
                         <input
                             type="password"
                             className="form-control"
@@ -56,7 +57,7 @@ function Register() {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="roleField" className="form-label">User Role</label>
+                        <label htmlFor="roleField" className="form-label"><strong>User Role</strong></label>
                         <select
                             id="roleField"
                             className="form-control"
@@ -67,8 +68,13 @@ function Register() {
                             <option value="teacher">Teacher</option>
                         </select>
                     </div>
-                    <button type="submit" className="btn btn-primary">Register</button>
+                    <button type="submit" className="btn btn-dark">Register</button>
                 </form>
+
+                <div className="mt-3">
+                    <p>Have an account? <Link to="/login">Login here</Link></p>
+                </div>
+
             </div>
         </div>
     );

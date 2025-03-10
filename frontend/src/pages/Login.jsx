@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../static/AuthContext';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -32,10 +33,10 @@ function Login() {
         <div className="container-fluid w-100 vh-100 position-relative">
             <div className="center">
                 <h1>Login Page</h1>
-                {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                {errorMessage && <div className="alert alert-danger mt-3">{errorMessage}</div>}
                 <form onSubmit={handleLogin}>
-                    <div class="mb-3">
-                        <label for="usernameField" class="form-label">Username</label>
+                    <div className="mb-3 mt-3">
+                        <label htmlFor="usernameField" className="form-label bold">Username</label>
                         <input
                             type="text"
                             className="form-control"
@@ -43,10 +44,10 @@ function Login() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                        />                    
+                        />
                     </div>
-                    <div class="mb-3">
-                        <label for="passwordField" class="form-label">Password</label>
+                    <div className="mb-3">
+                        <label htmlFor="passwordField" className="form-label bold">Password</label>
                         <input
                             type="password"
                             className="form-control"
@@ -56,13 +57,16 @@ function Login() {
                             required
                         />
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-dark">Submit</button>
                 </form>
 
+                {/* Link to the Register page */}
+                <div className="mt-3">
+                    <p>Don't have an account? <Link to="/register">Register here</Link></p>
+                </div>
             </div>
         </div>
     );
-
 }
 
 export default Login;

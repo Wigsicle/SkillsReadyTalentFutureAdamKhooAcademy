@@ -92,3 +92,6 @@ main{
     max-height: 70vh;
     overflow-y: auto;
 }
+.bold{
+    font-weight: bold;
+}
