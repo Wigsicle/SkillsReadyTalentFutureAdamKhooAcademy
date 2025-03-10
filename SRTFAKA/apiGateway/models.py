@@ -40,25 +40,26 @@ class AssessmentResponse(Assessment):
     
 class Job(BaseModel):
     name: str
-    company_id: int
     description: Optional[str] = None
-    monthly_salary: Optional[int] = None
-    start_date: str
-    end_date: str
-    employment_type_id: int
-    available_spot_count: int
-    industry_id: int
-    pay: int
+    monthlySalary: Optional[int] = None
+    startDate: str
+    endDate: str
+    companyId: int
+    employmentTypeId: int
+    availableSpotCount: int
+    industryId: int
+    companyName: str
+    industryName: str
 
 class JobResponse(Job):
     jobId: int
 
 class JobApplication(BaseModel):
-    applicant_id: int
-    job_id: int
-    resume_link: str
-    additional_info: Optional[str] = None
-    industry_id: int
+    applicantId: int
+    jobId: int
+    resumeLink: str
+    additionalInfo: Optional[str] = None
+    industryId: int
 
 class JobApplicationResponse(JobApplication):
     applicationId: int

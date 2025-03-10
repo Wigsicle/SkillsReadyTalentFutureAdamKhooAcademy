@@ -168,14 +168,13 @@ async def createJob(job: Job) -> job_pb2.JobData:
             return await stub.CreateJob(job_pb2.JobData(
                 name=job.name,
                 description=job.description,
-                salary=job.monthly_salary,
-                startDate=job.start_date,
-                endDate=job.end_date,
-                employmentType=job.employment_type,
-                companyId=job.company_id,
-                availableSpotCount=job.available_spot_count,
-                industryId=str(job.industry_id),
-                pay=job.pay
+                monthlySalary=job.monthlySalary,
+                startDate=job.startDate,
+                endDate=job.endDate,
+                availableSpotCount=job.availableSpotCount,
+                companyId=job.companyId,
+                employmentType=job.employmentTypeId,
+                industryId=job.industryId,
             ))
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
@@ -189,14 +188,13 @@ async def updateJob(jobId: str, job: Job) -> job_pb2.JobData:
                 jobId=jobId,
                 name=job.name,
                 description=job.description,
-                salary=job.monthly_salary,
-                startDate=job.start_date,
-                endDate=job.end_date,
-                employmentType=job.employment_type,
-                companyId=job.company_id,
-                availableSpotCount=job.available_spot_count,
-                industryId=str(job.industry_id),
-                pay=job.pay
+                monthlySalary=job.monthlySalary,
+                startDate=job.startDate,
+                endDate=job.endDate,
+                availableSpotCount=job.availableSpotCount,
+                companyId=job.companyId,
+                employmentType=job.employmentTypeId,    
+                industryId=job.industryId,
             ))
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")

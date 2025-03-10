@@ -21,13 +21,15 @@ message JobData {
   int32 jobId = 1;
   string name = 2;
   string description = 3;
-  int32 companyId = 4;
-  int32 employmentTypeId = 5;  
-  string startDate = 6;
-  string endDate = 7;
-  int32 availableSpotCount = 8;  
-  int32 industryId = 9;        
-  int32 pay = 10;                
+  int32 monthlySalary = 4;
+  string startDate = 5;
+  string endDate = 6;
+  int32 availableSpotCount = 7;
+  int32 companyId = 8;
+  int32 employmentTypeId = 9;
+  int32 industryId = 10;    
+  string companyName = 11;
+  string industryName = 12;     
 }
 
 // Response message containing a list of jobs

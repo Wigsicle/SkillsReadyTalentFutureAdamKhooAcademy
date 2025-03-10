@@ -8,9 +8,11 @@ from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from SRTFAKA.apiGateway.base import Base, Industry, Country
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.sql import text
 
 indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class EmploymentType(Base):
     """Full-Time/Part-Time/Intern"""
@@ -52,7 +54,6 @@ class JobListing(Base):
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     available_spot_count: Mapped[int] = mapped_column(Integer, nullable=False)
-    pay: Mapped[int] = mapped_column(Integer, nullable=False)
     
     # FK dependency
     company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.id'), nullable=False)
@@ -111,16 +112,13 @@ class Application(Base):
 currentPath = os.path.dirname(os.path.abspath(__file__))
 class JobDB:
     def __init__(self):
-        """Initialize the database connection like Course Service."""
-        db_path = os.path.join(currentPath, "jobs.db")  # Using SQLite
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
+        """Initialize the database connection."""
+        self.session = SessionLocal()
     
     def create_job(self, job_data: dict) -> Optional[int]:
         """Insert a new job into the database using raw SQL."""
         sql = """
-        INSERT INTO job_listing (name, description, monthly_salary, start_date, end_date, available_spot_count, company_id, employment_type_id, pay) 
+        INSERT INTO job_listing (name, description, monthly_salary, start_date, end_date, available_spot_count, company_id, employment_type_id) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         values = (
@@ -132,7 +130,6 @@ class JobDB:
             job_data["available_spot_count"],
             job_data["company_id"],
             job_data["employment_type_id"],
-            job_data["pay"]
         )
 
         try:
@@ -171,14 +168,27 @@ class JobDB:
 
         
     def get_job(self):
-        """Retrieve all job listings using raw SQL (like Course Service)."""
+        """Retrieve all job listings using raw SQL."""
         try:
-            sql = """
-            SELECT job_listing.id, job_listing.name, company.name, employment_type.value, job_listing.pay
+            sql = text("""
+            SELECT 
+                    job_listing.id,
+                    job_listing.name,
+                    job_listing.description,
+                    job_listing.monthly_salary,
+                    job_listing.start_date,
+                    job_listing.end_date,
+                    job_listing.available_spot_count, 
+                    company.id AS company_id,    
+                    company.name AS company_name, 
+                    employment_type.id,
+                    company.industry_id as industry_id,      
+                    industry.name AS industry_name
             FROM job_listing
             JOIN company ON job_listing.company_id = company.id
             JOIN employment_type ON job_listing.employment_type_id = employment_type.id
-            """
+            JOIN industry ON company.industry_id = industry.id
+            """)
             
             print(f"DEBUG: Running SQL Query:\n{sql}")  # Debugging Step
             
@@ -186,7 +196,7 @@ class JobDB:
             rows = result.fetchall()
             
             print(f"DEBUG: Jobs Retrieved: {len(rows)}")  # Debugging Step
-            
+
             return rows
         except SQLAlchemyError as e:
             print(f"ERROR in get_job: {e}")
@@ -208,7 +218,7 @@ class JobDB:
     def get_job_details(self, job_id: int) -> Optional[dict]:
         """Retrieve full job details using raw SQL."""
         sql = """
-        SELECT job_listing.id, job_listing.name, job_listing.description, company.name, employment_type.value, job_listing.pay
+        SELECT job_listing.id, job_listing.name, job_listing.description, company.name, employment_type.value,
         FROM job_listing
         JOIN company ON job_listing.company_id = company.id
         JOIN employment_type ON job_listing.employment_type_id = employment_type.id
