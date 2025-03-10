@@ -18,9 +18,41 @@ import grpc
 from SRTFAKA.generated import course_pb2
 from SRTFAKA.generated import course_pb2_grpc
 from .db import CourseDB
+from .db import CourseProgressDB
 
 courseDB = CourseDB()
+courseProgressDB = CourseProgressDB()
 
+class CourseProgress(course_pb2_grpc.CourseProgressServicer):
+    async def JoinCourse(
+        self,
+        request: course_pb2.CourseProgressData,
+        context: grpc.aio.ServicerContext,
+    ) -> course_pb2.CourseProgressData:
+        try: 
+            print(f"GRPC Server: {request}")
+
+            courseProgressObj = (
+                request.cleared,
+                request.student_id,
+                request.course_id
+            )
+
+            courseProgressDB = CourseProgressDB()
+            created_course_progress_id = courseProgressDB.joinCourse(courseProgressObj)
+
+            if not created_course_progress_id:
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details("Course creation failed or error occurred.")
+                return course_pb2.CourseProgressData()
+            
+            return course_pb2.CourseProgressData(cleared=request.cleared, student_id=request.student_id, course_id=request.course_id)
+
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error during course creation: {e}")
+            return course_pb2.CourseProgressData()
+        
 class Course(course_pb2_grpc.CourseServicer):
     async def GetAllCourse(
         self,
@@ -68,7 +100,6 @@ class Course(course_pb2_grpc.CourseServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Error during course creation: {e}")
             return course_pb2.CourseData()
-
 
     async def UpdateCourse(self, request: course_pb2.CourseData, context: grpc.aio.ServicerContext) -> course_pb2.CourseData:
         updated = courseDB.updateCourse(

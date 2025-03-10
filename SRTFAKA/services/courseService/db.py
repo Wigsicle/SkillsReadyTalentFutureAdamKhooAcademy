@@ -10,6 +10,9 @@ from SRTFAKA.certificateService.db import Certificate
 from SRTFAKA.common.utils import generateRandomId
 from contextlib import contextmanager
 
+# engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+# SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
 class Course(Base):
     __tablename__ = 'course'
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -51,6 +54,28 @@ class CourseProgress(Base):
 
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
+
+class CourseProgressDB:
+    def __init__(self):
+        # self.session = SessionLocal()
+        # SQLite database file
+        db_path = currentPath + '/course_progress.db'
+        self.conn = sqlite3.connect(db_path)
+        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
+        self.cursor = self.conn.cursor()
+
+    def joinCourse(self, courseProgressObj):
+        """User joins a course, insert into the database"""
+        sql = '''INSERT INTO course_progress (cleared, student_id, course_id)
+                VALUES (?, ?, ?)'''
+        try:
+            self.cursor.execute(sql, courseProgressObj)
+            self.conn.commit()
+            return self.cursor.lastrowid  # Return the new record's ID
+        except Exception as e:
+            self.conn.rollback()
+            print("Error joining course:", e)
+            return None
 
 class CourseDB:
     def __init__(self):

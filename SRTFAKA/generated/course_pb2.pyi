@@ -28,3 +28,13 @@ class CourseId(_message.Message):
     COURSEID_FIELD_NUMBER: _ClassVar[int]
     courseId: str
     def __init__(self, courseId: _Optional[str] = ...) -> None: ...
+
+class CourseProgressData(_message.Message):
+    __slots__ = ("cleared", "student_id", "course_id")
+    CLEARED_FIELD_NUMBER: _ClassVar[int]
+    STUDENT_ID_FIELD_NUMBER: _ClassVar[int]
+    COURSE_ID_FIELD_NUMBER: _ClassVar[int]
+    cleared: bool
+    student_id: str
+    course_id: str
+    def __init__(self, cleared: bool = ..., student_id: _Optional[str] = ..., course_id: _Optional[str] = ...) -> None: ...

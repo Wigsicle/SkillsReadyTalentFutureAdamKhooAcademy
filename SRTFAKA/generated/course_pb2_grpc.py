@@ -227,3 +227,75 @@ class Course(object):
             timeout,
             metadata,
             _registered_method=True)
+
+
+class CourseProgressStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.JoinCourse = channel.unary_unary(
+                '/Course.CourseProgress/JoinCourse',
+                request_serializer=course__pb2.CourseProgressData.SerializeToString,
+                response_deserializer=course__pb2.CourseProgressData.FromString,
+                _registered_method=True)
+
+
+class CourseProgressServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def JoinCourse(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_CourseProgressServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'JoinCourse': grpc.unary_unary_rpc_method_handler(
+                    servicer.JoinCourse,
+                    request_deserializer=course__pb2.CourseProgressData.FromString,
+                    response_serializer=course__pb2.CourseProgressData.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'Course.CourseProgress', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('Course.CourseProgress', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class CourseProgress(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def JoinCourse(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Course.CourseProgress/JoinCourse',
+            course__pb2.CourseProgressData.SerializeToString,
+            course__pb2.CourseProgressData.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
