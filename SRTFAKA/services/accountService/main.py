@@ -94,7 +94,6 @@ class Account(account_pb2_grpc.AccountServicer):
                 "address": request.address,
                 "email": request.email,
                 "password": request.password,
-                "user_type_id": request.user_type_id
             }
         )
         if not updated:
