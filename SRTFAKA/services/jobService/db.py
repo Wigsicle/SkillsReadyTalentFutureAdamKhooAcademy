@@ -50,7 +50,7 @@ class JobListing(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(255))
-    monthly_salary: Mapped[Optional[int]] = mapped_column(Integer, nullable=True) 
+    monthly_salary: Mapped[Optional[int]] = mapped_column(Integer, nullable=False) 
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     available_spot_count: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -117,53 +117,103 @@ class JobDB:
     
     def create_job(self, job_data: dict) -> Optional[int]:
         """Insert a new job into the database using raw SQL."""
-        sql = """
-        INSERT INTO job_listing (name, description, monthly_salary, start_date, end_date, available_spot_count, company_id, employment_type_id) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """
-        values = (
-            job_data["name"],
-            job_data["description"],
-            job_data["monthly_salary"],
-            job_data["start_date"],
-            job_data["end_date"],
-            job_data["available_spot_count"],
-            job_data["company_id"],
-            job_data["employment_type_id"],
-        )
+
+        industry_id = self.get_company_industry_id(job_data["company_id"])
+    
+        if industry_id is None:
+            print(f"ERROR: No industry found for company_id {job_data['company_id']}")
+            return None
+    
+        sql = text("""
+        INSERT INTO job_listing (
+                   name, 
+                   description, 
+                   monthly_salary, 
+                   start_date, 
+                   end_date, 
+                   available_spot_count, 
+                   company_id, 
+                   employment_type_id) 
+        VALUES (
+                   :name, 
+                   :description, 
+                   :monthly_salary, 
+                   :start_date, 
+                   :end_date, 
+                   :available_spot_count, 
+                   :company_id, 
+                   :employment_type_id
+                )
+                RETURNING id;
+                   """)
+        values = {
+            "name": job_data["name"],
+            "description": job_data["description"],
+            "monthly_salary": job_data["monthly_salary"],
+            "start_date": job_data["start_date"],
+            "end_date": job_data["end_date"],
+            "available_spot_count": job_data["available_spot_count"],
+            "company_id": job_data["company_id"],
+            "employment_type_id": job_data["employment_type_id"],
+    }
 
         try:
-            self.cursor.execute(sql, values)
-            self.conn.commit()
-            return self.cursor.lastrowid  # Return created job ID
-        except sqlite3.Error as e:
+            result = self.session.execute(sql, values)
+            self.session.commit()
+            job_id = result.scalar()  # Retrieve the generated job ID
+
+            if job_id:
+                # Retrieve company and industry names
+                company_name = self.get_company_name(job_data["company_id"])
+                industry_name = self.get_industry_name(industry_id)
+                employment_value = self.get_employment_value(job_data["employment_type_id"])
+
+                return {
+                    "job_id": job_id,
+                    "name": job_data["name"],
+                    "description": job_data["description"],
+                    "monthly_salary": job_data["monthly_salary"],
+                    "start_date": job_data["start_date"],
+                    "end_date": job_data["end_date"],
+                    "available_spot_count": job_data["available_spot_count"],
+                    "company_id": job_data["company_id"],
+                    "company_name": company_name,
+                    "employment_type_id": job_data["employment_type_id"],
+                    "employment_value": employment_value,
+                    "industry_id": industry_id,
+                    "industry_name": industry_name
+                }
+            return None
+
+        except SQLAlchemyError as e:
             print(f"ERROR in create_job: {e}")
-            self.conn.rollback()
+            self.session.rollback()
             return None
 
 
-
     def update_job(self, job_id: int, update_data: dict) -> bool:
-        """Update an existing job listing using raw SQL."""
-        sql = "UPDATE job_listing SET "
-        updates = []
-        values = []
+        """Update an existing job listing using raw SQL in PostgreSQL."""
+        
+        if not update_data:
+            print("ERROR in update_job: No update data provided.")
+            return False
 
-        for key, value in update_data.items():
-            updates.append(f"{key} = ?")
-            values.append(value)
+        updates = [f"{key} = :{key}" for key in update_data.keys()]
+        sql = text(f"""
+            UPDATE job_listing 
+            SET {", ".join(updates)}
+            WHERE id = :job_id
+        """)
 
-        sql += ", ".join(updates)
-        sql += " WHERE id = ?"
-        values.append(job_id)
+        update_data["job_id"] = job_id  # Add job_id to the parameter dictionary
 
         try:
-            self.cursor.execute(sql, tuple(values))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if at least one row was updated
-        except sqlite3.Error as e:
+            result = self.session.execute(sql, update_data)
+            self.session.commit()
+            return result.rowcount > 0  # True if at least one row was updated
+        except SQLAlchemyError as e:
             print(f"ERROR in update_job: {e}")
-            self.conn.rollback()
+            self.session.rollback()
             return False
 
         
@@ -181,7 +231,8 @@ class JobDB:
                     job_listing.available_spot_count, 
                     company.id AS company_id,    
                     company.name AS company_name, 
-                    employment_type.id,
+                    employment_type.id AS employment_type_id,
+                    employment_type.value AS employment_value,
                     company.industry_id as industry_id,      
                     industry.name AS industry_name
             FROM job_listing
@@ -237,18 +288,43 @@ class JobDB:
 
     def delete_job(self, job_id: int) -> bool:
         """Delete a job by jobId using raw SQL."""
-        sql = "DELETE FROM job_listing WHERE id = ?"
+        sql = text("DELETE FROM job_listing WHERE id = :job_id")
 
         try:
-            self.cursor.execute(sql, (job_id,))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if a row was deleted
-        except sqlite3.Error as e:
+            result = self.session.execute(sql, {"job_id": job_id})
+            self.session.commit()
+            return result.rowcount > 0  # True if a row was deleted
+        except SQLAlchemyError as e:
             print(f"ERROR in delete_job: {e}")
-            self.conn.rollback()
+            self.session.rollback()
             return False
 
-        
+    
+    def get_company_name(self, company_id: int) -> str:
+        """Retrieve company name based on company ID."""
+        sql = "SELECT name FROM company WHERE id = :company_id"
+        result = self.session.execute(text(sql), {"company_id": company_id}).fetchone()
+        return result[0] if result else "Unknown"
+    
+    def get_company_industry_id(self, company_id: int) -> Optional[int]:
+        """Retrieve the industry ID of a company based on the company ID."""
+        sql = text("SELECT industry_id FROM company WHERE id = :company_id")
+        result = self.session.execute(sql, {"company_id": company_id}).fetchone()
+        return result[0] if result else None
+
+
+    def get_industry_name(self, industry_id: int) -> str:
+        """Retrieve industry name based on industry ID."""
+        sql = "SELECT name FROM industry WHERE id = :industry_id"
+        result = self.session.execute(text(sql), {"industry_id": industry_id}).fetchone()
+        return result[0] if result else "Unknown"
+    
+    def get_employment_value(self, employment_type_id: int) -> str:
+        """Retrieve employment type value based on employment type ID."""
+        sql = text("SELECT value FROM employment_type WHERE id = :employment_type_id")
+        result = self.session.execute(sql, {"employment_type_id": employment_type_id}).fetchone()
+        return result[0] if result else "Unknown"
+
     def apply_job(self, applicant_id: int, job_id: int, resume_link: str, additional_info: Optional[str] = None) -> Optional[int]:
         """Allows a user to apply for a job using raw SQL."""
         sql = """
@@ -260,7 +336,7 @@ class JobDB:
         try:
             self.cursor.execute(sql, values)
             self.conn.commit()
-            return self.cursor.lastrowid
+            return self.cursor.lastrowid  # Return newly inserted application ID
         except sqlite3.Error as e:
             print(f"ERROR in apply_job: {e}")
             self.conn.rollback()

@@ -160,12 +160,12 @@ async def getJobDetails(jobId: str) -> job_pb2.JobData:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
         
-async def createJob(job: Job) -> job_pb2.JobData:
-    """Create a new job listing."""
+async def createJob(job: job_pb2.JobData) -> job_pb2.JobData:
+    """Create a new job listing and return the Protobuf JobData object."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.CreateJob(job_pb2.JobData(
+            response = await stub.CreateJob(job_pb2.JobData(
                 name=job.name,
                 description=job.description,
                 monthlySalary=job.monthlySalary,
@@ -173,11 +173,14 @@ async def createJob(job: Job) -> job_pb2.JobData:
                 endDate=job.endDate,
                 availableSpotCount=job.availableSpotCount,
                 companyId=job.companyId,
-                employmentType=job.employmentTypeId,
-                industryId=job.industryId,
+                employmentTypeId=job.employmentTypeId
             ))
+
+            return response  # ✅ Return Protobuf object directly
+
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
 
 async def updateJob(jobId: str, job: Job) -> job_pb2.JobData:
     """Update an existing job listing."""
@@ -193,18 +196,26 @@ async def updateJob(jobId: str, job: Job) -> job_pb2.JobData:
                 endDate=job.endDate,
                 availableSpotCount=job.availableSpotCount,
                 companyId=job.companyId,
-                employmentType=job.employmentTypeId,    
+                employmentTypeId=job.employmentTypeId,    
                 industryId=job.industryId,
             ))
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def deleteJob(jobId: str) -> job_pb2.JobId:
+
+
+async def deleteJob(jobId: int) -> dict:
     """Delete a job listing."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.DeleteJob(job_pb2.JobId(jobId=jobId))
+            response = await stub.DeleteJob(job_pb2.JobId(jobId=jobId))
+
+            if response.jobId == 0:
+                raise HTTPException(status_code=404, detail="Job not found or deletion failed.")
+
+            return {"message": "Job deleted successfully", "jobId": response.jobId}
+
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 

@@ -26,10 +26,11 @@ message JobData {
   string endDate = 6;
   int32 availableSpotCount = 7;
   int32 companyId = 8;
-  int32 employmentTypeId = 9;
-  int32 industryId = 10;    
-  string companyName = 11;
-  string industryName = 12;     
+  string companyName = 9;
+  int32 employmentTypeId = 10;
+  string employmentValue = 11;
+  int32 industryId = 12;
+  string industryName = 13;     
 }
 
 // Response message containing a list of jobs

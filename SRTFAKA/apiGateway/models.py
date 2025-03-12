@@ -44,12 +44,13 @@ class Job(BaseModel):
     monthlySalary: Optional[int] = None
     startDate: str
     endDate: str
-    companyId: int
-    employmentTypeId: int
     availableSpotCount: int
-    industryId: int
-    companyName: str
-    industryName: str
+    companyId: int
+    companyName: Optional[str] = None
+    employmentTypeId: int
+    employmentValue: Optional[str] = None
+    industryId: Optional[int] = None
+    industryName: Optional[str] = None
 
 class JobResponse(Job):
     jobId: int

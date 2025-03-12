@@ -6,7 +6,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class JobData(_message.Message):
-    __slots__ = ("jobId", "name", "description", "monthlySalary", "startDate", "endDate", "availableSpotCount", "companyId", "employmentTypeId", "industryId", "companyName", "industryName")
+    __slots__ = ("jobId", "name", "description", "monthlySalary", "startDate", "endDate", "availableSpotCount", "companyId", "companyName", "employmentTypeId", "employmentValue", "industryId", "industryName")
     JOBID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
@@ -15,9 +15,10 @@ class JobData(_message.Message):
     ENDDATE_FIELD_NUMBER: _ClassVar[int]
     AVAILABLESPOTCOUNT_FIELD_NUMBER: _ClassVar[int]
     COMPANYID_FIELD_NUMBER: _ClassVar[int]
-    EMPLOYMENTTYPEID_FIELD_NUMBER: _ClassVar[int]
-    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
     COMPANYNAME_FIELD_NUMBER: _ClassVar[int]
+    EMPLOYMENTTYPEID_FIELD_NUMBER: _ClassVar[int]
+    EMPLOYMENTVALUE_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
     INDUSTRYNAME_FIELD_NUMBER: _ClassVar[int]
     jobId: int
     name: str
@@ -27,11 +28,12 @@ class JobData(_message.Message):
     endDate: str
     availableSpotCount: int
     companyId: int
-    employmentTypeId: int
-    industryId: int
     companyName: str
+    employmentTypeId: int
+    employmentValue: str
+    industryId: int
     industryName: str
-    def __init__(self, jobId: _Optional[int] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., monthlySalary: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., availableSpotCount: _Optional[int] = ..., companyId: _Optional[int] = ..., employmentTypeId: _Optional[int] = ..., industryId: _Optional[int] = ..., companyName: _Optional[str] = ..., industryName: _Optional[str] = ...) -> None: ...
+    def __init__(self, jobId: _Optional[int] = ..., name: _Optional[str] = ..., description: _Optional[str] = ..., monthlySalary: _Optional[int] = ..., startDate: _Optional[str] = ..., endDate: _Optional[str] = ..., availableSpotCount: _Optional[int] = ..., companyId: _Optional[int] = ..., companyName: _Optional[str] = ..., employmentTypeId: _Optional[int] = ..., employmentValue: _Optional[str] = ..., industryId: _Optional[int] = ..., industryName: _Optional[str] = ...) -> None: ...
 
 class JobList(_message.Message):
     __slots__ = ("jobs",)

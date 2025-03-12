@@ -20,7 +20,6 @@ from SRTFAKA.generated import job_pb2_grpc
 from .db import JobDB
 from datetime import datetime
 
-
 jobDB = JobDB()
 
 class Job(job_pb2_grpc.JobServicer):
@@ -49,29 +48,16 @@ class Job(job_pb2_grpc.JobServicer):
                     companyId=int(row[7]),
                     companyName=row[8],
                     employmentTypeId=int(row[9]),
-                    industryId=int(row[10]),
-                    industryName=row[11]  
+                    employmentValue=row[10],
+                    industryId=int(row[11]),
+                    industryName=row[12]  
                 ))
             except IndexError:
-                print(f"❌ ERROR: Row structure mismatch! {row}")  # ✅ Debugging Step
+                print(f"ERROR: Row structure mismatch! {row}")
                 context.set_code(grpc.StatusCode.INTERNAL)
                 context.set_details("Data format error in job retrieval.")
                 return job_pb2.JobList()
 
-        # jobs = [
-        #     job_pb2.JobData(
-        #         jobId=row[0],  
-        #         name=row[1],
-        #         description=row[2] or "",
-        #         companyId=row[3],
-        #         employmentTypeId=row[4],  
-        #         startDate=row[5].strftime("%Y-%m-%d"),
-        #         endDate=row[6].strftime("%Y-%m-%d"),
-        #         availableSpotCount=row[7],
-        #         industryId=row[8],
-        #     ) 
-        #     for row in rows
-        # ]
         return job_pb2.JobList(jobs=jobs)
 
     async def GetJobDetails(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
@@ -97,29 +83,54 @@ class Job(job_pb2_grpc.JobServicer):
 
 
     async def CreateJob(self, request: job_pb2.JobData, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
-        """Create a new job listing"""
-        job_data = {
-             "name": request.name,
-            "description": request.description,
-            "monthly_salary": request.monthlySalary,
-            "start_date": datetime.strptime(request.startDate, "%Y-%m-%d"),
-            "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
-            "available_spot_count": request.availableSpotCount,
-            "company_id": request.companyId,
-            "employment_type_id": request.employmentTypeId,
-            "industry_id": request.industryId,
-        }
+        """Create a new job listing and return the job details including company, industry, and employment values."""
         
-        job_id = jobDB.create_job(job_data)
-        if not job_id:
+        try:
+            # Extracting job data
+            job_data = {
+                "name": request.name,
+                "description": request.description if request.description else "",  # Avoid NoneType
+                "monthly_salary": request.monthlySalary,
+                "start_date": datetime.strptime(request.startDate, "%Y-%m-%d"),
+                "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
+                "available_spot_count": request.availableSpotCount,
+                "company_id": request.companyId,
+                "employment_type_id": request.employmentTypeId,
+            }
+
+            
+            created_job = jobDB.create_job(job_data)
+            
+            if not created_job:
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details("Failed to create job.")
+                return job_pb2.JobData()
+
+           
+            return job_pb2.JobData(
+                jobId=created_job.get("job_id", 0),
+                name=created_job.get("name", ""),
+                description=created_job.get("description", ""),
+                monthlySalary=created_job.get("monthly_salary", 0),
+                startDate=created_job["start_date"].strftime("%Y-%m-%d") if created_job.get("start_date") else "",
+                endDate=created_job["end_date"].strftime("%Y-%m-%d") if created_job.get("end_date") else "",
+                availableSpotCount=created_job.get("available_spot_count", 0),
+                companyId=created_job.get("company_id", 0),
+                companyName=created_job.get("company_name", ""),
+                employmentTypeId=created_job.get("employment_type_id", 0),
+                employmentValue=created_job.get("employment_value", ""),
+                industryId=created_job.get("industry_id", 0),
+                industryName=created_job.get("industry_name", "")
+            )
+
+        except Exception as e:
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Failed to create job.")
+            context.set_details(f"Unexpected error: {str(e)}")
             return job_pb2.JobData()
-        
-        return job_pb2.JobData(jobId=job_id, name=request.name, companyId=request.companyId)
 
     async def UpdateJob(self, request: job_pb2.JobData, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
         """Update an existing job listing"""
+
         update_data = {
             "name": request.name,
             "description": request.description,
@@ -137,17 +148,19 @@ class Job(job_pb2_grpc.JobServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Job update failed.")
             return job_pb2.JobData()
-        
+
         return job_pb2.JobData(jobId=request.jobId)
 
 
     async def DeleteJob(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobId:
-        """Delete a job by its ID"""
+        """Delete a job by its ID."""
         deleted = jobDB.delete_job(request.jobId)
+
         if not deleted:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Job not found or deletion failed.")
-        
+            return job_pb2.JobId(jobId=0)
+
         return job_pb2.JobId(jobId=request.jobId)
 
     async def ApplyJob(self, request: job_pb2.ApplicationData, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationId:

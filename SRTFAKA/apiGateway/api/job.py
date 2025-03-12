@@ -19,14 +19,14 @@ async def create_job(job: Job):
     return {"message": "Job created", "data": MessageToDict(newJob)}
 
 @job.put("/job/update")
-async def update_job(jobId: str, job: Job, currentUser: JobResponse = Depends(getCurrentUser)):
+async def update_job(jobId: int, job: Job):
     response = await updateJob(jobId, job)
     if response is None:
         raise HTTPException(status_code=500, detail="Error occured")
     return {"message": "Job updated", "data": MessageToDict(response)}
 
 @job.delete("/job")
-async def delete_job(jobId: str, currentUser: JobResponse = Depends(getCurrentUser)):
+async def delete_job(jobId: int):
     deletedJob = await deleteJob(jobId)
     if deletedJob is None:
         raise HTTPException(status_code=500, detail="Error occured")
