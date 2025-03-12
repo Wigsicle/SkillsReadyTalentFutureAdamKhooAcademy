@@ -23,7 +23,7 @@ class CreateAccountRequest(_message.Message):
     USERNAME_FIELD_NUMBER: _ClassVar[int]
     PASSWORD_FIELD_NUMBER: _ClassVar[int]
     EMAIL_FIELD_NUMBER: _ClassVar[int]
-    COUNTRY_FIELD_NUMBER: _ClassVar[int]
+    COUNTRY_ID_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     USER_TYPE_ID_FIELD_NUMBER: _ClassVar[int]
     firstname: str
@@ -34,7 +34,7 @@ class CreateAccountRequest(_message.Message):
     country_id: int
     address: str
     user_type_id: int
-    def __init__(self, firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ..., email: _Optional[str] = ..., country: _Optional[int] = ..., address: _Optional[str] = ..., user_type_id: _Optional[int] = ...) -> None: ...
+    def __init__(self, firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ..., email: _Optional[str] = ..., country_id: _Optional[int] = ..., address: _Optional[str] = ..., user_type_id: _Optional[int] = ...) -> None: ...
 
 class UpdateAccountRequest(_message.Message):
     __slots__ = ("userId", "firstname", "lastname", "username", "password", "email", "country_id", "address")
