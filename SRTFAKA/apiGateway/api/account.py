@@ -15,7 +15,7 @@ async def get_account(currentUser: AccountResponse = Depends(getCurrentUser)):
     return {"message": "Account retrieved", "data": MessageToDict(account)}
 
 @account.post("/accounts/create") 
-async def create_account(firstname: str = Form, lastname: str = Form, username: str = Form, password: str = Form, country: str = Form, address: str = Form, email: str = Form, type: str = Form): 
+async def create_account(firstname: str = Form, lastname: str = Form, username: str = Form, password: str = Form, country: int = Form, address: str = Form, email: str = Form, type: int = Form): 
     accountObj = AccountCreation(firstname=firstname, lastname=lastname, username=username, password=hashPassword(password), country=country, address=address, email=email, type=type) 
     newAccount = await createAccount(accountObj) 
     if newAccount is None:

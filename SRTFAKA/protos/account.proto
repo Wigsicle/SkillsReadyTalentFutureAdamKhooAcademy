@@ -36,9 +36,9 @@ message CreateAccountRequest{
   string username = 3;
   string password = 4;
   string email = 5;
-  string country = 6;
+  int32 country = 6;
   string address = 7;
-  string type = 8;
+  int32 user_type_id = 8;
 }
 message UpdateAccountRequest {
   string userId = 1;
@@ -47,9 +47,8 @@ message UpdateAccountRequest {
   string username = 4;
   string password = 5;
   string email = 6;
-  string country = 7;
+  int32 country_id = 7;
   string address = 8;
-  string type = 9;
 }
 message AccountResponse {
   string userId = 1;
@@ -58,9 +57,9 @@ message AccountResponse {
   string username = 4;
   string password = 5;
   string email = 6;
-  string country = 7;
+  int32 country_id = 7;
   string address = 8;
-  string type = 9;
+  int32 user_type_id = 9;
 }
 message DeleteResponse{
   int32 status = 1;
