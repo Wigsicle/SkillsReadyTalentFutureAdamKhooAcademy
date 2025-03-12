@@ -2,26 +2,43 @@ syntax = "proto3";
 
 package Certificate;
 
-// The Certificate service definition.
-service Certificate {
-  rpc GetAllCertificate (CertificateData) returns (CertificateList) {}
+service CertificateService {
+  // Creates a new generic certificate in the database
   rpc CreateCertificate (CertificateData) returns (CertificateData) {}
-  rpc UpdateCertificate (CertificateData) returns (CertificateData) {}
-  rpc DeleteCertificate (CertificateId) returns (CertificateId) {}
+
+  // Issues a certificate to a user & adds it to the blockchain
+  rpc IssueCertificate (UserCertificateData) returns (UserCertificateData) {}
+
+  // Retrieves all certificates owned by a specific user
+  rpc GetUserCertificates (UserId) returns (UserCertificateList) {}
 }
 
-// Message representing a single certificate record
+// Message representing a generic certificate
 message CertificateData {
-  string name = 1;
-  string courseId = 2;
-  string certificateId = 3;
+  string id = 1;
+  string name = 2;
+  string courseId = 3;
+  string validityPeriod = 4;
+  string description = 5;
+  string additionalInfo = 6;
 }
 
-// Response message containing a list of certificates
-message CertificateList {
-  repeated CertificateData certificates = 1;
+// Message representing a user-issued certificate
+message UserCertificateData {
+  string id = 1;    // Unique ID of the issued certificate (from user_cert table)
+  string userId = 2;        // Matches user_id in the database
+  string certificateId = 3; // Matches cert_id in the database
+  string issuedOn = 4;      // Date when the certificate was issued
+  string expiresOn = 5;     // Expiration date (nullable)
+  string additionalInfo = 6;// JSON metadata (optional)
 }
 
-message CertificateId{
-  string certificateId = 1;
+// List of user certificates
+message UserCertificateList {
+  repeated UserCertificateData userCertificates = 1;
+}
+
+// Request messages
+message UserId {
+  string userId = 1;
 }

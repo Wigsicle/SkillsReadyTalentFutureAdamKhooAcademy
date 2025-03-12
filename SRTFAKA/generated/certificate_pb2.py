@@ -24,19 +24,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63\x65rtificate.proto\x12\x0b\x43\x65rtificate\"H\n\x0f\x43\x65rtificateData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08\x63ourseId\x18\x02 \x01(\t\x12\x15\n\rcertificateId\x18\x03 \x01(\t\"E\n\x0f\x43\x65rtificateList\x12\x32\n\x0c\x63\x65rtificates\x18\x01 \x03(\x0b\x32\x1c.Certificate.CertificateData\"&\n\rCertificateId\x12\x15\n\rcertificateId\x18\x01 \x01(\t2\xd5\x02\n\x0b\x43\x65rtificate\x12Q\n\x11GetAllCertificate\x12\x1c.Certificate.CertificateData\x1a\x1c.Certificate.CertificateList\"\x00\x12Q\n\x11\x43reateCertificate\x12\x1c.Certificate.CertificateData\x1a\x1c.Certificate.CertificateData\"\x00\x12Q\n\x11UpdateCertificate\x12\x1c.Certificate.CertificateData\x1a\x1c.Certificate.CertificateData\"\x00\x12M\n\x11\x44\x65leteCertificate\x12\x1a.Certificate.CertificateId\x1a\x1a.Certificate.CertificateId\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63\x65rtificate.proto\x12\x0b\x43\x65rtificate\"\x82\x01\n\x0f\x43\x65rtificateData\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x10\n\x08\x63ourseId\x18\x03 \x01(\t\x12\x16\n\x0evalidityPeriod\x18\x04 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x05 \x01(\t\x12\x16\n\x0e\x61\x64\x64itionalInfo\x18\x06 \x01(\t\"\x85\x01\n\x13UserCertificateData\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06userId\x18\x02 \x01(\t\x12\x15\n\rcertificateId\x18\x03 \x01(\t\x12\x10\n\x08issuedOn\x18\x04 \x01(\t\x12\x11\n\texpiresOn\x18\x05 \x01(\t\x12\x16\n\x0e\x61\x64\x64itionalInfo\x18\x06 \x01(\t\"Q\n\x13UserCertificateList\x12:\n\x10userCertificates\x18\x01 \x03(\x0b\x32 .Certificate.UserCertificateData\"\x18\n\x06UserId\x12\x0e\n\x06userId\x18\x01 \x01(\t2\x91\x02\n\x12\x43\x65rtificateService\x12Q\n\x11\x43reateCertificate\x12\x1c.Certificate.CertificateData\x1a\x1c.Certificate.CertificateData\"\x00\x12X\n\x10IssueCertificate\x12 .Certificate.UserCertificateData\x1a .Certificate.UserCertificateData\"\x00\x12N\n\x13GetUserCertificates\x12\x13.Certificate.UserId\x1a .Certificate.UserCertificateList\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'certificate_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_CERTIFICATEDATA']._serialized_start=34
-  _globals['_CERTIFICATEDATA']._serialized_end=106
-  _globals['_CERTIFICATELIST']._serialized_start=108
-  _globals['_CERTIFICATELIST']._serialized_end=177
-  _globals['_CERTIFICATEID']._serialized_start=179
-  _globals['_CERTIFICATEID']._serialized_end=217
-  _globals['_CERTIFICATE']._serialized_start=220
-  _globals['_CERTIFICATE']._serialized_end=561
+  _globals['_CERTIFICATEDATA']._serialized_start=35
+  _globals['_CERTIFICATEDATA']._serialized_end=165
+  _globals['_USERCERTIFICATEDATA']._serialized_start=168
+  _globals['_USERCERTIFICATEDATA']._serialized_end=301
+  _globals['_USERCERTIFICATELIST']._serialized_start=303
+  _globals['_USERCERTIFICATELIST']._serialized_end=384
+  _globals['_USERID']._serialized_start=386
+  _globals['_USERID']._serialized_end=410
+  _globals['_CERTIFICATESERVICE']._serialized_start=413
+  _globals['_CERTIFICATESERVICE']._serialized_end=686
 # @@protoc_insertion_point(module_scope)

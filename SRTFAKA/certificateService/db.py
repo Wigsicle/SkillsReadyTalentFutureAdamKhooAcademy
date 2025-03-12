@@ -1,11 +1,13 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base
+#from apiGateway.base import Base
+from SRTFAKA.apiGateway.base import Base
+
 
 # Database Connection
 DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db"
@@ -55,13 +57,48 @@ class UserCertificate(Base):
 #  **Helper Functions for Queries**
 # =====================================
 
-def create_certificate(db: Session, name: str, course_id: int, blockchain_tx_id: str = None, certificate_hash: str = None):
+def create_certificate(db: Session, name: str, course_id: int, validity_period: datetime, description: str, additional_info: dict):
+    """Creates a new generic certificate in the database."""
+    new_cert = Certificate(
+        name=name,
+        course_id=course_id,
+        validity_period=validity_period,
+        description=description,
+        additional_info=additional_info
+    )
+    db.add(new_cert)
+    db.commit()
+    db.refresh(new_cert)
+    return new_cert
+
+def issue_certificate(db: Session, user_id: int, cert_id: int, issued_on: datetime, expires_on: datetime, additional_info: dict):
+    """Issues a new certificate to a user based on an existing certificate."""
+    cert = db.query(Certificate).filter(Certificate.id == cert_id).first()
+    if not cert:
+        return None  # Certificate does not exist
+
+    new_user_cert = UserCertificate(
+        user_id=user_id,
+        cert_id=cert_id,
+        issued_on=issued_on,
+        expires_on=expires_on,
+        additional_info=additional_info
+    )
+    db.add(new_user_cert)
+    db.commit()
+    db.refresh(new_user_cert)
+    return new_user_cert
+
+def get_user_certificates(db: Session, user_id: int):
+    """Fetches all certificates owned by a specific user."""
+    return db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
+
+'''
+def create_certificate(db: Session, name: str, course_id: int):
     """Create and store a new certificate in the database."""
     new_cert = Certificate(
         name=name,
         course_id=course_id,
-        blockchain_tx_id=blockchain_tx_id,
-        certificate_hash=certificate_hash
     )
     db.add(new_cert)
     db.commit()
@@ -102,3 +139,4 @@ def delete_certificate(db: Session, certificate_id: int):
 def get_user_certificates(db: Session, user_id: int):
     """Fetch all certificates belonging to a specific user."""
     return db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
+'''

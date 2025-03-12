@@ -16,153 +16,123 @@ import asyncio
 import logging
 import grpc
 from sqlalchemy.orm import Session
+from typing import List
+from grpc_reflection.v1alpha import reflection
 
-from ..generated import certificate_pb2
-from ..generated import certificate_pb2_grpc
+
+
+#from ..generated import certificate_pb2
+#from ..generated import certificate_pb2_grpc
+from SRTFAKA.generated import certificate_pb2
+from SRTFAKA.generated import certificate_pb2_grpc
+
+
 from ..common.utils import generateRandomId
 #from .db import CertificateDB
-from .db import get_db, Certificate, UserCertificate
+from .db import get_db, issue_certificate, get_user_certificates
 from .fabric_gateway import FabricClient
 
 fabric_client = FabricClient()  # Blockchain client instance
 
 class CertificateService(certificate_pb2_grpc.CertificateServicer):
-    
-    async def GetAllCertificate(self, request, context):
-        """Fetches all certificates from the centralized database."""
-        try:
-            with next(get_db()) as db:
-                certificates = db.query(Certificate).all()
-                if not certificates:
-                    context.set_code(grpc.StatusCode.NOT_FOUND)
-                    context.set_details("No certificates found.")
-                    return certificate_pb2.CertificateList()
-                
-                return certificate_pb2.CertificateList(
-                    certificates=[
-                        certificate_pb2.CertificateData(
-                            certificateId=str(cert.id),
-                            name=cert.name,
-                            courseId=str(cert.course_id),
-                            blockchainTxId=cert.blockchain_tx_id or "",
-                            certificateHash=cert.certificate_hash or "",
-                        )
-                        for cert in certificates
-                    ]
-                )
-        except Exception as e:
-            logging.error(f"Error in GetAllCertificate: {e}")
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Internal server error.")
-            return certificate_pb2.CertificateList()
+    def __init__(self):
+        self.db = next(get_db())
 
     async def CreateCertificate(self, request, context):
-        """Issues a certificate, stores it in the database, and submits to the blockchain."""
-        new_certificate_id = generateRandomId()
+        """Creates a new generic certificate and stores it in the database."""
+        new_cert = create_certificate(
+            db=self.db,
+            name=request.name,
+            course_id=int(request.courseId),
+            validity_period=datetime.strptime(request.validityPeriod, "%H:%M:%S").time(),
+            description=request.description,
+            additional_info=request.additionalInfo
+        )
+        return certificate_pb2.CertificateData(
+            id=str(new_cert.id),
+            name=new_cert.name,
+            courseId=str(new_cert.course_id),
+            validityPeriod=new_cert.validity_period.strftime("%H:%M:%S"),
+            description=new_cert.description,
+            additionalInfo=json.dumps(new_cert.additional_info) if new_cert.additional_info else "{}"  # Convert to JSON string
+        )
 
-        try:
-            # Call Blockchain to issue certificate
-            tx_id, cert_hash = fabric_client.create_certificate(new_certificate_id, request.name, request.courseId)
+    async def IssueCertificate(self, request, context):
+        """Issues a certificate to a user and adds it to the blockchain."""
+        issued_cert = issue_certificate(
+            db=self.db,
+            user_id=int(request.userId),
+            cert_id=int(request.certificateId),
+            issued_on=datetime.strptime(request.issuedOn, "%Y-%m-%d"),
+            expires_on=datetime.strptime(request.expiresOn, "%Y-%m-%d"),
+            additional_info=json.loads(request.additionalInfo) if request.additionalInfo else {}
+        )
 
-            if not tx_id:
-                context.set_code(grpc.StatusCode.INTERNAL)
-                context.set_details("Blockchain transaction failed.")
-                return certificate_pb2.CertificateData()
+        if not issued_cert:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details("Base certificate not found in database.")
+            return certificate_pb2.UserCertificateData()
 
-            # Store certificate in DB
-            with next(get_db()) as db:
-                new_cert = Certificate(
-                    id=new_certificate_id,
-                    name=request.name,
-                    course_id=int(request.courseId),
-                    blockchain_tx_id=tx_id,
-                    certificate_hash=cert_hash
-                )
-                db.add(new_cert)
-                db.commit()
-                db.refresh(new_cert)
+        # Issue certificate in blockchain
+        success = fabric_client.create_certificate(
+            certificate_id=str(issued_cert.id),
+            #name=issued_cert.cert_info.name,
+            course_id=str(issued_cert.cert_info.course_id),
+            owner=str(issued_cert.user_id)
+        )
 
-                return certificate_pb2.CertificateData(
-                    certificateId=str(new_cert.id),
-                    name=new_cert.name,
-                    courseId=str(new_cert.course_id),
-                    blockchainTxId=tx_id,
-                    certificateHash=cert_hash
-                )
-
-        except Exception as e:
-            logging.error(f"Error in CreateCertificate: {e}")
+        if not success:
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Failed to create certificate.")
-            return certificate_pb2.CertificateData()
+            context.set_details("Failed to write certificate to blockchain.")
+            return certificate_pb2.UserCertificateData()
+
+        return certificate_pb2.UserCertificateData(
+            id=str(issued_cert.id),
+            userId=str(issued_cert.user_id),
+            certificateId=str(issued_cert.cert_id),
+            issuedOn=issued_cert.issued_on.strftime("%Y-%m-%d"),
+            expiresOn=issued_cert.expires_on.strftime("%Y-%m-%d"),
+            additionalInfo=json.dumps(issued_cert.additional_info) if issued_cert.additional_info else "{}"
+        )
 
     async def GetUserCertificates(self, request, context):
-        """Fetches all certificates owned by a user from the centralized database."""
-        try:
-            with next(get_db()) as db:
-                user_certificates = (
-                    db.query(UserCertificate)
-                    .filter(UserCertificate.user_id == request.user_id)
-                    .all()
+        """Fetches all certificates owned by a user."""
+        user_certificates = get_user_certificates(self.db, int(request.userId))
+        if not user_certificates:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details("No certificates found for user.")
+            return certificate_pb2.UserCertificateList()
+
+        return certificate_pb2.UserCertificateList(
+            userCertificates=[
+                certificate_pb2.UserCertificateData(
+                    id=str(cert.id),
+                    userId=str(cert.user_id),
+                    certificateId=str(cert.cert_id),
+                    issuedOn=cert.issued_on.strftime("%Y-%m-%d"),
+                    expiresOn=cert.expires_on.strftime("%Y-%m-%d"),
+                    additionalInfo=cert.additional_info or ""
                 )
-
-                if not user_certificates:
-                    context.set_code(grpc.StatusCode.NOT_FOUND)
-                    context.set_details("No certificates found for user.")
-                    return certificate_pb2.CertificateList()
-
-                return certificate_pb2.CertificateList(
-                    certificates=[
-                        certificate_pb2.CertificateData(
-                            certificateId=str(cert.cert_id),
-                            name=cert.cert_info.name,
-                            courseId=str(cert.cert_info.course_id),
-                            blockchainTxId=cert.blockchain_tx_id or "",
-                            certificateHash=cert.certificate_hash or "",
-                        )
-                        for cert in user_certificates
-                    ]
-                )
-        except Exception as e:
-            logging.error(f"Error in GetUserCertificates: {e}")
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Internal server error.")
-            return certificate_pb2.CertificateList()
-
-    async def GetCertificateDetails(self, request, context):
-        """Fetches details of a specific certificate from the centralized database."""
-        try:
-            with next(get_db()) as db:
-                certificate = db.query(Certificate).filter(Certificate.id == request.certificateId).first()
-                if not certificate:
-                    context.set_code(grpc.StatusCode.NOT_FOUND)
-                    context.set_details("Certificate not found.")
-                    return certificate_pb2.CertificateData()
-
-                return certificate_pb2.CertificateData(
-                    certificateId=str(certificate.id),
-                    name=certificate.name,
-                    courseId=str(certificate.course_id),
-                    blockchainTxId=certificate.blockchain_tx_id or "",
-                    certificateHash=certificate.certificate_hash or "",
-                )
-        except Exception as e:
-            logging.error(f"Error in GetCertificateDetails: {e}")
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Internal server error.")
-            return certificate_pb2.CertificateData()
-
+                for cert in user_certificates
+            ]
+        )
 
 async def serve():
-    """Starts the gRPC server."""
     server = grpc.aio.server()
     certificate_pb2_grpc.add_CertificateServicer_to_server(CertificateService(), server)
+
+    # Enable reflection
+    SERVICE_NAMES = (
+        certificate_pb2.DESCRIPTOR.services_by_name['Certificate'].full_name,
+        reflection.SERVICE_NAME,
+    )
+    reflection.enable_server_reflection(SERVICE_NAMES, server)
+
     listen_addr = "[::]:50055"
     server.add_insecure_port(listen_addr)
     logging.info("Starting gRPC server on %s", listen_addr)
     await server.start()
     await server.wait_for_termination()
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

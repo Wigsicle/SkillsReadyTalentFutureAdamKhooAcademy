@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from . import certificate_pb2 as certificate__pb2
+import certificate_pb2 as certificate__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__
@@ -25,9 +25,8 @@ if _version_not_supported:
     )
 
 
-class CertificateStub(object):
-    """The Certificate service definition.
-    """
+class CertificateServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -35,117 +34,75 @@ class CertificateStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetAllCertificate = channel.unary_unary(
-                '/Certificate.Certificate/GetAllCertificate',
-                request_serializer=certificate__pb2.CertificateData.SerializeToString,
-                response_deserializer=certificate__pb2.CertificateList.FromString,
-                _registered_method=True)
         self.CreateCertificate = channel.unary_unary(
-                '/Certificate.Certificate/CreateCertificate',
+                '/Certificate.CertificateService/CreateCertificate',
                 request_serializer=certificate__pb2.CertificateData.SerializeToString,
                 response_deserializer=certificate__pb2.CertificateData.FromString,
                 _registered_method=True)
-        self.UpdateCertificate = channel.unary_unary(
-                '/Certificate.Certificate/UpdateCertificate',
-                request_serializer=certificate__pb2.CertificateData.SerializeToString,
-                response_deserializer=certificate__pb2.CertificateData.FromString,
+        self.IssueCertificate = channel.unary_unary(
+                '/Certificate.CertificateService/IssueCertificate',
+                request_serializer=certificate__pb2.UserCertificateData.SerializeToString,
+                response_deserializer=certificate__pb2.UserCertificateData.FromString,
                 _registered_method=True)
-        self.DeleteCertificate = channel.unary_unary(
-                '/Certificate.Certificate/DeleteCertificate',
-                request_serializer=certificate__pb2.CertificateId.SerializeToString,
-                response_deserializer=certificate__pb2.CertificateId.FromString,
+        self.GetUserCertificates = channel.unary_unary(
+                '/Certificate.CertificateService/GetUserCertificates',
+                request_serializer=certificate__pb2.UserId.SerializeToString,
+                response_deserializer=certificate__pb2.UserCertificateList.FromString,
                 _registered_method=True)
 
 
-class CertificateServicer(object):
-    """The Certificate service definition.
-    """
-
-    def GetAllCertificate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
+class CertificateServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
 
     def CreateCertificate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """Creates a new generic certificate in the database
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UpdateCertificate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+    def IssueCertificate(self, request, context):
+        """Issues a certificate to a user & adds it to the blockchain
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DeleteCertificate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+    def GetUserCertificates(self, request, context):
+        """Retrieves all certificates owned by a specific user
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_CertificateServicer_to_server(servicer, server):
+def add_CertificateServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetAllCertificate': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAllCertificate,
-                    request_deserializer=certificate__pb2.CertificateData.FromString,
-                    response_serializer=certificate__pb2.CertificateList.SerializeToString,
-            ),
             'CreateCertificate': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateCertificate,
                     request_deserializer=certificate__pb2.CertificateData.FromString,
                     response_serializer=certificate__pb2.CertificateData.SerializeToString,
             ),
-            'UpdateCertificate': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateCertificate,
-                    request_deserializer=certificate__pb2.CertificateData.FromString,
-                    response_serializer=certificate__pb2.CertificateData.SerializeToString,
+            'IssueCertificate': grpc.unary_unary_rpc_method_handler(
+                    servicer.IssueCertificate,
+                    request_deserializer=certificate__pb2.UserCertificateData.FromString,
+                    response_serializer=certificate__pb2.UserCertificateData.SerializeToString,
             ),
-            'DeleteCertificate': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteCertificate,
-                    request_deserializer=certificate__pb2.CertificateId.FromString,
-                    response_serializer=certificate__pb2.CertificateId.SerializeToString,
+            'GetUserCertificates': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUserCertificates,
+                    request_deserializer=certificate__pb2.UserId.FromString,
+                    response_serializer=certificate__pb2.UserCertificateList.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'Certificate.Certificate', rpc_method_handlers)
+            'Certificate.CertificateService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('Certificate.Certificate', rpc_method_handlers)
+    server.add_registered_method_handlers('Certificate.CertificateService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class Certificate(object):
-    """The Certificate service definition.
-    """
-
-    @staticmethod
-    def GetAllCertificate(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/Certificate.Certificate/GetAllCertificate',
-            certificate__pb2.CertificateData.SerializeToString,
-            certificate__pb2.CertificateList.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
+class CertificateService(object):
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def CreateCertificate(request,
@@ -161,7 +118,7 @@ class Certificate(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Certificate.Certificate/CreateCertificate',
+            '/Certificate.CertificateService/CreateCertificate',
             certificate__pb2.CertificateData.SerializeToString,
             certificate__pb2.CertificateData.FromString,
             options,
@@ -175,7 +132,7 @@ class Certificate(object):
             _registered_method=True)
 
     @staticmethod
-    def UpdateCertificate(request,
+    def IssueCertificate(request,
             target,
             options=(),
             channel_credentials=None,
@@ -188,9 +145,9 @@ class Certificate(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Certificate.Certificate/UpdateCertificate',
-            certificate__pb2.CertificateData.SerializeToString,
-            certificate__pb2.CertificateData.FromString,
+            '/Certificate.CertificateService/IssueCertificate',
+            certificate__pb2.UserCertificateData.SerializeToString,
+            certificate__pb2.UserCertificateData.FromString,
             options,
             channel_credentials,
             insecure,
@@ -202,7 +159,7 @@ class Certificate(object):
             _registered_method=True)
 
     @staticmethod
-    def DeleteCertificate(request,
+    def GetUserCertificates(request,
             target,
             options=(),
             channel_credentials=None,
@@ -215,9 +172,9 @@ class Certificate(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Certificate.Certificate/DeleteCertificate',
-            certificate__pb2.CertificateId.SerializeToString,
-            certificate__pb2.CertificateId.FromString,
+            '/Certificate.CertificateService/GetUserCertificates',
+            certificate__pb2.UserId.SerializeToString,
+            certificate__pb2.UserCertificateList.FromString,
             options,
             channel_credentials,
             insecure,
