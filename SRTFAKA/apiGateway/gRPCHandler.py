@@ -42,10 +42,10 @@ async def createAccount(account: AccountCreation) -> account_pb2.AccountResponse
                 password=account.password,
                 firstname=account.firstname,
                 lastname=account.lastname,
-                country=account.country,
+                country_id=account.country_id,
                 address=account.address,
                 email=account.email,
-                type=account.type
+                user_type_id=account.user_type_id
             ))
             return response
         except grpc.aio.AioRpcError as e:

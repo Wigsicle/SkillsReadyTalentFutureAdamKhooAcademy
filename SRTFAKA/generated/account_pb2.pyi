@@ -17,7 +17,7 @@ class AccountRequestByUsername(_message.Message):
     def __init__(self, username: _Optional[str] = ...) -> None: ...
 
 class CreateAccountRequest(_message.Message):
-    __slots__ = ("firstname", "lastname", "username", "password", "email", "country", "address", "user_type_id")
+    __slots__ = ("firstname", "lastname", "username", "password", "email", "country_id", "address", "user_type_id")
     FIRSTNAME_FIELD_NUMBER: _ClassVar[int]
     LASTNAME_FIELD_NUMBER: _ClassVar[int]
     USERNAME_FIELD_NUMBER: _ClassVar[int]
@@ -31,7 +31,7 @@ class CreateAccountRequest(_message.Message):
     username: str
     password: str
     email: str
-    country: int
+    country_id: int
     address: str
     user_type_id: int
     def __init__(self, firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ..., email: _Optional[str] = ..., country: _Optional[int] = ..., address: _Optional[str] = ..., user_type_id: _Optional[int] = ...) -> None: ...

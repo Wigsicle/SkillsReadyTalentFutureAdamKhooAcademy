@@ -16,10 +16,10 @@ class AccountCreation(Account):
     username: str
     firstname: str
     lastname: str
-    country: str
+    country_id: int
     address: str
     email: str
-    type: str
+    user_type_id: int
     
 class AccountUpdate(Account):
     password: str
@@ -29,10 +29,10 @@ class AccountResponse(Account):
     password: str
     firstname: str
     lastname: str
-    country: str
+    country_id: int
     address: str
     email: str
-    type: str
+    user_type_id: int
 
 class Course(BaseModel):
     name: str

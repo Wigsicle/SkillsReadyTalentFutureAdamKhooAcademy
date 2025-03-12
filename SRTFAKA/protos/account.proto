@@ -36,7 +36,7 @@ message CreateAccountRequest{
   string username = 3;
   string password = 4;
   string email = 5;
-  int32 country = 6;
+  int32 country_id = 6;
   string address = 7;
   int32 user_type_id = 8;
 }
