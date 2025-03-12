@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base, Industry, Country
+from SRTFAKA.apiGateway.base import Base, Industry, Country
 
 indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
