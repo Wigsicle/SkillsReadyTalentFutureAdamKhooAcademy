@@ -55,10 +55,10 @@ class AccountDB:
             lastName TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            country INT NOT NULL,
+            country_id INT NOT NULL,
             address TEXT NOT NULL,
             email TEXT NOT NULL,
-            type INT NOT NULL
+            user_type_id INT NOT NULL
         );
         '''
         try:
@@ -96,7 +96,7 @@ class AccountDB:
     def createAccount(self, accountData):
         """Insert a new account into the database."""
         sql = '''
-            INSERT INTO accounts (accountId, firstName, lastName, username, password, country, address, email, type) 
+            INSERT INTO accounts (accountId, firstName, lastName, username, password, country_id, address, email, user_type_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         '''
         try:
@@ -112,11 +112,11 @@ class AccountDB:
         """Update account information for the given accountId."""
         sql = '''
             UPDATE accounts 
-            SET firstName = ?, lastName = ?, password = ?, country = ?, address = ?, email = ?, type = ?
+            SET firstName = ?, lastName = ?, password = ?, country_id = ?, address = ?, email = ?
             WHERE accountId = ?
         '''
         try:
-            self.cursor.execute(sql, (updateData['firstName'], updateData['lastName'], updateData['password'], updateData['country'], updateData['address'], updateData['email'], updateData['type'], accountId))
+            self.cursor.execute(sql, (updateData['firstName'], updateData['lastName'], updateData['password'], updateData['country_id'], updateData['address'], updateData['email'], accountId))
             self.conn.commit()
             return self.cursor.rowcount > 0  # True if the account was updated
         except sqlite3.Error as e:

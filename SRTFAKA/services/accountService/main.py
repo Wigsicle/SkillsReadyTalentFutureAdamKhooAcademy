@@ -34,11 +34,11 @@ class Account(account_pb2_grpc.AccountServicer):
             username=account["username"],
             firstname=account["firstname"],
             lastname=account["lastname"],
-            country=account["country"],
+            country_id=account["country_id"],
             address=account["address"],
             email=account["email"],
             password=account["password"],
-            type=account["type"]
+            user_type_id=account["user_type_id"]
         )
 
     async def GetAccountByUsername(self, request: account_pb2.AccountRequestByUsername, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
@@ -52,11 +52,11 @@ class Account(account_pb2_grpc.AccountServicer):
             username=account["username"],
             firstname=account["firstname"],
             lastname=account["lastname"],
-            country=account["country"],
+            country_id=account["country_id"],
             address=account["address"],
             email=account["email"],
             password=account["password"],
-            type=account["type"]
+            user_type_id=account["user_type_id"]
         )
     async def CreateAccount(self, request: account_pb2.CreateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         newUserId = generateRandomId()  # Generate a new user ID
@@ -68,10 +68,10 @@ class Account(account_pb2_grpc.AccountServicer):
                 request.lastname,         # lastName
                 request.username,         # username
                 request.password,         # password
-                request.country,          # country
+                request.country_id,          # country_id
                 request.address,          # address
                 request.email,            # email
-                request.type              # type
+                request.user_type_id              # user_type_id
             )
         )
         if account is False:
@@ -90,11 +90,11 @@ class Account(account_pb2_grpc.AccountServicer):
                 "username": request.username,
                 "firstname": request.firstname,
                 "lastname": request.lastname,
-                "country": request.country,
+                "country_id": request.country_id,
                 "address": request.address,
                 "email": request.email,
                 "password": request.password,
-                "type": request.type
+                "user_type_id": request.user_type_id
             }
         )
         if not updated:
