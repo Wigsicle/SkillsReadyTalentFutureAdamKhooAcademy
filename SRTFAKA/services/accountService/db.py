@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import pathlib
-from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, sessionmaker, Session
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from SRTFAKA.apiGateway.base import Base, Country
@@ -10,6 +10,7 @@ from SRTFAKA.certificateService.db import UserCertificate
 from SRTFAKA.courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 currentPath = os.path.dirname(os.path.abspath(__file__))
 
 class UserType(Base):
@@ -41,101 +42,83 @@ class User(Base):
 
 
 class AccountDB:
+    """Account database management using SQLAlchemy."""
     def __init__(self):
-        # SQLite database file (creates a new file if it doesn't exist)
-        db_path = currentPath + '/accounts.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # To access rows as dictionaries
-        self.cursor = self.conn.cursor()
-
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS accounts (
-            accountId TEXT PRIMARY KEY,
-            firstName TEXT NOT NULL,
-            lastName TEXT NOT NULL,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            country_id INT NOT NULL,
-            address TEXT NOT NULL,
-            email TEXT NOT NULL,
-            user_type_id INT NOT NULL
-        );
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'accounts' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
+        self.session = SessionLocal()
     
     def getAccountById(self, accountId):
-        """Fetch account details by accountId."""
+        """Fetch account details by accountId using SQLAlchemy."""
         try:
-            sql = 'SELECT * FROM accounts WHERE accountId = ?'
-            self.cursor.execute(sql, (accountId,))
-            result = self.cursor.fetchone()
-            return dict(result) if result else False
-        except sqlite3.Error as e:
-            print(f"Database error during getAccountById: {e}")
-            self.conn.rollback()
-            return False
+            account = self.session.query(User).filter(User.id == accountId).first()
+            return account if account else None
+        except Exception as e:
+            print(f"Error during getAccountById: {e}")
+            return None
 
     def getAccountByUsername(self, username):
-        """Fetch account details by username."""
+        """Fetch account details by username using SQLAlchemy."""
         try:
-            sql = 'SELECT * FROM accounts WHERE username = ?'
-            self.cursor.execute(sql, (username,))
-            result = self.cursor.fetchone()
-            return dict(result) if result else False
-        except sqlite3.Error as e:
-            print(f"Database error during getAccountByUsername: {e}")
-            self.conn.rollback()
-            return False
+            account = self.session.query(User).filter(User.email == username).first()
+            return account if account else None
+        except Exception as e:
+            print(f"Error during getAccountByUsername: {e}")
+            return None
 
     def createAccount(self, accountData):
-        """Insert a new account into the database."""
-        sql = '''
-            INSERT INTO accounts (accountId, firstName, lastName, username, password, country_id, address, email, user_type_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        '''
+        """Insert a new account into the database using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, accountData)
-            self.conn.commit()
-            return accountData[0]  # Return created account's accountId
-        except sqlite3.Error as e:
-            print(f"Database error during createAccount: {e}")
-            self.conn.rollback()
-            return False
+            new_account = User(
+                first_name=accountData[1],
+                last_name=accountData[2],
+                username=accountData[3],
+                password=accountData[4],
+                country_id=accountData[5],
+                address=accountData[6],
+                email=accountData[7],
+                user_type_id=accountData[8]
+            )
+            self.session.add(new_account)
+            self.session.commit()
+            return new_account.id  # Return created account's id
+        except Exception as e:
+            print(f"Error during createAccount: {e}")
+            self.session.rollback()
+            return None
 
     def updateAccount(self, accountId, updateData):
-        """Update account information for the given accountId."""
-        sql = '''
-            UPDATE accounts 
-            SET firstName = ?, lastName = ?, password = ?, country_id = ?, address = ?, email = ?
-            WHERE accountId = ?
-        '''
+        """Update account information using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, (updateData['firstName'], updateData['lastName'], updateData['password'], updateData['country_id'], updateData['address'], updateData['email'], accountId))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if the account was updated
-        except sqlite3.Error as e:
-            print(f"Database error during updateAccount: {e}")
-            self.conn.rollback()
+            account = self.session.query(User).filter(User.id == accountId).first()
+            if account:
+                account.first_name = updateData['firstName']
+                account.last_name = updateData['lastName']
+                account.password = updateData['password']
+                account.country_id = updateData['country_id']
+                account.address = updateData['address']
+                account.email = updateData['email']
+                self.session.commit()
+                return True
+            return False
+        except Exception as e:
+            print(f"Error during updateAccount: {e}")
+            self.session.rollback()
             return False
 
     def deleteAccount(self, accountId):
-        """Delete account by accountId."""
-        sql = 'DELETE FROM accounts WHERE accountId = ?'
+        """Delete account by accountId using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, (accountId,))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if the account was deleted
-        except sqlite3.Error as e:
-            print(f"Database error during deleteAccount: {e}")
-            self.conn.rollback()
+            account = self.session.query(User).filter(User.id == accountId).first()
+            if account:
+                self.session.delete(account)
+                self.session.commit()
+                return True
             return False
-    
+        except Exception as e:
+            print(f"Error during deleteAccount: {e}")
+            self.session.rollback()
+            return False
+
     def close(self):
-        self.cursor.close()
-        self.conn.close()
+        """Close the session."""
+        self.session.close()
+
