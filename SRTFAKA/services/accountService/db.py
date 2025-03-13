@@ -10,6 +10,7 @@ from SRTFAKA.certificateService.db import UserCertificate
 from SRTFAKA.courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+Base.metadata.create_all(engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 currentPath = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,7 +24,7 @@ class User(Base):
     __tablename__ = 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -70,12 +71,11 @@ class AccountDB:
             new_account = User(
                 first_name=accountData[1],
                 last_name=accountData[2],
-                username=accountData[3],
+                email=accountData[3], 
                 password=accountData[4],
                 country_id=accountData[5],
                 address=accountData[6],
-                email=accountData[7],
-                user_type_id=accountData[8]
+                user_type_id=accountData[7]
             )
             self.session.add(new_account)
             self.session.commit()
