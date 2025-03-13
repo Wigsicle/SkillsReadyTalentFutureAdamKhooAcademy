@@ -1,10 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 function Register() {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [userRole, setUserRole] = useState("student"); // Default role is 'student'
+    const [errorMessage, setErrorMessage] = useState("");
+    const [registered, setRegistered] = useState(false);
+
+    const navigate = useNavigate(); // Initialize the navigate function
+
+    const handleRegister = (e) => {
+        e.preventDefault();
+
+        // Simulate a successful registration process
+        if (username && password) {
+            setRegistered(true); // Set the state to indicate that registration is successful
+        } else {
+            setErrorMessage("Please fill in all fields.");
+        }
+    };
+
+    // If registration is successful, navigate to another page
+    if (registered) {
+        navigate("/welcome", { replace: true });
+        return null; // Prevents rendering the form after redirection
+    }
+
     return (
-        <div className="container">
-            <h1>Registration Page</h1>
-            <p>This page is under development.</p>
+        <div className="container-fluid w-100 vh-100 position-relative">
+            <div className="center">
+                <h1>Register Page</h1>
+                {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                <form onSubmit={handleRegister}>
+                    <div className="mb-3">
+                        <label htmlFor="usernameField" className="form-label"><strong>Username</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="usernameField"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="passwordField" className="form-label"><strong>Password</strong></label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            id="passwordField"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="roleField" className="form-label"><strong>User Role</strong></label>
+                        <select
+                            id="roleField"
+                            className="form-control"
+                            value={userRole}
+                            onChange={(e) => setUserRole(e.target.value)}
+                        >
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    <button type="submit" className="btn btn-dark">Register</button>
+                </form>
+
+                <div className="mt-3">
+                    <p>Have an account? <Link to="/login">Login here</Link></p>
+                </div>
+
+            </div>
         </div>
     );
 }
