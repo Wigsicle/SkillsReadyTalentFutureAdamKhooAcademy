@@ -1,4 +1,4 @@
-"""Changed certificate valid period to an integer of years
+"""Changed job_listing pay -> monthly salary
 
 Revision ID: 20a048b20f24
 Revises: e1dd9891e766
