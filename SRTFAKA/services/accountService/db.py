@@ -4,6 +4,7 @@ import pathlib
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, sessionmaker
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
+from typing import Optional
 from apiGateway.base import Base, Country
 from services.jobService.db import Application
 from services.certificateService.db import UserCertificate
@@ -36,7 +37,7 @@ class User(Base):
     user_type: Mapped[UserType] = relationship("UserType")
     
     # RS objects connected from other classes
-    applications: Mapped[list['Application']] = relationship()  #jobService
+    applications: Mapped[Optional[list['Application']]] = relationship()  #jobService
     certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
     courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
 
