@@ -4,9 +4,9 @@ import os
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from SRTFAKA.apiGateway.base import Base, Industry
-from SRTFAKA.services.assessmentService.db import Assessment
-from SRTFAKA.certificateService.db import Certificate
+from apiGateway.base import Base, Industry
+from services.assessmentService.db import Assessment
+from services.certificateService.db import Certificate
 
 class Course(Base):
     __tablename__ = 'course'

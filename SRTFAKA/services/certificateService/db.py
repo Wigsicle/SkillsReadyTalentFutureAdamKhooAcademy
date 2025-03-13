@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 from typing import Optional, Any
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
-from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, Date
 from sqlalchemy.ext.hybrid import hybrid_property
 from SRTFAKA.apiGateway.base import Base
 
@@ -18,12 +18,12 @@ class Certificate(Base):
     __tablename__ = 'certificate'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    validity_period: Mapped[datetime.time] = mapped_column(Time)
+    years_valid: Mapped[int] = mapped_column(Integer, nullable=True)   # number of years the cert is valid for
     description: Mapped[Optional[str]] = mapped_column(nullable=True)
     additional_info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True) # maps to a dictionary
     
     #FK
-    course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id')) # 1:1 
+    course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id'), nullable=True) # 1:1 
     
 class UserCertificate(Base):
     __tablename__ = 'user_cert'

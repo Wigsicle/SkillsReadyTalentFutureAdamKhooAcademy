@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class Token(BaseModel):
@@ -50,11 +51,31 @@ class AssessmentResponse(Assessment):
     
 class Job(BaseModel):
     name: str
-    company: str
-    
+    description: Optional[str] = None
+    monthlySalary: Optional[int] = None
+    startDate: str
+    endDate: str
+    availableSpotCount: int
+    companyId: int
+    companyName: Optional[str] = None
+    employmentTypeId: int
+    employmentValue: Optional[str] = None
+    industryId: Optional[int] = None
+    industryName: Optional[str] = None
+
 class JobResponse(Job):
-    jobId: str
-    
+    jobId: int
+
+class JobApplication(BaseModel):
+    applicantId: int
+    jobId: int
+    resumeLink: str
+    additionalInfo: Optional[str] = None
+    industryId: int
+
+class JobApplicationResponse(JobApplication):
+    applicationId: int
+
 class Certificate(BaseModel):
     name: str
     courseId: str
