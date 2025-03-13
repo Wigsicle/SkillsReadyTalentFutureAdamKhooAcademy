@@ -17,34 +17,38 @@ import logging
 import grpc
 from sqlalchemy.orm import Session
 from typing import List
-from grpc_reflection.v1alpha import reflection
+#from grpc_reflection.v1alpha import reflection
 
 
 
-#from ..generated import certificate_pb2
-#from ..generated import certificate_pb2_grpc
-from SRTFAKA.generated import certificate_pb2
-from SRTFAKA.generated import certificate_pb2_grpc
+from ..generated import certificate_pb2
+from ..generated import certificate_pb2_grpc
+#from SRTFAKA.generated import certificate_pb2
+#from SRTFAKA.generated import certificate_pb2_grpc
+from datetime import datetime
+import json
+
 
 
 from ..common.utils import generateRandomId
 #from .db import CertificateDB
-from .db import get_db, issue_certificate, get_user_certificates
+from .db import get_db, Certificate, UserCertificate, create_certificate, issue_certificate, get_user_certificates
 from .fabric_gateway import FabricClient
 
 fabric_client = FabricClient()  # Blockchain client instance
 
-class CertificateService(certificate_pb2_grpc.CertificateServicer):
+class CertificateService(certificate_pb2_grpc.CertificateService):
     def __init__(self):
         self.db = next(get_db())
 
     async def CreateCertificate(self, request, context):
         """Creates a new generic certificate and stores it in the database."""
+
         new_cert = create_certificate(
             db=self.db,
             name=request.name,
             course_id=int(request.courseId),
-            validity_period=datetime.strptime(request.validityPeriod, "%H:%M:%S").time(),
+            validity_period=datetime.strptime(request.validityPeriod, "%H:%M:%S"),
             description=request.description,
             additional_info=request.additionalInfo
         )
@@ -119,11 +123,11 @@ class CertificateService(certificate_pb2_grpc.CertificateServicer):
 
 async def serve():
     server = grpc.aio.server()
-    certificate_pb2_grpc.add_CertificateServicer_to_server(CertificateService(), server)
-
+    certificate_pb2_grpc.add_CertificateServiceServicer_to_server(CertificateService(), server)
+'''
     # Enable reflection
     SERVICE_NAMES = (
-        certificate_pb2.DESCRIPTOR.services_by_name['Certificate'].full_name,
+        certificate_pb2.DESCRIPTOR.services_by_name['CertificateService'].full_name,
         reflection.SERVICE_NAME,
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
@@ -133,7 +137,7 @@ async def serve():
     logging.info("Starting gRPC server on %s", listen_addr)
     await server.start()
     await server.wait_for_termination()
-
+'''
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     asyncio.run(serve())

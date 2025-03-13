@@ -2,11 +2,13 @@ import sqlite3
 from datetime import datetime
 import os
 from typing import Optional, Any, List
-from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
+from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, Session
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-#from apiGateway.base import Base
+#from ..apiGateway.base import Base
 from SRTFAKA.apiGateway.base import Base
+import json  # ✅ Missing import
+from sqlalchemy.orm import DeclarativeBase
 
 
 # Database Connection
@@ -39,6 +41,7 @@ class Certificate(Base):
     
     #FK
     course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id')) # 1:1 
+
     
 class UserCertificate(Base):
     __tablename__ = 'user_cert'
@@ -69,6 +72,9 @@ def create_certificate(db: Session, name: str, course_id: int, validity_period: 
     db.add(new_cert)
     db.commit()
     db.refresh(new_cert)
+     # Debugging:
+    print(f"Created certificate: {new_cert}")  # ✅ Check what is being returned
+    print(f"Certificate ID: {new_cert.id}")    # ✅ Ensure ID exists
     return new_cert
 
 def issue_certificate(db: Session, user_id: int, cert_id: int, issued_on: datetime, expires_on: datetime, additional_info: dict):
@@ -93,50 +99,5 @@ def get_user_certificates(db: Session, user_id: int):
     """Fetches all certificates owned by a specific user."""
     return db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
 
-'''
-def create_certificate(db: Session, name: str, course_id: int):
-    """Create and store a new certificate in the database."""
-    new_cert = Certificate(
-        name=name,
-        course_id=course_id,
-    )
-    db.add(new_cert)
-    db.commit()
-    db.refresh(new_cert)
-    return new_cert
 
-def get_all_certificates(db: Session):
-    """Fetch all certificates from the database."""
-    return db.query(Certificate).all()
 
-def get_certificate_by_id(db: Session, certificate_id: int):
-    """Fetch a specific certificate by its ID."""
-    return db.query(Certificate).filter(Certificate.id == certificate_id).first()
-
-def update_certificate(db: Session, certificate_id: int, name: str = None, course_id: int = None):
-    """Update an existing certificate in the database."""
-    certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
-    if not certificate:
-        return None
-
-    if name:
-        certificate.name = name
-    if course_id:
-        certificate.course_id = course_id
-
-    db.commit()
-    return certificate
-
-def delete_certificate(db: Session, certificate_id: int):
-    """Delete a certificate from the database."""
-    certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
-    if certificate:
-        db.delete(certificate)
-        db.commit()
-        return True
-    return False
-
-def get_user_certificates(db: Session, user_id: int):
-    """Fetch all certificates belonging to a specific user."""
-    return db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
-'''
