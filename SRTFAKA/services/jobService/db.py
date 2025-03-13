@@ -54,6 +54,7 @@ class JobListing(Base):
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default= datetime.now())
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     available_spot_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    monthly_salary: Mapped[int] = mapped_column(Integer, nullable=False)
     
     # FK dependency
     company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.id'), nullable=False)
@@ -105,6 +106,7 @@ class Application(Base):
     #applicant: Mapped[User] = relationship(back_populates='applications')
     listing: Mapped[JobListing] = relationship('JobListing', back_populates='applications')
     industry: Mapped[Industry] = relationship('Industry', foreign_keys=indFKey)
+    
     
 
 

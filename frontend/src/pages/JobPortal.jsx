@@ -17,7 +17,7 @@ function JobPortal() {
                 "Knowledge of RESTful APIs and cloud services",
             ],
             posted: "2 days ago",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://variety.com/wp-content/uploads/2021/07/Rick-Astley-Never-Gonna-Give-You-Up.png?w=1000&h=563&crop=1",
             type: "Full-time",
             rating: 4.7,
             reviews: 320,
@@ -35,7 +35,7 @@ function JobPortal() {
                 "Familiarity with SIEM solutions",
             ],
             posted: "5 days ago",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://variety.com/wp-content/uploads/2021/07/Rick-Astley-Never-Gonna-Give-You-Up.png?w=1000&h=563&crop=1",
             type: "Contract",
             rating: 4.5,
             reviews: 215,
@@ -53,7 +53,7 @@ function JobPortal() {
                 "Experience in AI and ML model deployment",
             ],
             posted: "1 week ago",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://variety.com/wp-content/uploads/2021/07/Rick-Astley-Never-Gonna-Give-You-Up.png?w=1000&h=563&crop=1",
             type: "Full-time",
             rating: 4.9,
             reviews: 410,
@@ -74,63 +74,74 @@ function JobPortal() {
     return (
         <div className="job-portal">
             {/* Search Bar */}
-            <div className="job-search-bar">
-                <input
+            <div class="mb-3">
+            <input
                     type="text"
+                    className="form-control"
                     placeholder="Enter job title, company, or location"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <button className="search-btn">Search</button>
             </div>
 
             <div className="job-portal-container">
+                <h2>Available Jobs</h2>
+
                 {/* Job List */}
-                <div className="job-list">
-                    <h2>Available Jobs</h2>
+                <div className="card-list">
                     {filteredJobs.map((job) => (
-                        <div key={job.id} className={`job-card ${selectedJob?.id === job.id ? "selected" : ""}`} onClick={() => setSelectedJob(job)}>
-                            <img src={job.image} alt={job.title} className="job-image" />
-                            <div className="job-info">
-                                <h3 className="job-title">{job.title}</h3>
-                                <p className="job-company">{job.company}</p>
-                                <p className="job-location">{job.location}</p>
-                                <p className="job-posted">{job.posted}</p>
+                        <div key={job.id} className={`card ${selectedJob?.id === job.id ? "selected" : ""}`} onClick={() => setSelectedJob(job)} data-bs-toggle="modal" data-bs-target="#jobModal">
+                            <img src={job.image} alt={job.title} className="card-image-top" />
+                            <div className="card-body">
+                                <h3 className="card-title">{job.title}</h3>
+                                <p className="card-text">{job.company}</p>
+                                <p className="card-text">{job.location}</p>
+                                <p className="card-text">{job.posted}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* Job Details */}
-                <div className="job-details">
-                    {selectedJob ? (
-                        <>
-                            <img src={selectedJob.image} alt={selectedJob.title} className="job-detail-image" />
-                            <h2>{selectedJob.title}</h2>
-                            <p className="job-company">{selectedJob.company}</p>
-                            <p className="job-location">{selectedJob.location} | {selectedJob.type}</p>
-                            <p className="job-category">Category: {selectedJob.category}</p>
-                            <p className="job-description">{selectedJob.description}</p>
-                            <h3>Requirements:</h3>
-                            <ul className="job-requirements">
+           
+            </div>
+ 
+        <div class="modal fade" tabindex="-1" id="jobModal" aria-labelledby="jobModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Job </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                        {selectedJob !== null ? (
+                            <div>
+                                <img src={selectedJob.image} alt={selectedJob.title} className="job-detail-image w-100" />
+                                <h2 className="pt-3">{selectedJob.title}</h2>
+                                <p className="job-company">{selectedJob.company}</p>
+                                <p className="job-location">{selectedJob.location} | {selectedJob.type}</p>
+                                <p className="job-category">Category: {selectedJob.category}</p>
+                                <p className="job-description">{selectedJob.description}</p>
+                                <h3>Requirements:</h3>
+                                <ul className="job-requirements">
                                 {selectedJob.requirements.map((req, index) => (
                                     <li key={index}>{req}</li>
                                 ))}
-                            </ul>
-                            <div className="job-actions">
-                                <button className="apply-btn">Quick Apply</button>
-                                <button className="save-btn">Save</button>
+                                </ul>
                             </div>
-                        </>
-                    ) : (
-                        <div className="job-placeholder">
-                            <h2>Select a job</h2>
-                            <p>Display details here</p>
-                            <img src="https://via.placeholder.com/200x150" alt="Placeholder" />
-                        </div>
-                    )}
+                        ) : (
+                            <p>No selected job</p>
+                        )}   
+                        
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Apply</button>
+                </div>
                 </div>
             </div>
+            </div>
+
         </div>
     );
 }

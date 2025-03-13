@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import "../styles.css"; // Import global styles
+import catImage from '../assets/cat.jpg';  // Import the image
 
 function Courses() {
     const navigate = useNavigate(); // ✅ Initialize navigate function
@@ -17,7 +18,7 @@ function Courses() {
             instructor: "Julian Melanson",
             rating: 4.5,
             reviews: "44,829",
-            image: "https://via.placeholder.com/300x200", // Placeholder image
+            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=", // Placeholder image
         },
         {
             id: 2,
@@ -25,7 +26,7 @@ function Courses() {
             instructor: "Ing. Tomas Moravek",
             rating: 4.2,
             reviews: "1,773",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
         },
         {
             id: 3,
@@ -33,7 +34,7 @@ function Courses() {
             instructor: "Anton Voroniuk",
             rating: 4.5,
             reviews: "508",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
         },
         {
             id: 4,
@@ -41,36 +42,25 @@ function Courses() {
             instructor: "Anton Voroniuk",
             rating: 4.5,
             reviews: "260",
-            image: "https://via.placeholder.com/300x200",
+            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
         },
     ];
 
+
     return (
-        <div className="courses-container">
+        <div className="container-fluid">
             <h1>All the skills you need in one place</h1>
             <p>From critical skills to technical topics, we support your professional development.</p>
 
-            {/* Category Navigation */}
-            <div className="category-tabs">
-                {categories.map((category, index) => (
-                    <button
-                        key={index}
-                        className={`category-btn ${selectedCategory === category ? "active" : ""}`}
-                        onClick={() => setSelectedCategory(category)}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
 
             {/* Course List */}
-            <div className="course-list">
+            <div className="card-list">
                 {courses.map((course) => (
-                    <div className="course-card" key={course.id}>
-                        <img src={course.image} alt={course.title} className="course-image" />
-                        <div className="course-details">
-                            <h3 className="course-title">{course.title}</h3>
-                            <p className="course-instructor">{course.instructor}</p>
+                    <div className="card" key={course.id}>
+                        <img src={course.image} alt={course.title} className="card-img-top" />
+                        <div className="card-body">
+                            <h3 className="card-title">{course.title}</h3>
+                            <p className="card-text">{course.instructor}</p>
                             <div className="course-rating">
                                 ⭐ {course.rating} ({course.reviews} reviews)
                             </div>
@@ -79,13 +69,8 @@ function Courses() {
                 ))}
             </div>
 
-            {/* View More Button */}
-            <button className="view-more-btn">Show all {selectedCategory} courses</button>
 
-            {/* Back to Home Button with Navigation */}
-            <button className="back-to-home-btn" onClick={() => navigate("/")}>
-                Back to Home
-            </button>
+            
         </div>
     );
 }
