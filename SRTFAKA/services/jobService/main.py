@@ -62,23 +62,33 @@ class Job(job_pb2_grpc.JobServicer):
 
     async def GetJobDetails(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobData:
         """Retrieve full job details"""
+        
+        print(f"DEBUG: Fetching job details for job_id={request.jobId}")
+        
         job = jobDB.get_job_details(request.jobId)
+
         if not job:
+            print(f"ERROR: Job not found for job_id={request.jobId}")
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Job not found.")
             return job_pb2.JobData()
-        
+
+        print(f"DEBUG: Job Details Retrieved: {job}")
+
         return job_pb2.JobData(
-            jobId=job[0],
-            name=job[1],
-            description=job[2] or "",
-            monthlySalary=job[3],
-            startDate=job[4].strftime("%Y-%m-%d"),
-            endDate=job[5].strftime("%Y-%m-%d"),
-            availableSpotCount=job[6],
-            companyId=job[7],
-            employmentTypeId=job[8],
-            industryId=job[9],
+            jobId=job["job_id"],
+            name=job["job_name"],
+            description=job["description"] or "",
+            monthlySalary=job["monthly_salary"],
+            startDate=job["start_date"],
+            endDate=job["end_date"],
+            availableSpotCount=job["available_spot_count"],
+            companyId=job["company_id"],
+            companyName=job["company_name"], 
+            employmentTypeId=job["employment_type_id"],
+            employmentValue=job["employment_value"],  
+            industryId=job["industry_id"],
+            industryName=job["industry_name"] 
         )
 
 
@@ -89,7 +99,7 @@ class Job(job_pb2_grpc.JobServicer):
             # Extracting job data
             job_data = {
                 "name": request.name,
-                "description": request.description if request.description else "",  # Avoid NoneType
+                "description": request.description if request.description else "",  
                 "monthly_salary": request.monthlySalary,
                 "start_date": datetime.strptime(request.startDate, "%Y-%m-%d"),
                 "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
@@ -165,62 +175,93 @@ class Job(job_pb2_grpc.JobServicer):
 
     async def ApplyJob(self, request: job_pb2.ApplicationData, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationId:
         """Allows a user to apply for a job"""
+
+        print(f"DEBUG: Received in ApplyJob - applicantId={request.applicantId}, jobId={request.jobId}")
+        print(f"DEBUG: Sending applicant_id={request.applicantId} to apply_job()")
         application_id = jobDB.apply_job(
-            applicant_id=request.applicationId,
+            applicant_id=request.applicantId,
             job_id=request.jobId,
             resume_link=request.resumeLink,
             additional_info=request.additionalInfo
         )
-        
+
         if not application_id:
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Application failed.")
             return job_pb2.ApplicationId()
-        
+
         return job_pb2.ApplicationId(applicationId=application_id)
 
     async def GetApplications(self, request: job_pb2.UserId, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationList:
-        """Retrieve all job applications by a user"""
-        applications = jobDB.get_applications(request.userId)
+        """Retrieve job applications for a specific user."""
+        
+        print(f"DEBUG: Fetching job applications for user_id={request.userId}")
+
+        applications = jobDB.get_applications_by_user(request.userId)
+
         if not applications:
+            print(f"ERROR: No applications found for user_id={request.userId}")
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("No applications found.")
             return job_pb2.ApplicationList()
-        
+
         return job_pb2.ApplicationList(
             applications=[
                 job_pb2.ApplicationData(
-                    applicationId=app[0],
-                    jobId=app[1],
-                    jobName=app[2],
-                    companyId=app[3],
-                    appliedOn=app[4].strftime("%Y-%m-%d"),
-                    resumeLink=app[5],
-                    additionalInfo=app[6] or "",
-                    industryId=app[7]
+                    applicationId=app["application_id"],
+                    applicantId=app["applicant_id"],
+                    applicantName=app["applicant_name"], 
+                    jobId=app["job_id"],
+                    jobName=app["job_name"],
+                    companyId=app["company_id"],
+                    companyName=app["company_name"], 
+                    industryId=app["industry_id"],
+                    industryName=app["industry_name"], 
+                    employmentValue=app["employment_value"],  
+                    appliedOn=app["applied_on"],
+                    resumeLink=app["resume_link"],
+                    additionalInfo=app["additional_info"],
+                    status=app["status"]
                 )
                 for app in applications
             ]
         )
+
+
     
     async def GetApplicationDetails(self, request: job_pb2.ApplicationId, context: grpc.aio.ServicerContext) -> job_pb2.ApplicationData:
-        """Retrieve full details of a specific job application"""
+        """Retrieve full details of a specific job application."""
+        
+        print(f"DEBUG: Fetching application details for application_id={request.applicationId}")
+        
         application = jobDB.get_application_details(request.applicationId)
+
         if not application:
+            print(f"ERROR: Application not found for application_id={request.applicationId}")
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Application not found.")
             return job_pb2.ApplicationData()
-        
+
+        print(f"DEBUG: Application Details Retrieved: {application}")
+
         return job_pb2.ApplicationData(
-            applicationId=application[0],
-            jobId=application[1],
-            jobName=application[2],
-            companyId=application[3],
-            appliedOn=application[4].strftime("%Y-%m-%d"),
-            resumeLink=application[5],
-            additionalInfo=application[6] or "",
-            industryId=application[7]
+            applicationId=application["application_id"],
+            applicantId=application["applicant_id"],
+            applicantName=application["applicant_name"], 
+            jobId=application["job_id"],
+            jobName=application["job_name"],
+            companyId=application["company_id"],
+            companyName=application["company_name"], 
+            industryId=application["industry_id"],
+            industryName=application["industry_name"], 
+            employmentValue=application["employment_value"],  
+            appliedOn=application["applied_on"],
+            resumeLink=application["resume_link"],
+            additionalInfo=application["additional_info"] or "",
+            status=application["status"]
         )
+
+
 
 async def serve() -> None:
     """Start the gRPC server."""

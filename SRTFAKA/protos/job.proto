@@ -50,14 +50,21 @@ message Empty {}
 
 message ApplicationData {
   int32 applicationId = 1;
-  int32 jobId = 2;
-  string jobName = 3;
-  int32 companyId = 4;
-  string appliedOn = 5;
-  string resumeLink = 6;
-  string additionalInfo = 7;
+  int32 applicantId = 2;
+  string applicantName = 3; 
+  int32 jobId = 4;
+  string jobName = 5;
+  int32 companyId = 6;
+  string companyName = 7;  
   int32 industryId = 8;
+  string industryName = 9;  
+  string employmentValue = 10; 
+  string appliedOn = 11;
+  string resumeLink = 12;
+  string additionalInfo = 13;
+  string status = 14;
 }
+
 
 // Response message containing a list of applications
 message ApplicationList {

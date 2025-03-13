@@ -52,24 +52,36 @@ class Empty(_message.Message):
     def __init__(self) -> None: ...
 
 class ApplicationData(_message.Message):
-    __slots__ = ("applicationId", "jobId", "jobName", "companyId", "appliedOn", "resumeLink", "additionalInfo", "industryId")
+    __slots__ = ("applicationId", "applicantId", "applicantName", "jobId", "jobName", "companyId", "companyName", "industryId", "industryName", "employmentValue", "appliedOn", "resumeLink", "additionalInfo", "status")
     APPLICATIONID_FIELD_NUMBER: _ClassVar[int]
+    APPLICANTID_FIELD_NUMBER: _ClassVar[int]
+    APPLICANTNAME_FIELD_NUMBER: _ClassVar[int]
     JOBID_FIELD_NUMBER: _ClassVar[int]
     JOBNAME_FIELD_NUMBER: _ClassVar[int]
     COMPANYID_FIELD_NUMBER: _ClassVar[int]
+    COMPANYNAME_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
+    INDUSTRYNAME_FIELD_NUMBER: _ClassVar[int]
+    EMPLOYMENTVALUE_FIELD_NUMBER: _ClassVar[int]
     APPLIEDON_FIELD_NUMBER: _ClassVar[int]
     RESUMELINK_FIELD_NUMBER: _ClassVar[int]
     ADDITIONALINFO_FIELD_NUMBER: _ClassVar[int]
-    INDUSTRYID_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
     applicationId: int
+    applicantId: int
+    applicantName: str
     jobId: int
     jobName: str
     companyId: int
+    companyName: str
+    industryId: int
+    industryName: str
+    employmentValue: str
     appliedOn: str
     resumeLink: str
     additionalInfo: str
-    industryId: int
-    def __init__(self, applicationId: _Optional[int] = ..., jobId: _Optional[int] = ..., jobName: _Optional[str] = ..., companyId: _Optional[int] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ..., industryId: _Optional[int] = ...) -> None: ...
+    status: str
+    def __init__(self, applicationId: _Optional[int] = ..., applicantId: _Optional[int] = ..., applicantName: _Optional[str] = ..., jobId: _Optional[int] = ..., jobName: _Optional[str] = ..., companyId: _Optional[int] = ..., companyName: _Optional[str] = ..., industryId: _Optional[int] = ..., industryName: _Optional[str] = ..., employmentValue: _Optional[str] = ..., appliedOn: _Optional[str] = ..., resumeLink: _Optional[str] = ..., additionalInfo: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
 
 class ApplicationList(_message.Message):
     __slots__ = ("applications",)

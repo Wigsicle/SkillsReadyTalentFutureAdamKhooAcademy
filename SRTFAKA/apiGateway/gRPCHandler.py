@@ -151,14 +151,26 @@ async def getJobs() -> job_pb2.JobList:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
 
-async def getJobDetails(jobId: str) -> job_pb2.JobData:
+async def getJobDetails(jobId: int) -> job_pb2.JobData:
     """Retrieve job details by job ID."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.GetJobDetails(job_pb2.JobId(jobId=jobId))
+            print(f"DEBUG: Fetching job details for job_id={jobId}")
+            
+            response = await stub.GetJobDetails(job_pb2.JobId(jobId=jobId))
+
+            if response.jobId == 0:
+                print(f"ERROR: Job not found for job_id={jobId}")
+                raise HTTPException(status_code=404, detail="Job not found.")
+
+            print(f"DEBUG: Job details received: {response}")
+            return response
+
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+            print(f"ERROR: gRPC request failed for job_id={jobId} - {e.details()}")
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
         
 async def createJob(job: job_pb2.JobData) -> job_pb2.JobData:
     """Create a new job listing and return the Protobuf JobData object."""
@@ -176,7 +188,7 @@ async def createJob(job: job_pb2.JobData) -> job_pb2.JobData:
                 employmentTypeId=job.employmentTypeId
             ))
 
-            return response  # ✅ Return Protobuf object directly
+            return response
 
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
@@ -219,38 +231,63 @@ async def deleteJob(jobId: int) -> dict:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def applyForJob(job_id: str, applicant_id: str, resume_link: str, industry_id: str, additional_info: Optional[str] = None) -> job_pb2.ApplicationId:
+async def applyForJob(applicant_id: int, job_id: int, resume_link: str, additional_info: Optional[str] = None) -> job_pb2.ApplicationId:
     """Allows a user to apply for a job."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
+            print(f"DEBUG: Sending applicant_id={applicant_id} to ApplyJob gRPC call")
+            
             return await stub.ApplyJob(job_pb2.ApplicationData(
-                jobId=job_id,
                 applicantId=applicant_id,
+                jobId=job_id,
                 resumeLink=resume_link,
-                additionalInfo=additional_info or "",
-                industryId=str(industry_id)
+                additionalInfo=additional_info or ""
             ))
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def getApplicationsByUser(userId: str) -> job_pb2.ApplicationList:
-    """Retrieve all job applications by a user."""
+
+async def getApplicationsByUser(userId: int) -> job_pb2.ApplicationList:
+    """Retrieve job applications for a specific user."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.GetApplications(job_pb2.UserId(userId=userId))
-        except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+            print(f"DEBUG: Fetching applications for user_id={userId}")
+            
+            response = await stub.GetApplications(job_pb2.UserId(userId=userId))
 
-async def getApplicationDetails(applicationId: str) -> job_pb2.ApplicationData:
+            if not response.applications:
+                print(f"ERROR: No applications found for user_id={userId}")
+                raise HTTPException(status_code=404, detail="No job applications found.")
+
+            return response
+
+        except grpc.aio.AioRpcError as e:
+            print(f"ERROR: gRPC request failed for user_id={userId} - {e.details()}")
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
+
+async def getApplicationDetails(applicationId: int) -> job_pb2.ApplicationData:
     """Retrieve job application details by application ID."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.GetApplicationDetails(job_pb2.ApplicationId(applicationId=applicationId))
+            print(f"DEBUG: Fetching application details for application_id={applicationId}")
+            
+            response = await stub.GetApplicationDetails(job_pb2.ApplicationId(applicationId=applicationId))
+
+            if response.applicationId == 0:
+                print(f"ERROR: Application not found for application_id={applicationId}")
+                raise HTTPException(status_code=404, detail="Application not found.")
+
+            print(f"DEBUG: Application details received: {response}")
+            return response
+
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+            print(f"ERROR: gRPC request failed for application_id={applicationId} - {e.details()}")
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
         
 async def getCertificate() -> certificate_pb2.CertificateList:
     async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
