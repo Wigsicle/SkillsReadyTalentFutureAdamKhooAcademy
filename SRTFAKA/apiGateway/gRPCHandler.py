@@ -1,4 +1,4 @@
-from SRTFAKA.generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
+from generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
 from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Certificate
 from fastapi import HTTPException
 from dotenv import load_dotenv

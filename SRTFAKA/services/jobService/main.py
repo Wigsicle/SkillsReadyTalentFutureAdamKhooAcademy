@@ -15,8 +15,8 @@
 import asyncio
 import logging
 import grpc
-from SRTFAKA.generated import job_pb2
-from SRTFAKA.generated import job_pb2_grpc
+from generated import job_pb2
+from generated import job_pb2_grpc
 from .db import JobDB
 from datetime import datetime
 
