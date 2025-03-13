@@ -15,9 +15,9 @@
 import asyncio
 import logging
 import grpc
-from SRTFAKA.generated import account_pb2
-from SRTFAKA.generated import account_pb2_grpc
-from SRTFAKA.common.utils import generateRandomId
+from generated import account_pb2
+from generated import account_pb2_grpc
+from common.utils import generateRandomId
 from .db import AccountDB
 
 accountDB = AccountDB()
@@ -31,7 +31,6 @@ class Account(account_pb2_grpc.AccountServicer):
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
             userId=account["accountId"],
-            username=account["username"],
             firstname=account["firstname"],
             lastname=account["lastname"],
             country_id=account["country_id"],
@@ -49,7 +48,6 @@ class Account(account_pb2_grpc.AccountServicer):
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
             userId=account["accountId"],
-            username=account["username"],
             firstname=account["firstname"],
             lastname=account["lastname"],
             country_id=account["country_id"],
@@ -66,7 +64,6 @@ class Account(account_pb2_grpc.AccountServicer):
                 newUserId,               # accountId
                 request.firstname,        # firstName
                 request.lastname,         # lastName
-                request.username,         # username
                 request.password,         # password
                 request.country_id,          # country_id
                 request.address,          # address
@@ -87,7 +84,6 @@ class Account(account_pb2_grpc.AccountServicer):
         updated = accountDB.updateAccount(
             request.userId,
             {
-                "username": request.username,
                 "firstname": request.firstname,
                 "lastname": request.lastname,
                 "country_id": request.country_id,

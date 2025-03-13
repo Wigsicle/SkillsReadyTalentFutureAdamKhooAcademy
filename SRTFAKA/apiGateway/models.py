@@ -10,11 +10,10 @@ class TokenData(BaseModel):
     userId: str
     
 class Account(BaseModel):
-    username: str 
+    email: str 
     
 class AccountCreation(Account):
     password: str
-    username: str
     firstname: str
     lastname: str
     country_id: int

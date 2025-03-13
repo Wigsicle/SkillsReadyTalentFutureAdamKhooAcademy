@@ -19,7 +19,7 @@ package account;
 // The Account service definition.
 service Account {
   rpc GetAccountById (AccountRequestById) returns (AccountResponse) {}
-  rpc GetAccountByUsername (AccountRequestByUsername) returns (AccountResponse) {}
+  rpc GetAccountByEmail (AccountRequestByEmail) returns (AccountResponse) {}
   rpc UpdateAccount (UpdateAccountRequest) returns (AccountResponse) {}
   rpc CreateAccount (CreateAccountRequest) returns (AccountResponse) {}
   rpc DeleteAccount (UpdateAccountRequest) returns (DeleteResponse) {}
@@ -27,39 +27,35 @@ service Account {
 message AccountRequestById {
   string userId = 1;
 }
-message AccountRequestByUsername{
-  string username = 1;
+message AccountRequestByEmail{
+  string email = 1;
 }
 message CreateAccountRequest{
   string firstname = 1;
   string lastname = 2;
-  string username = 3;
-  string password = 4;
-  string email = 5;
-  int32 country_id = 6;
-  string address = 7;
-  int32 user_type_id = 8;
+  string password = 3;
+  string email = 4;
+  int32 country_id = 5;
+  string address = 6;
+  int32 user_type_id = 7;
 }
 message UpdateAccountRequest {
   string userId = 1;
   string firstname = 2;
   string lastname = 3;
-  string username = 4;
-  string password = 5;
-  string email = 6;
-  int32 country_id = 7;
-  string address = 8;
+  string password = 4;
+  int32 country_id = 5;
+  string address = 6;
 }
 message AccountResponse {
   string userId = 1;
   string firstname = 2;
   string lastname = 3;
-  string username = 4;
-  string password = 5;
-  string email = 6;
-  int32 country_id = 7;
-  string address = 8;
-  int32 user_type_id = 9;
+  string password = 4;
+  string email = 5;
+  int32 country_id = 6;
+  string address = 7;
+  int32 user_type_id = 8;
 }
 message DeleteResponse{
   int32 status = 1;

@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import pathlib
-from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, sessionmaker
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base, Country
@@ -11,6 +11,7 @@ from services.courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class UserType(Base):
     __tablename__ = 'user_type'

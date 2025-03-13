@@ -38,7 +38,6 @@ async def createAccount(account: AccountCreation) -> account_pb2.AccountResponse
         stub = account_pb2_grpc.AccountStub(channel)
         try:
             response = await stub.CreateAccount(account_pb2.CreateAccountRequest(
-                username=account.username, 
                 password=account.password,
                 firstname=account.firstname,
                 lastname=account.lastname,

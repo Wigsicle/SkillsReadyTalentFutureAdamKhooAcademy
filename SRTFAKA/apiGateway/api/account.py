@@ -15,8 +15,8 @@ async def get_account(currentUser: AccountResponse = Depends(getCurrentUser)):
     return {"message": "Account retrieved", "data": MessageToDict(account)}
 
 @account.post("/accounts/create") 
-async def create_account(firstname: str = Form, lastname: str = Form, username: str = Form, password: str = Form, country_id: int = Form, address: str = Form, email: str = Form, user_type_id: int = Form): 
-    accountObj = AccountCreation(firstname=firstname, lastname=lastname, username=username, password=hashPassword(password), country_id=country_id, address=address, email=email, user_type_id=user_type_id) 
+async def create_account(firstname: str = Form, lastname: str = Form, password: str = Form, country_id: int = Form, address: str = Form, email: str = Form, user_type_id: int = Form): 
+    accountObj = AccountCreation(firstname=firstname, lastname=lastname, password=hashPassword(password), country_id=country_id, address=address, email=email, user_type_id=user_type_id) 
     newAccount = await createAccount(accountObj) 
     if newAccount is None:
         raise HTTPException(status_code=500, detail="Error occured")

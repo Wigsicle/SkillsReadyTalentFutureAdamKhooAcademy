@@ -5,7 +5,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
 from sqlalchemy.ext.hybrid import hybrid_property
-from SRTFAKA.apiGateway.base import Base
+from apiGateway.base import Base
 
 
 class Assessment(Base):
