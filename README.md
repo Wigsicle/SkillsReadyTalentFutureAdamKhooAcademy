@@ -36,6 +36,14 @@ alembic stamp head
 ```
 
 ### Importing dummy data into DB
+1. Copy the Insertion Script into the Docker container
+```
+docker cp [Path to your insert script]acad_db_insert.sql [Docker container ID]:/acad_db_insert.sql
+```
+2. Go to your docker container db terminal
+```
+psql -U postgres -d academy_db -f acad_db_insert.sql
+``` 
 
 ### Migrating Model Changes into the DB
 Only do this if you actually changed something in the DB models, remember to update the sql insert script if you change the columns!
