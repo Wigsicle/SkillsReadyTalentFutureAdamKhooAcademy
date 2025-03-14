@@ -1,30 +1,39 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000/accounts";  // FastAPI API Gateway
+const API_BASE_URL = "http://localhost";  // Base API URL
 
-mockedUser = {
-    name: "testUser", 
-    username: "test", 
-    password: "test",
-    role: "student",
-    accountStatus: true,
-}
-// Fetch the logged-in user's account
-export const getAccount = async () => {
-    return mockedUser;  // Mock user data
+// Utility function to make a generic API request
+export const makeRequest = async (endpoint, method, data = null) => {
+    try {
+        const config = {
+            method: method,  // GET, POST, PUT, DELETE, etc.
+            url: `${API_BASE_URL}${endpoint}`,
+            data: data,  // If there’s data (for POST/PUT requests)
+        };
+
+        const response = await axios(config);
+        return response.data;  // Return the response data
+    } catch (error) {
+        console.error("API Request Error:", error);
+        return { error: "An error occurred while processing the request." };
+    }
 };
 
-export const createAccount = async (userData) => {
-    console.log("Mock Register:", userData);
-    return { message: "Account created successfully!" };
+export const getJob = async () => {
+    return await makeRequest("/job", "GET");
 };
 
-export const updateAccount = async (userData) => {
-    console.log("Mock Update:", userData);
-    return { message: "Account updated successfully!" };
+// Create a new job (POST request)
+export const createJob = async (userData) => {
+    return await makeRequest("/job/create", "POST", userData);
 };
 
-export const deleteAccount = async () => {
-    console.log("Mock Delete");
-    return { message: "Account deleted successfully!" };
+// Update an existing job (PUT request)
+export const updateJob = async (userData) => {
+    return await makeRequest("/job/update", "PUT", userData);
+};
+
+// Delete an job (DELETE request)
+export const deleteJob = async () => {
+    return await makeRequest("/job", "DELETE");
 };
