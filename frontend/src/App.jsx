@@ -30,7 +30,7 @@ function MainApp(){
                         <Route path="/assessments" element={<Assessments/>} />
                         <Route path="/certificates" element={<Certificates />} />
                         <Route path="/job-portal" element={<JobPortal/>} />
-                        <Route path="*" element={<Profile />} />
+                        <Route path="*" element={<Home />} />
                     </Routes>
             </div>
         </div>

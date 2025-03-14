@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles.css"; // Import global styles
+import BreadCrumb from "../components/Breadcrumb";
 
 function JobPortal() {
     // Job list (dummy data)
@@ -73,19 +74,23 @@ function JobPortal() {
 
     return (
         <div className="job-portal">
+            <BreadCrumb title={"Jobs"} homeRoute={"/"}/>
+
             {/* Search Bar */}
-            <div class="mb-3">
-            <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter job title, company, or location"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
 
             <div className="job-portal-container">
-                <h2>Available Jobs</h2>
+                <h1>Available Jobs</h1>
+                <p>A sea of opportunites awaits.</p>
+
+                <div class="mb-3">
+                <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter job title, company, or location"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />  
+                </div>
 
                 {/* Job List */}
                 <div className="card-list">

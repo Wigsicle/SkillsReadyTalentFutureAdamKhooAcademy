@@ -40,7 +40,8 @@ alembic stamp head
 ```
 docker cp [Path to your insert script]acad_db_insert.sql [Docker container ID]:/acad_db_insert.sql
 ```
-2. Go to your docker container db terminal
+2. Go to your docker container db terminal and paste the command into it
+![alt text](image.png)
 ```
 psql -U postgres -d academy_db -f acad_db_insert.sql
 ``` 
