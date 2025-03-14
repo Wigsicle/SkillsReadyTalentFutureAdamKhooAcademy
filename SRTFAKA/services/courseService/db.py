@@ -87,9 +87,10 @@ class CourseProgressDB:
 
         try:
             result = self.session.execute(sql, values)
-            self.sesion.commit()
+            self.session.commit()
             course_progress_id = result.scalar()
             print(course_progress_id)
+            return course_progress_id
         except SQLAlchemyError as e:
             print(f"ERROr in joinCourse: {e}")
             self.session.rollback()

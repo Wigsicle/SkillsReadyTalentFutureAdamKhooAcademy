@@ -32,15 +32,9 @@ class CourseProgress(courseProgress_pb2_grpc.CourseProgressServicer):
         try: 
             print(f"GRPC Server: {request}")
 
-            # courseProgressObj = (
-            #     request.cleared,
-            #     request.student_id,
-            #     request.course_id
-            # )
-
             courseProgressDB = CourseProgressDB()
-            created_course_progress_id = courseProgressDB.joinCourse(False, request.student_id, request.course_id)
-            # print(created_course_progress_id)
+            created_course_progress_id = courseProgressDB.joinCourse(request.cleared, request.student_id, request.course_id)
+            
             if not created_course_progress_id:
                 context.set_code(grpc.StatusCode.INTERNAL)
                 context.set_details("Join course failed or error occurred.")

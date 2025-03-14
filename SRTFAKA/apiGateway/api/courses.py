@@ -34,29 +34,16 @@ async def delete_course(courseId: str, currentUser: CourseResponse = Depends(get
         raise HTTPException(status_code=500, detail="Error occured")
     return {"message": "Course deleted successfully"}
 
-# @courseProgress.post("/courseProgress/join")
-# async def join_course(courseId: str, currentUser: CourseProgress = Depends(getCurrentUser)):
-#     course_progress = CourseProgress(
-#         student_id=currentUser.student_id,
-#         course_id=courseId,
-#         cleared=False  # Or any other default value
-#     )
-    
-#     try:
-#         response = await joinCourse(course_progress)
-#         return {"message": "Course joined successfully", "response": response}
-#     except HTTPException as e:
-#         raise HTTPException(status_code=e.status_code, detail=e.detail)
-
 @courseProgress.post("/courseProgress/join")
 async def join_course(course_progress: CourseProgress):
     # Ensure the courseProgress object is correctly passed and contains necessary data
-    try:
         # You can directly use the course_progress object here
         response = await joinCourse(course_progress)
-        return {"message": "Course joined successfully", "response": response}
-    except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+        if response is None:
+            raise HTTPException(status_code=500, details="Join Course failed")
+        return {"message": "Joined Course", "data": MessageToDict(response)}
+    
 
 
 
