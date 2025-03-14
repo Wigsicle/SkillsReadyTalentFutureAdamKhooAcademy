@@ -64,10 +64,10 @@ class Account(account_pb2_grpc.AccountServicer):
                 newUserId,               # accountId
                 request.firstname,        # firstName
                 request.lastname,         # lastName
+                request.email,            # email
                 request.password,         # password
                 request.country_id,          # country_id
                 request.address,          # address
-                request.email,            # email
                 request.user_type_id              # user_type_id
             )
         )

@@ -6,9 +6,10 @@ from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional
 from apiGateway.base import Base, Country
-from services.jobService.db import Application
-from services.certificateService.db import UserCertificate
-from services.courseService.db import CourseProgress
+# from services.jobService.db import Application
+# from services.certificateService.db import UserCertificate
+# from services.courseService.db import CourseProgress
+import traceback
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -37,9 +38,9 @@ class User(Base):
     user_type: Mapped[UserType] = relationship("UserType")
     
     # RS objects connected from other classes
-    applications: Mapped[Optional[list['Application']]] = relationship()  #jobService
-    certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
-    courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
+    # applications: Mapped[Optional[list['Application']]] = relationship()  #jobService
+    # certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
+    # courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
 
 
 class AccountDB:
@@ -68,6 +69,7 @@ class AccountDB:
     def createAccount(self, accountData):
         """Insert a new account into the database using SQLAlchemy."""
         try:
+            print(accountData)
             new_account = User(
                 first_name=accountData[1],
                 last_name=accountData[2],
@@ -81,6 +83,7 @@ class AccountDB:
             self.session.commit()
             return new_account.id  # Return created account's id
         except Exception as e:
+            traceback.print_exc()
             print(f"Error during createAccount: {e}")
             self.session.rollback()
             return None
