@@ -7,7 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base, Country
 from services.jobService.db import Application
 from certificateService.db import UserCertificate
-from courseService.db import CourseProgress
+from services.courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))

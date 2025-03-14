@@ -2,16 +2,21 @@ import sqlite3
 from datetime import datetime
 import os
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, Session, sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from SRTFAKA.apiGateway.base import Base, Industry
-from SRTFAKA.services.assessmentService.db import Assessment
-from SRTFAKA.certificateService.db import Certificate
-from SRTFAKA.common.utils import generateRandomId
+from apiGateway.base import Base, Industry
+from services.assessmentService.db import Assessment
+from certificateService.db import Certificate
+from common.utils import generateRandomId
 from contextlib import contextmanager
+from sqlalchemy.sql import text
 
-# engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
-# SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+indFKey = 'industry.id'
+courseFKey = 'course.id'
+userFKey = 'user.id'
+engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class Course(Base):
     __tablename__ = 'course'
@@ -21,7 +26,7 @@ class Course(Base):
     
     # FK
     industry_id: Mapped[int] = mapped_column(ForeignKey('industry.id'))
-    cert_id: Mapped[int] = mapped_column(nullable=False)    # 1 to 1 RS 
+    cert_id: Mapped[int] = mapped_column(nullable=True)    # 1 to 1 RS 
     
     students_enrolled: Mapped[list['CourseProgress']] = relationship(back_populates='course_info')
     assessments: Mapped[list['Assessment']] = relationship()
@@ -57,66 +62,55 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 
 class CourseProgressDB:
     def __init__(self):
-        # self.session = SessionLocal()
-        # SQLite database file
-        db_path = currentPath + '/course_progress.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
+        self.session = SessionLocal()
 
-    def joinCourse(self, courseProgressObj):
+    def joinCourse(self, cleared: bool, student_id: int, course_id: int):
         """User joins a course, insert into the database"""
-        sql = '''INSERT INTO course_progress (cleared, student_id, course_id)
-                VALUES (?, ?, ?)'''
+        
+        sql = text("""
+                   INSERT INTO course_progress (
+                   cleared,
+                   student_id,
+                   course_id)
+                   VALUES (
+                   :cleared,
+                   :student_id,
+                   :course_id
+                   )
+                   RETURNING id;
+                   """)
+        values = {
+            "cleared": cleared,
+            "student_id": student_id,
+            "course_id": course_id
+        }
+
         try:
-            self.cursor.execute(sql, courseProgressObj)
-            self.conn.commit()
-            return self.cursor.lastrowid  # Return the new record's ID
-        except Exception as e:
-            self.conn.rollback()
-            print("Error joining course:", e)
+            result = self.session.execute(sql, values)
+            self.sesion.commit()
+            course_progress_id = result.scalar()
+            print(course_progress_id)
+        except SQLAlchemyError as e:
+            print(f"ERROr in joinCourse: {e}")
+            self.session.rollback()
             return None
 
 class CourseDB:
     def __init__(self):
-        # SQLite database file
-        db_path = currentPath + '/course.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
-
-        # SQL to create courses table
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS course (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            details TEXT NOT NULL,
-            industry_id INTEGER,
-            cert_id INTEGER,
-            FOREIGN KEY (industry_id) REFERENCES industry(id),
-            FOREIGN KEY (cert_id) REFERENCES certificate(id)
-        )
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'course' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
+        self.session = SessionLocal()
     
-    def createCourse(self, courseObj):
+    def createCourse(self, name: String, details: String, industry_id: int, cert_id: int):
         """Insert a new course into the database."""
-        sql = '''INSERT INTO course (name, details, industry_id, cert_id) 
-                 VALUES (?, ?, ?, ?)'''
+        new_course = Course(name=name, details=details, industry_id=industry_id, cert_id=cert_id)
         try:
-            self.cursor.execute(sql, courseObj)
-            self.conn.commit()
-            return courseObj[0]  # Return created course ID
-        except sqlite3.Error as e:
+            self.session.add(new_course)
+            self.session.commit()
+            self.session.refresh(new_course)
+            return new_course.id
+        except SQLAlchemyError.Error as e:
+            self.session.rollback()
             print(f"Database error during createCourse: {e}")
-            self.conn.rollback()
-            return False
+            return None
 
     def updateCourse(self, courseObj):
         """Update the amount of an existing course by courseId."""

@@ -15,43 +15,43 @@
 import asyncio
 import logging
 import grpc
-from SRTFAKA.generated import course_pb2
-from SRTFAKA.generated import course_pb2_grpc
+from generated import course_pb2, courseProgress_pb2
+from generated import course_pb2_grpc, courseProgress_pb2_grpc
 from .db import CourseDB
 from .db import CourseProgressDB
 
 courseDB = CourseDB()
 courseProgressDB = CourseProgressDB()
 
-class CourseProgress(course_pb2_grpc.CourseProgressServicer):
+class CourseProgress(courseProgress_pb2_grpc.CourseProgressServicer):
     async def JoinCourse(
         self,
-        request: course_pb2.CourseProgressData,
+        request: courseProgress_pb2.CourseProgressData,
         context: grpc.aio.ServicerContext,
-    ) -> course_pb2.CourseProgressData:
+    ) -> courseProgress_pb2.CourseProgressData:
         try: 
             print(f"GRPC Server: {request}")
 
-            courseProgressObj = (
-                request.cleared,
-                request.student_id,
-                request.course_id
-            )
+            # courseProgressObj = (
+            #     request.cleared,
+            #     request.student_id,
+            #     request.course_id
+            # )
 
             courseProgressDB = CourseProgressDB()
-            created_course_progress_id = courseProgressDB.joinCourse(courseProgressObj)
-
+            created_course_progress_id = courseProgressDB.joinCourse(False, request.student_id, request.course_id)
+            # print(created_course_progress_id)
             if not created_course_progress_id:
                 context.set_code(grpc.StatusCode.INTERNAL)
-                context.set_details("Course creation failed or error occurred.")
-                return course_pb2.CourseProgressData()
+                context.set_details("Join course failed or error occurred.")
+                return courseProgress_pb2.CourseProgressData()
             
-            return course_pb2.CourseProgressData(cleared=request.cleared, student_id=request.student_id, course_id=request.course_id)
+            return courseProgress_pb2.CourseProgressData(cleared=request.cleared, student_id=request.student_id, course_id=request.course_id)
 
         except Exception as e:
             context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details(f"Error during course creation: {e}")
-            return course_pb2.CourseProgressData()
+            context.set_details(f"Error during joining course creation: {e}")
+            return courseProgress_pb2.CourseProgressData()
         
 class Course(course_pb2_grpc.CourseServicer):
     async def GetAllCourse(
@@ -77,17 +77,9 @@ class Course(course_pb2_grpc.CourseServicer):
         try:
             print(f"GRPC Server: {request}")
 
-            # Creating the course object using the data from the request
-            courseObj = (
-                request.name,       # name
-                request.details,    # details (updated to reflect correct field)
-                request.industry_id, # industry_id
-                request.cert_id      # cert_id
-            )
-
             # Call the createCourse method to insert the course into the database
             courseDB = CourseDB()  # Ensure this is initialized properly in your class
-            created_course_id = courseDB.createCourse(courseObj)
+            created_course_id = courseDB.createCourse(request.name, request.details, request.industry_id, request.cert_id)
 
             if not created_course_id:
                 context.set_code(grpc.StatusCode.INTERNAL)
@@ -122,6 +114,8 @@ class Course(course_pb2_grpc.CourseServicer):
 async def serve() -> None:
     server = grpc.aio.server()
     course_pb2_grpc.add_CourseServicer_to_server(Course(), server)
+    courseProgress_pb2_grpc.add_CourseProgressServicer_to_server(CourseProgress(), server)
+
     listen_addr = "[::]:50052"
     server.add_insecure_port(listen_addr)
     logging.info("Starting server on %s", listen_addr)

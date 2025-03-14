@@ -1,4 +1,4 @@
-from generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
+from ..generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, courseProgress_pb2, courseProgress_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
 from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Certificate, CourseProgress
 from fastapi import HTTPException
 from dotenv import load_dotenv
@@ -79,12 +79,12 @@ async def getCourse() -> course_pb2.CourseList:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
         
-async def joinCourse(course_progress: CourseProgress) -> course_pb2.CourseProgressData:
+async def joinCourse(course_progress: CourseProgress) -> courseProgress_pb2.CourseProgressData:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
-        stub = course_pb2_grpc.CourseProgressStub(channel)
+        stub = courseProgress_pb2_grpc.CourseProgressStub(channel)
         try:
 
-            response = await stub.JoinCourse(course_pb2.CourseProgressData(
+            response = await stub.JoinCourse(courseProgress_pb2.CourseProgressData(
                 cleared=course_progress.cleared, 
                 student_id=course_progress.student_id, 
                 course_id=course_progress.course_id

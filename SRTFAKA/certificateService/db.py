@@ -5,7 +5,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON
 from sqlalchemy.ext.hybrid import hybrid_property
-from SRTFAKA.apiGateway.base import Base
+from apiGateway.base import Base
 
 class Certificate(Base):
     """

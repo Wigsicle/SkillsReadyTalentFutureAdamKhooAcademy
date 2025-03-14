@@ -31,8 +31,8 @@ class Course(BaseModel):
 
 class CourseProgress(BaseModel):
     cleared: bool
-    student_id: str
-    course_id: str
+    student_id: int
+    course_id: int
     
 class CourseResponse(Course):
     courseId: str

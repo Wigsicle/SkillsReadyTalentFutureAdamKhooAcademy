@@ -10,7 +10,7 @@ from apiGateway.base import Base, Country, Industry
 from services.jobService.db import Application, JobListing, Company, EmploymentType
 from certificateService.db import Certificate, UserCertificate
 from accountService.db import User, UserType
-from courseService.db import Course, CourseProgress
+from services.courseService.db import Course, CourseProgress
 from services.assessmentService.db import Assessment, AssessmentAttempt
 
 # this is the Alembic Config object, which provides

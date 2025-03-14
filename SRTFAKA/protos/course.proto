@@ -8,6 +8,7 @@ service Course {
   rpc CreateCourse (CourseData) returns (CourseData) {}
   rpc UpdateCourse (CourseData) returns (CourseData) {}
   rpc DeleteCourse (CourseId) returns (CourseId) {}
+  rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
 }
 
 // Message representing a single course record
@@ -27,12 +28,3 @@ message CourseId{
   string courseId = 1;
 }
 
-service CourseProgress {
-  rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
-}
-
-message CourseProgressData {
-  bool cleared = 1;
-  string student_id = 2;
-  string course_id = 3;
-}
