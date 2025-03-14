@@ -12,16 +12,17 @@ service Assessment {
 
 // Message representing a single assessment record
 message AssessmentData {
-  string name = 1;
-  string courseId = 2;
-  string assessmentId = 3;
+  string name = 1;          // Name of the assessment
+  int32 courseId = 2;      // Course ID (should be int32)
+  int32 assessmentId = 3;  // Assessment ID (should be int32)
+  float total_marks = 4;   // Total marks (should be int32)
 }
 
 // Response message containing a list of assessments
 message AssessmentList {
-  repeated AssessmentData assessments = 1;
+  repeated AssessmentData assessments = 1; // List of assessments
 }
 
-message AssessmentId{
-  string assessmentId = 1;
+message AssessmentId {
+  int32 assessmentId = 1; // Assessment ID (should be int32)
 }

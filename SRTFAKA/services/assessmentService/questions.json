@@ -1,0 +1,175 @@
+{
+    "assessments": [
+        {
+            "assessmentId": "1",
+            "name": "Computer Science Fundamentals",
+            "courseId": "CS101",
+            "questions": [
+                {
+                    "question": "What is the time complexity of binary search?",
+                    "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+                    "answer": "O(log n"
+                },
+                {
+                    "question": "Which data structure uses LIFO?",
+                    "options": ["Queue", "Stack", "Array", "Linked List"],
+                    "answer": "Stack"
+                },
+                {
+                    "question": "What does CPU stand for?",
+                    "options": ["Central Processing Unit", "Central Process Unit", "Computer Personal Unit", "Central Processor Unit"],
+                    "answer": "Central Processing Unit"
+                },
+                {
+                    "question": "Which of the following is a programming language?",
+                    "options": ["HTML", "CSS", "Python", "XML"],
+                    "answer": "Python"
+                },
+                {
+                    "question": "What is the main function of an operating system?",
+                    "options": ["Manage hardware resources", "Run applications", "Provide security", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "Which of the following is not a type of database?",
+                    "options": ["Relational", "NoSQL", "Hierarchical", "Sequential"],
+                    "answer": "Sequential"
+                },
+                {
+                    "question": "What is the purpose of an algorithm?",
+                    "options": ["To solve problems", "To store data", "To manage resources", "To create graphics"],
+                    "answer": "To solve problems"
+                },
+                {
+                    "question": "Which of the following is a web development framework?",
+                    "options": ["Django", "Flask", "Ruby on Rails", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "What is the primary purpose of a compiler?",
+                    "options": ["Translate code to machine language", "Execute code", "Debug code", "Optimize code"],
+                    "answer": "Translate code to machine language"
+                },
+                {
+                    "question": "Which of the following is a version control system?",
+                    "options": ["Git", "SVN", "Mercurial", "All of the above"],
+                    "answer": "All of the above"
+                }
+            ]
+        },
+        {
+            "assessmentId": "2",
+            "name": "Data Structures and Algorithms",
+            "courseId": "CS102",
+            "questions": [
+                {
+                    "question": "What is a linked list?",
+                    "options": ["A data structure", "A type of algorithm", "A programming language", "None of the above"],
+                    "answer": "A data structure"
+                },
+                {
+                    "question": "What is the worst-case time complexity of quicksort?",
+                    "options": ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+                    "answer": "O(n^2)"
+                },
+                {
+                    "question": "Which of the following is a tree data structure?",
+                    "options": ["Binary Tree", "Linked List", "Array", "Stack"],
+                    "answer": "Binary Tree"
+                },
+                {
+                    "question": "What is a hash table?",
+                    "options": ["A data structure that maps keys to values", "A type of algorithm", "A programming language", "None of the above"],
+                    "answer": "A data structure that maps keys to values"
+                },
+                {
+                    "question": "What is the primary use of a queue?",
+                    "options": ["FIFO operations", "LIFO operations", "Sorting data", "Searching data"],
+                    "answer": "FIFO operations"
+                },
+                {
+                    "question": "What is a binary search tree?",
+                    "options": ["A tree where each node has at most two children", "A tree where nodes are sorted", "Both A and B", "None of the above"],
+                    "answer": "Both A and B"
+                },
+                {
+                    "question": "What is the time complexity of inserting an element in a balanced binary search tree?",
+                    "options": ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+                    "answer": "O(log n)"
+                },
+                {
+                    "question": "Which of the following is a sorting algorithm?",
+                    "options": ["Bubble Sort", "Merge Sort", "Quick Sort", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "What is dynamic programming?",
+                    "options": ["A method for solving complex problems by breaking them down", "A type of algorithm", "A programming language", "None of the above"],
+                    "answer": "A method for solving complex problems by breaking them down"
+                },
+                {
+                    "question": "What is the space complexity of an algorithm?",
+                    "options": ["The amount of memory required by the algorithm", "The time taken by the algorithm", "The number of operations performed", "None of the above"],
+                    "answer": "The amount of memory required by the algorithm"
+                }
+            ]
+        },
+        {
+            "assessmentId": "3",
+            "name": "Web Development Basics",
+            "courseId": "CS103",
+            "questions": [
+                {
+                    "question": "What does HTML stand for?",
+                    "options": ["HyperText Markup Language", "HighText Machine Language", "HyperText Markup Level", "None of the above"],
+                    "answer": "HyperText Markup Language"
+                },
+                {
+                    "question": "Which of the following is a CSS framework?",
+                    "options": ["Bootstrap", "Django", "Flask", "Ruby on Rails"],
+                    "answer": "Bootstrap"
+                },
+                {
+                    "question": "What is the purpose of JavaScript?",
+                    "options": ["To style web pages", "To structure web pages", "To add interactivity to web pages", "None of the above"],
+                    "answer": "To add interactivity to web pages"
+                },
+                {
+                    "question": "Which of the following is a JavaScript library?",
+                    "options": ["React", "Angular", "Vue", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "What is the purpose of a web server?",
+                    "options": ["To host websites", "To store data", "To run applications", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "What does API stand for?",
+                    "options": ["Application Programming Interface", "Application Program Interface", "Application Programming Interaction", "None of the above"],
+                    "answer": "Application Programming Interface"
+                },
+                {
+                    "question": "Which of the following is a front-end framework?",
+                    "options": ["Node.js", "Express", "React", "Django"],
+                    "answer": "React"
+                },
+                {
+                    "question": "What is the purpose of a database?",
+                    "options": ["To store data", "To process data", "To display data", "None of the above"],
+                    "answer": "To store data"
+                },
+                {
+                    "question": "Which of the following is a back-end language?",
+                    "options": ["JavaScript", "Python", "Ruby", "All of the above"],
+                    "answer": "All of the above"
+                },
+                {
+                    "question": "What is responsive web design?",
+                    "options": ["Designing websites that work on all devices", "Designing websites for mobile only", "Designing websites for desktop only", "None of the above"],
+                    "answer": "Designing websites that work on all devices"
+                }
+            ]
+        }
+    ]
+} 

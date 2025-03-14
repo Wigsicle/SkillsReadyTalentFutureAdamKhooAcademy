@@ -15,10 +15,11 @@
 import asyncio
 import logging
 import grpc
-from ..generated import assessment_pb2
-from ..generated import assessment_pb2_grpc
-from ..common.utils import generateRandomId
-from .db import AssessmentDB
+from ...generated import assessment_pb2
+from ...generated import assessment_pb2_grpc
+from ...common.utils import generateRandomId
+from .db import AssessmentDB, Assessment
+from sqlalchemy.orm import Session
 
 assessmentDB = AssessmentDB()
 
@@ -28,29 +29,37 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
         request: assessment_pb2.AssessmentData,
         context: grpc.aio.ServicerContext,
     ) -> assessment_pb2.AssessmentList:
-        rows = assessmentDB.getAllAssessment()
-        if rows is None:
+        assessments = assessmentDB.getAllAssessment()
+        if assessments is None:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("No assessments found.")
             return assessment_pb2.AssessmentList()
-        assessments = [assessment_pb2.AssessmentData(assessmentId=row["assessmentId"], name=row["name"],
-                                           courseId=row["courseId"]) for row in rows]
-        return assessment_pb2.AssessmentList(assessments=assessments)
 
+        # Log the retrieved assessments
+        for assessment in assessments:
+            print(f"Retrieved Assessment: ID={assessment.id}, Name={assessment.name}, CourseID={assessment.course_id}, TotalMarks={assessment.total_marks}")
+
+        return assessment_pb2.AssessmentList(assessments=[assessment_pb2.AssessmentData(
+            assessmentId=int(assessment.id) if assessment.id is not None else 0,
+            name=assessment.name if assessment.name is not None else "",
+            courseId=int(assessment.course_id) if assessment.course_id is not None else 0,
+            total_marks=float(assessment.total_marks) if assessment.total_marks is not None else 0.0
+        ) for assessment in assessments])
 
     async def CreateAssessment(
                 self,
                 request: assessment_pb2.AssessmentData,
                 context: grpc.aio.ServicerContext,
             ) -> assessment_pb2.AssessmentData:
-                newAssessmentId = generateRandomId()
-                print(f"GRPC Server: {request}")
-                assessment = assessmentDB.createAssessment((newAssessmentId, request.name, request.courseId))
-                if assessment is None:
-                    context.set_code(grpc.StatusCode.INTERNAL)
-                    context.set_details("Assessment creation failed or error occured.")
-                    return assessment_pb2.AssessmentData()
-                return assessment_pb2.AssessmentData(assessmentId=newAssessmentId, name=request.name, courseId=request.courseId)
+                with Session() as session:
+                    new_assessment = Assessment(
+                        name=request.name,
+                        course_id=request.courseId,
+                        question_paper=request.question_paper  # Assuming this is passed in the request
+                    )
+                    session.add(new_assessment)
+                    session.commit()
+                    return assessment_pb2.AssessmentData(assessmentId=new_assessment.id, name=new_assessment.name, courseId=new_assessment.course_id)
 
     async def UpdateAssessment(self, request: assessment_pb2.AssessmentData, context: grpc.aio.ServicerContext) -> assessment_pb2.AssessmentData:
         updated = assessmentDB.updateAssessment(

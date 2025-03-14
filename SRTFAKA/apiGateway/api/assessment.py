@@ -8,9 +8,12 @@ assessment = APIRouter()
 
 @assessment.get("/assessment")
 async def get_assessment():
-    assessments = MessageToDict(await getAssessment())
+    # Get the protobuf message
+    response = await getAssessment()
+    # Convert the protobuf message to a dictionary
+    assessments = MessageToDict(response)
     return {"message": "Assessments retrieved", "data": assessments}
-    
+
 @assessment.post("/assessment/create") 
 async def create_assessment(assessment: Assessment): 
     newAssessment = await createAssessment(assessment) 
