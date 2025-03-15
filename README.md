@@ -26,12 +26,7 @@ Using the docker-compose.yml file, start the db service.
 ```
 cd SRTFAKA
 ```
-2. IF THERE ARE NO MIGRATION FILES IN THE alembic/versions FOLDER. Generate a migration from the Alembic env file
-SKIP THIS IF HAVE 
-```
-alembic revision --autogenerate -m "yourCommitMessage"
-```
-3. Update the migration into your database
+2. Migrate the existing schema into your database
 ```
 alembic upgrade head
 ```
@@ -39,9 +34,30 @@ In case you have issues with your migration, force one by changing the head
 ```
 alembic stamp head
 ```
+
 ### Importing dummy data into DB
+1. Copy the Insertion Script into the Docker container
+```
+docker cp [Path to your insert script]acad_db_insert.sql [Docker container ID]:/acad_db_insert.sql
+```
+2. Go to your docker container db terminal and paste the command into it
+![alt text](image.png)
+```
+psql -U postgres -d academy_db -f acad_db_insert.sql
+``` 
 
+### Migrating Model Changes into the DB
+Only do this if you actually changed something in the DB models, remember to update the sql insert script if you change the columns!
+1. Generate a migration script based on your NEW model changes
 
+Alembic will recognise the difference between your current DB and the changed model and generate a set of changes.
+```
+alembic revision --autogenerate -m "Your commit message"
+```
+2. Migrate the updated schema into your database
+```
+alembic upgrade head
+```
 ## Execution
 ### Powershell Script (Option 1)
 1. Open a powershell terminal outside the root folder (Outside SRTFAKA)
