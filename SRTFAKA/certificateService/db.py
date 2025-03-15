@@ -8,7 +8,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 #from ..apiGateway.base import Base
 from SRTFAKA.apiGateway.base import Base
 import json  # ✅ Missing import
-from sqlalchemy.orm import DeclarativeBase
+#from sqlalchemy.orm import DeclarativeBase
+from datetime import time
+from SRTFAKA.common.models import Course  # Import the Course model
 
 
 # Database Connection
@@ -23,6 +25,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+class Course(Base):
+    __tablename__ = "course"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
 class Certificate(Base):
     """
@@ -54,13 +60,21 @@ class UserCertificate(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)    # Use this to access user obj
     cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
 
-    cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
+    #cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
+     # Corrected Relationship
+    #cert_info: Mapped[Certificate] = relationship("Certificate", foreign_keys=[cert_id])
+    cert_info: Mapped["Certificate"] = relationship("Certificate", foreign_keys=[cert_id])
+
+
+
+#Base.metadata.create_all(engine)
+
 
 # =====================================
 #  **Helper Functions for Queries**
 # =====================================
 
-def create_certificate(db: Session, name: str, course_id: int, validity_period: datetime, description: str, additional_info: dict):
+def create_certificate(db: Session, name: str, course_id: int, validity_period: time, description: str, additional_info: dict):
     """Creates a new generic certificate in the database."""
     new_cert = Certificate(
         name=name,
@@ -72,9 +86,10 @@ def create_certificate(db: Session, name: str, course_id: int, validity_period: 
     db.add(new_cert)
     db.commit()
     db.refresh(new_cert)
-     # Debugging:
-    print(f"Created certificate: {new_cert}")  # ✅ Check what is being returned
-    print(f"Certificate ID: {new_cert.id}")    # ✅ Ensure ID exists
+    # Debugging
+    print(f"Created certificate: {new_cert}")
+    print(f"Certificate ID: {new_cert.id}")  # Check if `id` is populated
+    print(f"Certificate attributes: {new_cert.__dict__}")  # Print all attributes
     return new_cert
 
 def issue_certificate(db: Session, user_id: int, cert_id: int, issued_on: datetime, expires_on: datetime, additional_info: dict):
