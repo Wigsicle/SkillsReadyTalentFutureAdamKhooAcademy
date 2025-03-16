@@ -131,12 +131,14 @@ class CourseDB:
         try:
             sql = text("""
             SELECT 
-                    course.id,
-                    course.name,
-                    course.details,
-                    course.industry_id,
-                    course.cert_id
+                course.id,
+                course.name,
+                course.details,
+                course.industry_id,
+                course.cert_id,
+                industry.name AS industry_name  -- Add this line to select the name of the industry
             FROM course
+            JOIN industry ON course.industry_id = industry.id
             """)            
             result = self.session.execute(sql)
             courses = result.mappings().all()

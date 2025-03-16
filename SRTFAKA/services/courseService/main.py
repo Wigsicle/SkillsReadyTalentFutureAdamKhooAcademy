@@ -65,6 +65,7 @@ class Course(course_pb2_grpc.CourseServicer):
                 name=row["name"],
                 details=row["details"],
                 industry_id=row["industry_id"],
+                industry_name=row["industry_name"],
                 cert_id=row["cert_id"],
             ) for row in rows
         ]

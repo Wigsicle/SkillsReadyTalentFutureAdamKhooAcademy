@@ -28,6 +28,7 @@ class Course(BaseModel):
     name: str
     details: str
     industry_id: int
+    industry_name: str
     cert_id: int
 
 class CourseProgress(BaseModel):

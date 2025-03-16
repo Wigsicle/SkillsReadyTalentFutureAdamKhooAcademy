@@ -16,7 +16,8 @@ message CourseData {
   string name = 2;
   string details = 3;
   int32 industry_id = 4;
-  int32 cert_id = 5;
+  string industry_name = 5;
+  int32 cert_id = 6;
 }
 
 // Response message containing a list of courses
