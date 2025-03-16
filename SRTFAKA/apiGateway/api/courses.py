@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from ..gRPCHandler import getCourse, createCourse, updateCourse, deleteCourse, joinCourse
+from ..gRPCHandler import getCourse, createCourse, updateCourse, deleteCourse, joinCourse, getCourseById
 from google.protobuf.json_format import MessageToDict
 from ..models import CourseResponse, Course, CourseProgress
 from ..auth import getCurrentUser
@@ -12,6 +12,12 @@ courseProgress = APIRouter()
 async def get_course():
     courses = MessageToDict(await getCourse())
     return {"message": "Courses retrieved", "data": courses}
+
+@course.get("/course/{course_id}")
+async def get_course_by_id(course_id: int):
+    course_data = MessageToDict(await getCourseById(course_id))
+    return {"message": "Course retrieved", "data": course_data}
+
     
 @course.post("/course/create") 
 async def create_course(course: Course): 

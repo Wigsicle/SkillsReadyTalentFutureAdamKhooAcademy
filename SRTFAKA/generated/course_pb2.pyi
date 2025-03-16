@@ -28,7 +28,7 @@ class CourseList(_message.Message):
     def __init__(self, courses: _Optional[_Iterable[_Union[CourseData, _Mapping]]] = ...) -> None: ...
 
 class CourseId(_message.Message):
-    __slots__ = ("courseId",)
-    COURSEID_FIELD_NUMBER: _ClassVar[int]
-    courseId: str
-    def __init__(self, courseId: _Optional[str] = ...) -> None: ...
+    __slots__ = ("id",)
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: int
+    def __init__(self, id: _Optional[int] = ...) -> None: ...

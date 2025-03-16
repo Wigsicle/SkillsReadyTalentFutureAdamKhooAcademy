@@ -148,41 +148,28 @@ class CourseDB:
             print(f"Database error during getAllCourse: {e}")
             return []
         
-    def getCourse(self, name=None, instructor=None):
+    def getCourseById(self, id: int):
         try:
-            # Start SQL query and parameters list
-            sql = "SELECT * FROM courses WHERE 1=1"
-            params = []
+            sql = text("""
+            SELECT 
+                course.id,
+                course.name,
+                course.details,
+                course.industry_id,
+                course.cert_id,
+                industry.name AS industry_name
+            FROM course
+            JOIN industry ON course.industry_id = industry.id
+            WHERE course.id = :id
+            """)
+            result = self.session.execute(sql, {"id": id})
+            course = result.mappings().first()  # Using first() to get a single result
 
-            # Dynamic conditions based on provided filters
-            if name:
-                sql += " AND name = ?"
-                params.append(name)
-            
-            if instructor:
-                sql += " AND instructor = ?"
-                params.append(instructor)
-        
-            
-            # Execute the query
-            self.cursor.execute(sql, tuple(params))
-            rows = self.cursor.fetchall()
-
-            # If no rows found, return None
-            if not rows:
-                return None
-
-            # Convert rows to a list of dictionaries
-            courses = []
-            for row in rows:
-                row_dict = dict(row)
-                courses.append(row_dict)
-
-            return courses
-        
-        except sqlite3.Error as e:
+            return course if course else None
+        except SQLAlchemyError as e:
             print(f"Database error during getCourse: {e}")
-            return False
+            return None
+
 
     def deleteCourse(self, courseId):
         """Delete an course by courseId."""

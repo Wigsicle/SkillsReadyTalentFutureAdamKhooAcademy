@@ -69,7 +69,6 @@ async def deleteAccount(accountId: str) -> None:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-
 async def getCourse() -> course_pb2.CourseList:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
         stub = course_pb2_grpc.CourseStub(channel)
@@ -79,6 +78,16 @@ async def getCourse() -> course_pb2.CourseList:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
         
+async def getCourseById(course_id: int) -> course_pb2.CourseList:
+    async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
+        stub = course_pb2_grpc.CourseStub(channel)
+        try:
+            request = course_pb2.CourseId(id=course_id)
+            response = await stub.GetCourseById(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+
 async def joinCourse(course_progress: CourseProgress) -> courseProgress_pb2.CourseProgressData:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
         stub = courseProgress_pb2_grpc.CourseProgressStub(channel)

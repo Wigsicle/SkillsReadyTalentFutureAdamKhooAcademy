@@ -72,8 +72,27 @@ class Course(course_pb2_grpc.CourseServicer):
         # print(courses)
         return course_pb2.CourseList(courses=courses)
 
+    async def GetCourseById(
+        self,
+        request: course_pb2.CourseId,
+        context: grpc.aio.ServicerContext,
+    ) -> course_pb2.CourseData:
+        course = courseDB.getCourseById(request.id)
 
-
+        if not course:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(f"Course with ID {request.id} not found.")
+            return course_pb2.CourseData()
+        
+        return course_pb2.CourseData(
+            id=course['id'],
+            name=course['name'],
+            details=course['details'],
+            industry_id=course['industry_id'],
+            cert_id=course['cert_id'],
+            industry_name=course['industry_name'],
+        )
+    
     async def CreateCourse(
         self,
         request: course_pb2.CourseData,
