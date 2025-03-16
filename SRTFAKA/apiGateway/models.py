@@ -24,6 +24,7 @@ class AccountResponse(Account):
     accountStatus: str
 
 class Course(BaseModel):
+    id: int
     name: str
     details: str
     industry_id: int

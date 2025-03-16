@@ -54,12 +54,23 @@ class Course(course_pb2_grpc.CourseServicer):
         context: grpc.aio.ServicerContext,
     ) -> course_pb2.CourseList:
         rows = courseDB.getAllCourse()
-        if rows is None:
+        if not rows:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("No courses found.")
             return course_pb2.CourseList()
-        courses = [course_pb2.CourseData(name=row["name"], details=row["details"], industry_id=row["industry_id"], cert_id=row["cert_id"]) for row in rows]
+
+        courses = [
+            course_pb2.CourseData(
+                id=row["id"],  # Accessing dictionary keys
+                name=row["name"],
+                details=row["details"],
+                industry_id=row["industry_id"],
+                cert_id=row["cert_id"],
+            ) for row in rows
+        ]
+        # print(courses)
         return course_pb2.CourseList(courses=courses)
+
 
 
     async def CreateCourse(

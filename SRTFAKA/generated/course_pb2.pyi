@@ -6,16 +6,18 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CourseData(_message.Message):
-    __slots__ = ("name", "details", "industry_id", "cert_id")
+    __slots__ = ("id", "name", "details", "industry_id", "cert_id")
+    ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DETAILS_FIELD_NUMBER: _ClassVar[int]
     INDUSTRY_ID_FIELD_NUMBER: _ClassVar[int]
     CERT_ID_FIELD_NUMBER: _ClassVar[int]
+    id: int
     name: str
     details: str
     industry_id: int
     cert_id: int
-    def __init__(self, name: _Optional[str] = ..., details: _Optional[str] = ..., industry_id: _Optional[int] = ..., cert_id: _Optional[int] = ...) -> None: ...
+    def __init__(self, id: _Optional[int] = ..., name: _Optional[str] = ..., details: _Optional[str] = ..., industry_id: _Optional[int] = ..., cert_id: _Optional[int] = ...) -> None: ...
 
 class CourseList(_message.Message):
     __slots__ = ("courses",)
