@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ourse.proto\x12\x06\x43ourse\"Q\n\nCourseData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x65tails\x18\x02 \x01(\t\x12\x13\n\x0bindustry_id\x18\x03 \x01(\x05\x12\x0f\n\x07\x63\x65rt_id\x18\x04 \x01(\x05\"1\n\nCourseList\x12#\n\x07\x63ourses\x18\x01 \x03(\x0b\x32\x12.Course.CourseData\"\x1c\n\x08\x43ourseId\x12\x10\n\x08\x63ourseId\x18\x01 \x01(\t\"L\n\x12\x43ourseProgressData\x12\x0f\n\x07\x63leared\x18\x01 \x01(\x08\x12\x12\n\nstudent_id\x18\x02 \x01(\t\x12\x11\n\tcourse_id\x18\x03 \x01(\t2\xec\x01\n\x06\x43ourse\x12\x38\n\x0cGetAllCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseList\"\x00\x12\x38\n\x0c\x43reateCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseData\"\x00\x12\x38\n\x0cUpdateCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseData\"\x00\x12\x34\n\x0c\x44\x65leteCourse\x12\x10.Course.CourseId\x1a\x10.Course.CourseId\"\x00\x32X\n\x0e\x43ourseProgress\x12\x46\n\nJoinCourse\x12\x1a.Course.CourseProgressData\x1a\x1a.Course.CourseProgressData\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63ourse.proto\x12\x06\x43ourse\"Q\n\nCourseData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x64\x65tails\x18\x02 \x01(\t\x12\x13\n\x0bindustry_id\x18\x03 \x01(\x05\x12\x0f\n\x07\x63\x65rt_id\x18\x04 \x01(\x05\"1\n\nCourseList\x12#\n\x07\x63ourses\x18\x01 \x03(\x0b\x32\x12.Course.CourseData\"\x1c\n\x08\x43ourseId\x12\x10\n\x08\x63ourseId\x18\x01 \x01(\t2\xec\x01\n\x06\x43ourse\x12\x38\n\x0cGetAllCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseList\"\x00\x12\x38\n\x0c\x43reateCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseData\"\x00\x12\x38\n\x0cUpdateCourse\x12\x12.Course.CourseData\x1a\x12.Course.CourseData\"\x00\x12\x34\n\x0c\x44\x65leteCourse\x12\x10.Course.CourseId\x1a\x10.Course.CourseId\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,10 +37,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_COURSELIST']._serialized_end=156
   _globals['_COURSEID']._serialized_start=158
   _globals['_COURSEID']._serialized_end=186
-  _globals['_COURSEPROGRESSDATA']._serialized_start=188
-  _globals['_COURSEPROGRESSDATA']._serialized_end=264
-  _globals['_COURSE']._serialized_start=267
-  _globals['_COURSE']._serialized_end=503
-  _globals['_COURSEPROGRESS']._serialized_start=505
-  _globals['_COURSEPROGRESS']._serialized_end=593
+  _globals['_COURSE']._serialized_start=189
+  _globals['_COURSE']._serialized_end=425
 # @@protoc_insertion_point(module_scope)

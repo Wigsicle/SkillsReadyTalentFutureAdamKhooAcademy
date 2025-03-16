@@ -129,22 +129,22 @@ class CourseDB:
 
     def getAllCourse(self):
         try:
-            sql = '''SELECT * FROM courses'''
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
-            if not rows:
-                return None
+            sql = text("""
+            SELECT 
+                    course.id,
+                    course.name,
+                    course.details,
+                    course.industry_id,
+                    course.cert_id
+            FROM course
+            """)            
+            result = self.session.execute(sql)
+            courses = result.mappings().all()
 
-            # Convert rows to a list of dictionaries with ISO 8601 timestamp strings
-            courses = []
-            for row in rows:
-                row_dict = dict(row)
-                courses.append(row_dict)
-            # sorted_rows = sorted(rows, key=lambda row: datetime.strptime(row['transactionDate'], "%d/%m/%Y"))
-            return courses
-        except sqlite3.Error as e:
-            print(f"Database error during getCourse: {e}")
-            return False
+            return courses if courses else []
+        except SQLAlchemyError as e:
+            print(f"Database error during getAllCourse: {e}")
+            return []
         
     def getCourse(self, name=None, instructor=None):
         try:

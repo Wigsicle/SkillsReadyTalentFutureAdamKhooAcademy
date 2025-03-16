@@ -8,7 +8,6 @@ service Course {
   rpc CreateCourse (CourseData) returns (CourseData) {}
   rpc UpdateCourse (CourseData) returns (CourseData) {}
   rpc DeleteCourse (CourseId) returns (CourseId) {}
-  rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
 }
 
 // Message representing a single course record
