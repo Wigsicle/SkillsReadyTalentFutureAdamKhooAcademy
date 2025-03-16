@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package Certificate;
 
+import "google/protobuf/timestamp.proto";
+
 service CertificateService {
   // Creates a new generic certificate in the database
   rpc CreateCertificate (CertificateData) returns (CertificateData) {}
@@ -11,26 +13,30 @@ service CertificateService {
 
   // Retrieves all certificates owned by a specific user
   rpc GetUserCertificates (UserId) returns (UserCertificateList) {}
+
+  rpc UpdateCertificate (CertificateData) returns (CertificateData) {}
+  
+  rpc UpdateUserCertificate (UserCertificateData) returns (UserCertificateData) {}
 }
 
 // Message representing a generic certificate
 message CertificateData {
-  string id = 1;
+  int32 id = 1;
   string name = 2;
-  string courseId = 3;
-  string validityPeriod = 4;
-  string description = 5;
-  string additionalInfo = 6;
+  optional int32 courseId = 3;   // Nullable (Optional field)
+  optional int32 yearsValid = 4;  // Changed from `validityPeriod` (Now an integer)
+  optional string description = 5; // Nullable description
+  optional string additionalInfo = 6; // JSON metadata (string format)
 }
 
 // Message representing a user-issued certificate
 message UserCertificateData {
-  string id = 1;    // Unique ID of the issued certificate (from user_cert table)
-  string userId = 2;        // Matches user_id in the database
-  string certificateId = 3; // Matches cert_id in the database
-  string issuedOn = 4;      // Date when the certificate was issued
-  string expiresOn = 5;     // Expiration date (nullable)
-  string additionalInfo = 6;// JSON metadata (optional)
+  int32 id = 1;    // Unique ID of the issued certificate (from user_cert table)
+  int32 userId = 2;        // Matches user_id in the database
+  int32 certId = 3; // Matches cert_id in the database
+  google.protobuf.Timestamp issuedOn = 4;      // Date when the certificate was issued
+  optional google.protobuf.Timestamp expiresOn = 5;     // Expiration date (nullable)
+  optional string additionalInfo = 6;// JSON metadata (optional)
 }
 
 // List of user certificates

@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import certificate_pb2 as certificate__pb2
+from . import certificate_pb2 as certificate__pb2
 
 GRPC_GENERATED_VERSION = '1.67.1'
 GRPC_VERSION = grpc.__version__
@@ -49,6 +49,16 @@ class CertificateServiceStub(object):
                 request_serializer=certificate__pb2.UserId.SerializeToString,
                 response_deserializer=certificate__pb2.UserCertificateList.FromString,
                 _registered_method=True)
+        self.UpdateCertificate = channel.unary_unary(
+                '/Certificate.CertificateService/UpdateCertificate',
+                request_serializer=certificate__pb2.CertificateData.SerializeToString,
+                response_deserializer=certificate__pb2.CertificateData.FromString,
+                _registered_method=True)
+        self.UpdateUserCertificate = channel.unary_unary(
+                '/Certificate.CertificateService/UpdateUserCertificate',
+                request_serializer=certificate__pb2.UserCertificateData.SerializeToString,
+                response_deserializer=certificate__pb2.UserCertificateData.FromString,
+                _registered_method=True)
 
 
 class CertificateServiceServicer(object):
@@ -75,6 +85,18 @@ class CertificateServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateCertificate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateUserCertificate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_CertificateServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -92,6 +114,16 @@ def add_CertificateServiceServicer_to_server(servicer, server):
                     servicer.GetUserCertificates,
                     request_deserializer=certificate__pb2.UserId.FromString,
                     response_serializer=certificate__pb2.UserCertificateList.SerializeToString,
+            ),
+            'UpdateCertificate': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateCertificate,
+                    request_deserializer=certificate__pb2.CertificateData.FromString,
+                    response_serializer=certificate__pb2.CertificateData.SerializeToString,
+            ),
+            'UpdateUserCertificate': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateUserCertificate,
+                    request_deserializer=certificate__pb2.UserCertificateData.FromString,
+                    response_serializer=certificate__pb2.UserCertificateData.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -175,6 +207,60 @@ class CertificateService(object):
             '/Certificate.CertificateService/GetUserCertificates',
             certificate__pb2.UserId.SerializeToString,
             certificate__pb2.UserCertificateList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateCertificate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Certificate.CertificateService/UpdateCertificate',
+            certificate__pb2.CertificateData.SerializeToString,
+            certificate__pb2.CertificateData.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateUserCertificate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Certificate.CertificateService/UpdateUserCertificate',
+            certificate__pb2.UserCertificateData.SerializeToString,
+            certificate__pb2.UserCertificateData.FromString,
             options,
             channel_credentials,
             insecure,
