@@ -24,11 +24,11 @@ async def getAccountById(accountId: str) -> account_pb2.AccountResponse:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
 
 
-async def getAccountByUsername(accountUsername: str) -> account_pb2.AccountResponse:
+async def getAccountByEmail(accountEmail: str) -> account_pb2.AccountResponse:
     async with grpc.aio.insecure_channel(ACCOUNT_SERVICE_ADDRESS) as channel:
         stub = account_pb2_grpc.AccountStub(channel)
         try:
-            response = await stub.GetAccountByUsername(account_pb2.AccountRequestByUsername(username=accountUsername))
+            response = await stub.GetAccountByEmail(account_pb2.AccountRequestByEmail(email=accountEmail))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")

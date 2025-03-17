@@ -57,13 +57,13 @@ class AccountDB:
             print(f"Error during getAccountById: {e}")
             return None
 
-    def getAccountByUsername(self, username):
+    def getAccountByEmail(self, email):
         """Fetch account details by username using SQLAlchemy."""
         try:
-            account = self.session.query(User).filter(User.email == username).first()
+            account = self.session.query(User).filter(User.email == email).first()
             return account if account else None
         except Exception as e:
-            print(f"Error during getAccountByUsername: {e}")
+            print(f"Error during getAccountByEmail: {e}")
             return None
 
     def createAccount(self, accountData):

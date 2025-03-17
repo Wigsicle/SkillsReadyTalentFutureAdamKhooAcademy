@@ -30,31 +30,31 @@ class Account(account_pb2_grpc.AccountServicer):
             context.set_details("Account not found or error occured.")
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
-            userId=account["accountId"],
-            firstname=account["firstname"],
-            lastname=account["lastname"],
-            country_id=account["country_id"],
-            address=account["address"],
-            email=account["email"],
-            password=account["password"],
-            user_type_id=account["user_type_id"]
+            userId=str(account.id),
+            firstname=account.first_name,
+            lastname=account.last_name,
+            country_id=int(account.country_id),
+            address=account.address,
+            email=account.email,
+            password=account.password,
+            user_type_id=int(account.user_type_id)
         )
 
-    async def GetAccountByUsername(self, request: account_pb2.AccountRequestByUsername, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
-        account = accountDB.getAccountByUsername(request.username)
+    async def GetAccountByEmail(self, request: account_pb2.AccountRequestByEmail, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
+        account = accountDB.getAccountByEmail(request.email)
         if account is False:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("Account not found or error occured.")
             return account_pb2.AccountResponse()
         return account_pb2.AccountResponse(
-            userId=account["accountId"],
-            firstname=account["firstname"],
-            lastname=account["lastname"],
-            country_id=account["country_id"],
-            address=account["address"],
-            email=account["email"],
-            password=account["password"],
-            user_type_id=account["user_type_id"]
+            userId=str(account.id),
+            firstname=account.first_name,
+            lastname=account.last_name,
+            country_id=int(account.country_id),
+            address=account.address,
+            email=account.email,
+            password=account.password,
+            user_type_id=int(account.user_type_id)
         )
     async def CreateAccount(self, request: account_pb2.CreateAccountRequest, context: grpc.aio.ServicerContext) -> account_pb2.AccountResponse:
         newUserId = generateRandomId()  # Generate a new user ID
