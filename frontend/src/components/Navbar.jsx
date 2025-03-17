@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from '../static/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { MdWork, MdLibraryBooks, MdAssessment } from "react-icons/md";
+import { PiCertificateFill } from "react-icons/pi";
 
 function Navbar() {
     const [loggedOut, setLoggedOut] = useState(false);
@@ -26,25 +28,25 @@ function Navbar() {
               <li className="nav-item mt-5">
                   <Link to="/courses" className="nav-link">
                       <svg className="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-                      Courses
+                      Courses <MdLibraryBooks />
                   </Link>
               </li>
-              <li>
+              <li className="nav-item">
                   <Link to="/job-portal" className="nav-link link-body-emphasis">
                       <svg className="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-                      Jobs
+                      Jobs <MdWork/>
                   </Link>
               </li>
-              <li>
-                  <Link to="/certificates" className="nav-link link-body-emphasis">
-                      <svg className="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-                      Certificates
-                  </Link>
-              </li>
-              <li>
+              <li className="nav-item">
                   <Link to="/assessments" className="nav-link link-body-emphasis">
                       <svg className="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-                      Assessments
+                      Assessments <MdAssessment />
+                  </Link>
+              </li>
+              <li className="nav-item">
+                  <Link to="/certificates" className="nav-link link-body-emphasis">
+                      <svg className="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+                      Certificates <PiCertificateFill  />
                   </Link>
               </li>
           </ul>

@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import "../styles.css"; // Import global styles
+import BreadCrumb from "../components/Breadcrumb";
 
 function Assessments() {
+    const navigate = useNavigate(); // Initialize navigate function
+
     // Dummy assessment data
     const assessments = [
         {
@@ -11,9 +15,8 @@ function Assessments() {
             instructor: "Prof. John Doe",
             rating: 4.8,
             reviews: 5234,
-            questions: 100,
+            image: "https://tinyurl.com/srtfakateampg", // Placeholder image
             level: "Intermediate",
-            image: "https://via.placeholder.com/300x200", // Placeholder image
         },
         {
             id: 2,
@@ -22,9 +25,8 @@ function Assessments() {
             instructor: "Dr. Alice Smith",
             rating: 4.6,
             reviews: 4120,
-            questions: 150,
+            image: "https://tinyurl.com/srtfakateampg",
             level: "Advanced",
-            image: "https://via.placeholder.com/300x200",
         },
         {
             id: 3,
@@ -33,41 +35,89 @@ function Assessments() {
             instructor: "Eng. Mark Thompson",
             rating: 4.9,
             reviews: 2890,
-            questions: 120,
+            image: "https://tinyurl.com/srtfakateampg",
             level: "Beginner",
-            image: "https://via.placeholder.com/300x200",
         },
     ];
 
+    const [selectedAssessment, setSelectedAssessment] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    // Filter assessments based on search term
+    const filteredAssessments = assessments.filter((assessment) =>
+        assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        assessment.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        assessment.reviews.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="assessments-container">
+        <div className="container-fluid">
+            <BreadCrumb title={"Assessments"} homeRoute={"/"} />
             <h1>Assess Your Skills & Earn Certifications</h1>
             <p>Prepare for industry-leading certifications with our expert-designed assessment tests.</p>
 
+            {/* Search Input */}
+            <div className="mb-3">
+                <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter assessment title, instructor, or rating"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
             {/* Assessment List */}
-            <div className="assessment-list">
-                {assessments.map((assessment) => (
-                    <div className="assessment-card" key={assessment.id}>
-                        <img src={assessment.image} alt={assessment.title} className="assessment-image" />
-                        <div className="assessment-details">
-                            <h3 className="assessment-title">{assessment.title}</h3>
-                            <p className="assessment-description">{assessment.description}</p>
-                            <p className="assessment-instructor">{assessment.instructor}</p>
-                            <div className="assessment-rating">
-                                ⭐ {assessment.rating} ({assessment.reviews} reviews)
-                            </div>
-                            <div className="assessment-meta">
-                                {assessment.questions} questions • {assessment.level}
-                            </div>
+            <div className="card-list">
+                {filteredAssessments.map((assessment) => (
+                    <div
+                        key={assessment.id}
+                        className={`card ${selectedAssessment?.id === assessment.id ? "selected" : ""}`}
+                        onClick={() => setSelectedAssessment(assessment)}
+                        data-bs-toggle="modal"
+                        data-bs-target="#assessmentModal"
+                    >
+                        <img src={assessment.image} alt={assessment.title} className="card-image-top" />
+                        <div className="card-body">
+                            <h3 className="card-title">{assessment.title}</h3>
+                            <p className="card-text">{assessment.instructor}</p>
+                            <p className="card-text">{assessment.rating} ⭐</p>
+                            <p className="card-text">{assessment.reviews} reviews</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Back to Home Button */}
-            <button className="back-to-home-btn" onClick={() => window.history.back()}>
-                Back to Home
-            </button>
+            {/* Modal to show details of the selected assessment */}
+            <div className="modal fade" tabindex="-1" id="assessmentModal" aria-labelledby="assessmentModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Assessment Details</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            {selectedAssessment !== null ? (
+                                <div>
+                                    <img src={selectedAssessment.image} alt={selectedAssessment.title} className="course-detail-image w-100" />
+                                    <h2 className="pt-3"><b>{selectedAssessment.title}</b></h2>
+                                    <p className="course-instructor">Taught By: {selectedAssessment.instructor}</p>
+                                    <p className="course-rating">Rating: {selectedAssessment.rating} ⭐</p>
+                                    <p className="course-reviews">Reviews: {selectedAssessment.reviews}</p>
+                                    <p className="course-level">Level: {selectedAssessment.level}</p>
+                                    <p className="course-description">{selectedAssessment.description}</p>
+
+                                </div>
+                            ) : (
+                                <p>No selected assessment</p>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-dark" data-bs-dismiss="modal">Begin</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

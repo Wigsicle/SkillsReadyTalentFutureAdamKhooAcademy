@@ -1,0 +1,6 @@
+Name, Revision_Id,
+1. create_db: 6bfbe538f7b0, 2025-03-08
+2. joel_new_job: 7e4285de9c10, 2025-03-11 @ 00:27
+3. Set a nullable field for course.cert_id: 156afc10bc16, 2025-03-11 @ 16:10
+4. changed cert validity period (datetime -> int): e1dd9891e766, 2025-03-11 @ 18:05
+5. Changed job_listing column pay -> monthly salary: 20a048b20f24, 2025-03-11 @ 18:30

@@ -4,17 +4,33 @@ package Job;
 
 // The Job service definition.
 service Job {
-  rpc GetAllJob (JobData) returns (JobList) {}
-  rpc CreateJob (JobData) returns (JobData) {}
-  rpc UpdateJob (JobData) returns (JobData) {}
-  rpc DeleteJob (JobId) returns (JobId) {}
+  rpc GetAllJobs (Empty) returns (JobList) {}   
+  rpc GetJobDetails (JobId) returns (JobData) {}  
+  rpc CreateJob (JobData) returns (JobData) {}    
+  rpc UpdateJob (JobData) returns (JobData) {}   
+  rpc DeleteJob (JobId) returns (JobId) {}        
+
+  // Job applications
+  rpc ApplyJob (ApplicationData) returns (ApplicationId) {}  
+  rpc GetApplications (UserId) returns (ApplicationList) {}  
+  rpc GetApplicationDetails (ApplicationId) returns (ApplicationData) {}  
 }
 
 // Message representing a single job record
 message JobData {
-  string name = 1;
-  string company = 2;
-  string jobId = 3;
+  int32 jobId = 1;
+  string name = 2;
+  string description = 3;
+  int32 monthlySalary = 4;
+  string startDate = 5;
+  string endDate = 6;
+  int32 availableSpotCount = 7;
+  int32 companyId = 8;
+  string companyName = 9;
+  int32 employmentTypeId = 10;
+  string employmentValue = 11;
+  int32 industryId = 12;
+  string industryName = 13;     
 }
 
 // Response message containing a list of jobs
@@ -22,6 +38,45 @@ message JobList {
   repeated JobData jobs = 1;
 }
 
-message JobId{
-  string jobId = 1;
+// Job ID message
+message JobId {
+  int32 jobId = 1;
+}
+
+// Empty message for requests with no parameters
+message Empty {}
+
+// =============== Job Applications ====================
+
+message ApplicationData {
+  int32 applicationId = 1;
+  int32 applicantId = 2;
+  string applicantName = 3; 
+  int32 jobId = 4;
+  string jobName = 5;
+  int32 companyId = 6;
+  string companyName = 7;  
+  int32 industryId = 8;
+  string industryName = 9;  
+  string employmentValue = 10; 
+  string appliedOn = 11;
+  string resumeLink = 12;
+  string additionalInfo = 13;
+  string status = 14;
+}
+
+
+// Response message containing a list of applications
+message ApplicationList {
+  repeated ApplicationData applications = 1;
+}
+
+// Application ID message
+message ApplicationId {
+  int32 applicationId = 1;
+}
+
+// User ID message for retrieving applications
+message UserId {
+  int32 userId = 1;
 }
