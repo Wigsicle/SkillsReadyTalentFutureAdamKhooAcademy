@@ -56,12 +56,10 @@ async def updateAccount(accountId: str, account: AccountUpdate) -> account_pb2.A
         try:
             response = await stub.UpdateAccount(account_pb2.UpdateAccountRequest(
                 userId=accountId,
-                username=account.username,
-                firstname=account.firstname,
-                lastname=account.lastname,
-                country=account.country,
+                firstname=account.first_name,
+                lastname=account.last_name,
+                country_id=account.country_id,
                 address=account.address,
-                email=account.email,
                 password=account.password
             ))
             return response

@@ -22,6 +22,10 @@ class AccountCreation(Account):
     user_type_id: int
     
 class AccountUpdate(Account):
+    first_name: str
+    last_name: str
+    country_id: int
+    address: str
     password: str
     
 class AccountResponse(Account):

@@ -93,12 +93,11 @@ class AccountDB:
         try:
             account = self.session.query(User).filter(User.id == accountId).first()
             if account:
-                account.first_name = updateData['firstName']
-                account.last_name = updateData['lastName']
+                account.first_name = updateData['firstname']
+                account.last_name = updateData['lastname']
                 account.password = updateData['password']
                 account.country_id = updateData['country_id']
                 account.address = updateData['address']
-                account.email = updateData['email']
                 self.session.commit()
                 return True
             return False

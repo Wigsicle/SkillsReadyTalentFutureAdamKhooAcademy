@@ -44,8 +44,8 @@ message UpdateAccountRequest {
   string firstname = 2;
   string lastname = 3;
   string password = 4;
-  int32 country_id = 5;
-  string address = 6;
+  int32 country_id = 6;
+  string address = 7;
 }
 message AccountResponse {
   string userId = 1;

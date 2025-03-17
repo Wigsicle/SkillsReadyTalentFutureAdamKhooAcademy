@@ -88,7 +88,6 @@ class Account(account_pb2_grpc.AccountServicer):
                 "lastname": request.lastname,
                 "country_id": request.country_id,
                 "address": request.address,
-                "email": request.email,
                 "password": request.password,
             }
         )
