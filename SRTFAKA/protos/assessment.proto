@@ -8,20 +8,36 @@ service Assessment {
   rpc CreateAssessment (AssessmentData) returns (AssessmentData) {}
   rpc UpdateAssessment (AssessmentData) returns (AssessmentData) {}
   rpc DeleteAssessment (AssessmentId) returns (AssessmentId) {}
+  rpc GetAllAssessmentAttempts(AssessmentData) returns (AssessmentAttemptList) {} 
+  rpc AddAssessmentAttempt(AssessmentAttemptData) returns (AssessmentAttemptData) {} 
 }
 
 // Message representing a single assessment record
 message AssessmentData {
-  string name = 1;
-  string courseId = 2;
-  string assessmentId = 3;
+  string name = 1;          // Name of the assessment
+  int32 courseId = 2;      // Course ID (should be int32)
+  int32 assessmentId = 3;  // Assessment ID (should be int32)
+  float total_marks = 4;   // Total marks (should be int32)
+}
+
+message AssessmentAttemptData {
+  int32 attemptId = 1;
+  float earnedMarks = 2;
+  string attemptedOn = 3;
+  string remarks = 4;
+  int32 studentId = 5;  // Ensure this field is included
+  int32 assessmentId = 6; // Ensure this field is included
+}
+
+message AssessmentAttemptList {
+  repeated AssessmentAttemptData attempts = 1;
 }
 
 // Response message containing a list of assessments
 message AssessmentList {
-  repeated AssessmentData assessments = 1;
+  repeated AssessmentData assessments = 1; // List of assessments
 }
 
-message AssessmentId{
-  string assessmentId = 1;
+message AssessmentId {
+  int32 assessmentId = 1; // Assessment ID (should be int32)
 }

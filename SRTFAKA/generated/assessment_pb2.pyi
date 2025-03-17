@@ -6,14 +6,38 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class AssessmentData(_message.Message):
-    __slots__ = ("name", "courseId", "assessmentId")
+    __slots__ = ("name", "courseId", "assessmentId", "total_marks")
     NAME_FIELD_NUMBER: _ClassVar[int]
     COURSEID_FIELD_NUMBER: _ClassVar[int]
     ASSESSMENTID_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_MARKS_FIELD_NUMBER: _ClassVar[int]
     name: str
-    courseId: str
-    assessmentId: str
-    def __init__(self, name: _Optional[str] = ..., courseId: _Optional[str] = ..., assessmentId: _Optional[str] = ...) -> None: ...
+    courseId: int
+    assessmentId: int
+    total_marks: float
+    def __init__(self, name: _Optional[str] = ..., courseId: _Optional[int] = ..., assessmentId: _Optional[int] = ..., total_marks: _Optional[float] = ...) -> None: ...
+
+class AssessmentAttemptData(_message.Message):
+    __slots__ = ("attemptId", "earnedMarks", "attemptedOn", "remarks", "studentId", "assessmentId")
+    ATTEMPTID_FIELD_NUMBER: _ClassVar[int]
+    EARNEDMARKS_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPTEDON_FIELD_NUMBER: _ClassVar[int]
+    REMARKS_FIELD_NUMBER: _ClassVar[int]
+    STUDENTID_FIELD_NUMBER: _ClassVar[int]
+    ASSESSMENTID_FIELD_NUMBER: _ClassVar[int]
+    attemptId: int
+    earnedMarks: float
+    attemptedOn: str
+    remarks: str
+    studentId: int
+    assessmentId: int
+    def __init__(self, attemptId: _Optional[int] = ..., earnedMarks: _Optional[float] = ..., attemptedOn: _Optional[str] = ..., remarks: _Optional[str] = ..., studentId: _Optional[int] = ..., assessmentId: _Optional[int] = ...) -> None: ...
+
+class AssessmentAttemptList(_message.Message):
+    __slots__ = ("attempts",)
+    ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
+    attempts: _containers.RepeatedCompositeFieldContainer[AssessmentAttemptData]
+    def __init__(self, attempts: _Optional[_Iterable[_Union[AssessmentAttemptData, _Mapping]]] = ...) -> None: ...
 
 class AssessmentList(_message.Message):
     __slots__ = ("assessments",)
@@ -24,5 +48,5 @@ class AssessmentList(_message.Message):
 class AssessmentId(_message.Message):
     __slots__ = ("assessmentId",)
     ASSESSMENTID_FIELD_NUMBER: _ClassVar[int]
-    assessmentId: str
-    def __init__(self, assessmentId: _Optional[str] = ...) -> None: ...
+    assessmentId: int
+    def __init__(self, assessmentId: _Optional[int] = ...) -> None: ...

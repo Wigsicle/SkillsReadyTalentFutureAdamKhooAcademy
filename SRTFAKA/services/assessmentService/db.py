@@ -1,21 +1,28 @@
-import sqlite3
 from datetime import datetime
-import os
 from typing import Optional, Any
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base
 
+DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 class Assessment(Base):
     __tablename__ = 'assessment'
-    id:Mapped[int] = mapped_column(primary_key=True)
-    name:Mapped[str] = mapped_column(String(255), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     total_marks: Mapped[float] = mapped_column(nullable=False, default=0.0)
     question_paper: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True)
     
-    course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False) # Many assessments - 1 course, M:1
+    course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False)  # Many assessments - 1 course, M:1
+    
+    # Use a string reference for the relationship
+    attempts: Mapped[list["AssessmentAttempt"]] = relationship("AssessmentAttempt", back_populates="assessment")
     
     # list of attempts that markers can mark
      
@@ -24,145 +31,46 @@ class Assessment(Base):
 class AssessmentAttempt(Base):
     __tablename__ = 'assessment_attempt'
     id: Mapped[int] = mapped_column(primary_key=True)
-    earned_marks: Mapped[Optional[float]] = mapped_column()    # marks given to an attempt of the assessment
-    attempted_on: Mapped[datetime] = mapped_column(default=datetime.now())
-    remarks: Mapped[Optional[str]] = mapped_column(String(255))
+    earned_marks: Mapped[float] = mapped_column(nullable=False)
+    attempted_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    remarks: Mapped[str] = mapped_column(String(255), nullable=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Keep as student_id but reference user.id
+    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False)  # Foreign key to assessment
     
     @hybrid_property
     def score_str(self) -> str:
         result = ""
         if self.earned_marks is not None:
             result = f"{self.earned_marks}/{self.assessment.total_marks}"
-            
         return result
     
-    #FK
-    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
-    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
-    
-    assessment: Mapped[Assessment] = relationship
+    assessment: Mapped[Assessment] = relationship("Assessment", back_populates="attempts")
     
 
-currentPath = os.path.dirname(os.path.abspath(__file__))
 class AssessmentDB:
     def __init__(self):
-        # SQLite database file
-        db_path = currentPath + '/assessments.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
-
-        # SQL to create assessments table
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS assessments (
-            assessmentId TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL,
-            courseId TEXT NOT NULL
-        )
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'assessments' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
-    
-    def createAssessment(self, assessmentObj):
-        """Insert a new assessment into the database."""
-        sql = '''INSERT INTO assessments (assessmentId, name, courseId) 
-                 VALUES (?, ?, ?)'''
-        try:
-            self.cursor.execute(sql, assessmentObj)
-            self.conn.commit()
-            return assessmentObj[0]  # Return created assessment ID
-        except sqlite3.Error as e:
-            print(f"Database error during createAssessment: {e}")
-            self.conn.rollback()
-            return False
-
-    def updateAssessment(self, assessmentObj):
-        """Update the amount of an existing assessment by assessmentId."""
-        sql = '''UPDATE assessments
-                 SET name = ?, courseId=?
-                 WHERE assessmentId = ?'''
-        try:
-            self.cursor.execute(sql, (assessmentObj['name'], assessmentObj['courseId'], assessmentObj['assessmentId']))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during updateAssessment: {e}")
-            self.conn.rollback()
-            return False
+        self.session = SessionLocal()
 
     def getAllAssessment(self):
+       try:
+           assessments = self.session.query(Assessment).all()
+           for assessment in assessments:
+               print(f"Retrieved Assessment: {assessment.id}, {assessment.name}, {assessment.course_id}, {assessment.total_marks}")
+           return assessments
+       except Exception as e:
+           print(f"Database error during getAllAssessment: {e}")
+           return None
+       finally:
+           self.session.close()
+
+    def getAllAssessmentAttempts(self):
         try:
-            sql = '''SELECT * FROM assessments'''
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
-            if not rows:
-                return None
-
-            # Convert rows to a list of dictionaries with ISO 8601 timestamp strings
-            assessments = []
-            for row in rows:
-                row_dict = dict(row)
-                assessments.append(row_dict)
-            # sorted_rows = sorted(rows, key=lambda row: datetime.strptime(row['transactionDate'], "%d/%m/%Y"))
-            return assessments
-        except sqlite3.Error as e:
-            print(f"Database error during getAssessment: {e}")
-            return False
-        
-    def getAssessment(self, name=None, courseid=None):
-        try:
-            # Start SQL query and parameters list
-            sql = "SELECT * FROM assessments WHERE 1=1"
-            params = []
-
-            # Dynamic conditions based on provided filters
-            if name:
-                sql += " AND name = ?"
-                params.append(name)
-            
-            if courseid:
-                sql += " AND courseId = ?"
-                params.append(courseid)
-        
-            
-            # Execute the query
-            self.cursor.execute(sql, tuple(params))
-            rows = self.cursor.fetchall()
-
-            # If no rows found, return None
-            if not rows:
-                return None
-
-            # Convert rows to a list of dictionaries
-            assessments = []
-            for row in rows:
-                row_dict = dict(row)
-                assessments.append(row_dict)
-
-            return assessments
-        
-        except sqlite3.Error as e:
-            print(f"Database error during getAssessment: {e}")
-            return False
-
-    def deleteAssessment(self, assessmentId):
-        """Delete an assessment by assessmentId."""
-        sql = '''DELETE FROM assessments WHERE assessmentId = ?'''
-        try:
-            self.cursor.execute(sql, (assessmentId,))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during deleteAssessment: {e}")
-            self.conn.rollback()
-            return False
-
-    def close(self):
-        """Close the database connection."""
-        self.cursor.close()
-        self.conn.close()
+            attempts = self.session.query(AssessmentAttempt).all()
+            for attempt in attempts:
+                print(f"Retrieved Assessment Attempt: ID={attempt.id}, Earned Marks={attempt.earned_marks}, Attempted On={attempt.attempted_on}, Remarks={attempt.remarks}")
+            return attempts
+        except Exception as e:
+            print(f"Database error during getAllAssessmentAttempts: {e}")
+            return None
+        finally:
+            self.session.close()

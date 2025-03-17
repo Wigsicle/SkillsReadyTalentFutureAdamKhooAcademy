@@ -55,6 +55,16 @@ class AssessmentStub(object):
                 request_serializer=assessment__pb2.AssessmentId.SerializeToString,
                 response_deserializer=assessment__pb2.AssessmentId.FromString,
                 _registered_method=True)
+        self.GetAllAssessmentAttempts = channel.unary_unary(
+                '/Assessment.Assessment/GetAllAssessmentAttempts',
+                request_serializer=assessment__pb2.AssessmentData.SerializeToString,
+                response_deserializer=assessment__pb2.AssessmentAttemptList.FromString,
+                _registered_method=True)
+        self.AddAssessmentAttempt = channel.unary_unary(
+                '/Assessment.Assessment/AddAssessmentAttempt',
+                request_serializer=assessment__pb2.AssessmentAttemptData.SerializeToString,
+                response_deserializer=assessment__pb2.AssessmentAttemptData.FromString,
+                _registered_method=True)
 
 
 class AssessmentServicer(object):
@@ -85,6 +95,18 @@ class AssessmentServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetAllAssessmentAttempts(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddAssessmentAttempt(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AssessmentServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -107,6 +129,16 @@ def add_AssessmentServicer_to_server(servicer, server):
                     servicer.DeleteAssessment,
                     request_deserializer=assessment__pb2.AssessmentId.FromString,
                     response_serializer=assessment__pb2.AssessmentId.SerializeToString,
+            ),
+            'GetAllAssessmentAttempts': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAllAssessmentAttempts,
+                    request_deserializer=assessment__pb2.AssessmentData.FromString,
+                    response_serializer=assessment__pb2.AssessmentAttemptList.SerializeToString,
+            ),
+            'AddAssessmentAttempt': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddAssessmentAttempt,
+                    request_deserializer=assessment__pb2.AssessmentAttemptData.FromString,
+                    response_serializer=assessment__pb2.AssessmentAttemptData.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -218,6 +250,60 @@ class Assessment(object):
             '/Assessment.Assessment/DeleteAssessment',
             assessment__pb2.AssessmentId.SerializeToString,
             assessment__pb2.AssessmentId.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetAllAssessmentAttempts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Assessment.Assessment/GetAllAssessmentAttempts',
+            assessment__pb2.AssessmentData.SerializeToString,
+            assessment__pb2.AssessmentAttemptList.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def AddAssessmentAttempt(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Assessment.Assessment/AddAssessmentAttempt',
+            assessment__pb2.AssessmentAttemptData.SerializeToString,
+            assessment__pb2.AssessmentAttemptData.FromString,
             options,
             channel_credentials,
             insecure,

@@ -139,38 +139,31 @@ async def getAssessment() -> assessment_pb2.AssessmentList:
     async with grpc.aio.insecure_channel(ASSESSMENT_SERVICE_ADDRESS) as channel:
         stub = assessment_pb2_grpc.AssessmentStub(channel)
         try:
+            # Call the GetAllAssessment method using the stub
             response = await stub.GetAllAssessment(assessment_pb2.AssessmentData())
-            return response
-        except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
-
-async def createAssessment(assessment: Assessment) -> assessment_pb2.AssessmentData:
-    async with grpc.aio.insecure_channel(ASSESSMENT_SERVICE_ADDRESS) as channel:
-        stub = assessment_pb2_grpc.AssessmentStub(channel)
-        try:
-            response = await stub.CreateAssessment(assessment_pb2.AssessmentData(name=assessment.name, courseId=assessment.courseId))
+            # Return the response directly as a protobuf message
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def updateAssessment(assessmentId: str, assessment: Assessment) -> assessment_pb2.AssessmentData:
+async def getAssessmentAttempts() -> assessment_pb2.AssessmentAttemptList:
     async with grpc.aio.insecure_channel(ASSESSMENT_SERVICE_ADDRESS) as channel:
         stub = assessment_pb2_grpc.AssessmentStub(channel)
         try:
-            response = await stub.UpdateAssessment(assessment_pb2.AssessmentData(assessmentId=assessmentId, name=assessment.name, courseId=assessment.courseId))
+            response = await stub.GetAllAssessmentAttempts(assessment_pb2.AssessmentData())
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def deleteAssessment(assessmentId: str) -> assessment_pb2.AssessmentId:
+async def addAssessmentAttempt(attempt: assessment_pb2.AssessmentAttemptData) -> assessment_pb2.AssessmentAttemptData:
     async with grpc.aio.insecure_channel(ASSESSMENT_SERVICE_ADDRESS) as channel:
         stub = assessment_pb2_grpc.AssessmentStub(channel)
         try:
-            response = await stub.DeleteAssessment(assessment_pb2.AssessmentId(assessmentId=assessmentId))
+            response = await stub.AddAssessmentAttempt(attempt)
             return response
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
-        
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
 async def getJobs() -> job_pb2.JobList:
     """Retrieve all job listings."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:

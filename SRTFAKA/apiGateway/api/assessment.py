@@ -1,33 +1,56 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from ..gRPCHandler import getAssessment, createAssessment, updateAssessment, deleteAssessment
+from ..gRPCHandler import getAssessment, getAssessmentAttempts, addAssessmentAttempt
 from google.protobuf.json_format import MessageToDict
 from ..models import AssessmentResponse, Assessment
 from ..auth import getCurrentUser
+from ...generated import assessment_pb2
+from pydantic import BaseModel
+from typing import Optional
+
+# Define the Pydantic model for AssessmentAttemptData here
+class AssessmentAttemptData(BaseModel):
+    attemptId: int
+    earnedMarks: float
+    attemptedOn: str
+    remarks: Optional[str] = None
+    studentId: int  # Ensure this field is included
+    assessmentId: int  # Ensure this field is included
 
 assessment = APIRouter()
 
 @assessment.get("/assessment")
 async def get_assessment():
-    assessments = MessageToDict(await getAssessment())
+    # Get the protobuf message
+    response = await getAssessment()
+    # Convert the protobuf message to a dictionary
+    assessments = MessageToDict(response)
     return {"message": "Assessments retrieved", "data": assessments}
+
+@assessment.get("/assessment/attempts")
+async def get_assessment_attempts():
+    # Get the protobuf message
+    response = await getAssessmentAttempts()
+    # Convert the protobuf message to a dictionary
+    attempts = MessageToDict(response)
+    return {"message": "Assessment attempts retrieved", "data": attempts}
+
+@assessment.post("/assessment/attempts")
+async def add_assessment(attempt: AssessmentAttemptData):
+    """Add a new assessment attempt."""
+    # Convert the Pydantic model to Protobuf message
+    attempt_proto = assessment_pb2.AssessmentAttemptData(
+        earnedMarks=attempt.earnedMarks,
+        attemptedOn=attempt.attemptedOn,
+        remarks=attempt.remarks,
+        studentId=attempt.studentId,  # Keep as studentId
+        assessmentId=attempt.assessmentId
+    )
     
-@assessment.post("/assessment/create") 
-async def create_assessment(assessment: Assessment): 
-    newAssessment = await createAssessment(assessment) 
-    if newAssessment is None:
-        raise HTTPException(status_code=500, detail="Error occured")
-    return {"message": "Assessment created", "data": MessageToDict(newAssessment)}
-
-@assessment.put("/assessment/update")
-async def update_assessment(assessmentId: str, assessment: Assessment, currentUser: AssessmentResponse = Depends(getCurrentUser)):
-    response = await updateAssessment(assessmentId, assessment)
+    # Call the gRPC service to add the assessment attempt
+    response = await addAssessmentAttempt(attempt_proto)
+    
     if response is None:
-        raise HTTPException(status_code=500, detail="Error occured")
-    return {"message": "Assessment updated", "data": MessageToDict(response)}
-
-@assessment.delete("/assessment")
-async def delete_assessment(assessmentId: str, currentUser: AssessmentResponse = Depends(getCurrentUser)):
-    deletedAssessment = await deleteAssessment(assessmentId)
-    if deletedAssessment is None:
-        raise HTTPException(status_code=500, detail="Error occured")
-    return {"message": "Assessment deleted successfully"}
+        raise HTTPException(status_code=500, detail="Error occurred while adding assessment attempt")
+    
+    # Convert the Protobuf response to a dictionary
+    return {"message": "Assessment attempt added", "data": MessageToDict(response)}
