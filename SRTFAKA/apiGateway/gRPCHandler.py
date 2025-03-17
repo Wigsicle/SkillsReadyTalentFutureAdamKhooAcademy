@@ -1,4 +1,4 @@
-from SRTFAKA.generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
+from generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
 from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Certificate
 from fastapi import HTTPException
 from dotenv import load_dotenv
@@ -194,25 +194,34 @@ async def createJob(job: job_pb2.JobData) -> job_pb2.JobData:
             raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
 
 
-async def updateJob(jobId: str, job: Job) -> job_pb2.JobData:
+async def updateJob(jobId: int, job: Job) -> job_pb2.JobData:
     """Update an existing job listing."""
     async with grpc.aio.insecure_channel(JOB_SERVICE_ADDRESS) as channel:
         stub = job_pb2_grpc.JobStub(channel)
         try:
-            return await stub.UpdateJob(job_pb2.JobData(
+            print(f"DEBUG: Sending job update request for job_id={jobId}")
+
+            response = await stub.UpdateJob(job_pb2.JobData(
                 jobId=jobId,
                 name=job.name,
                 description=job.description,
-                monthlySalary=job.monthlySalary,
                 startDate=job.startDate,
                 endDate=job.endDate,
                 availableSpotCount=job.availableSpotCount,
-                companyId=job.companyId,
-                employmentTypeId=job.employmentTypeId,    
-                industryId=job.industryId,
+                employmentTypeId=job.employmentTypeId
             ))
+
+            if response.jobId == 0:
+                print(f"ERROR: Job update failed for job_id={jobId}")
+                raise HTTPException(status_code=500, detail="Job update failed.")
+
+            print(f"DEBUG: Job update response received: {response}")
+            return response
+
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+            print(f"ERROR: gRPC request failed for job_id={jobId} - {e.details()}")
+            raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
+
 
 
 

@@ -45,7 +45,7 @@ class Job(BaseModel):
     startDate: str
     endDate: str
     availableSpotCount: int
-    companyId: int
+    companyId: Optional[int] = None
     companyName: Optional[str] = None
     employmentTypeId: int
     employmentValue: Optional[str] = None

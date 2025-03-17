@@ -15,8 +15,8 @@
 import asyncio
 import logging
 import grpc
-from SRTFAKA.generated import job_pb2
-from SRTFAKA.generated import job_pb2_grpc
+from generated import job_pb2
+from generated import job_pb2_grpc
 from .db import JobDB
 from datetime import datetime
 
@@ -144,22 +144,40 @@ class Job(job_pb2_grpc.JobServicer):
         update_data = {
             "name": request.name,
             "description": request.description,
-            "monthly_salary": request.monthlySalary,
             "start_date": datetime.strptime(request.startDate, "%Y-%m-%d"),
             "end_date": datetime.strptime(request.endDate, "%Y-%m-%d"),
             "available_spot_count": request.availableSpotCount,
-            "company_id": request.companyId,
-            "employment_type_id": request.employmentTypeId,
-            "industry_id": request.industryId,
+            "employment_type_id": request.employmentTypeId
         }
 
-        updated = jobDB.update_job(request.jobId, update_data)
-        if not updated:
+        print(f"DEBUG: Updating job_id={request.jobId} with data: {update_data}")
+
+        updated_job = jobDB.update_job(request.jobId, update_data)
+        if not updated_job:
+            print(f"ERROR: Job update failed for job_id={request.jobId}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Job update failed.")
             return job_pb2.JobData()
 
-        return job_pb2.JobData(jobId=request.jobId)
+        print(f"DEBUG: Job updated successfully: {updated_job}")
+
+        return job_pb2.JobData(
+            jobId=updated_job["job_id"],
+            name=updated_job["name"],
+            description=updated_job["description"],
+            startDate=updated_job["start_date"],
+            endDate=updated_job["end_date"],
+            availableSpotCount=updated_job["available_spot_count"],
+            companyId=updated_job["company_id"],
+            companyName=updated_job["company_name"],
+            employmentTypeId=updated_job["employment_type_id"],
+            employmentValue=updated_job["employment_value"],
+            industryId=updated_job["industry_id"],
+            industryName=updated_job["industry_name"],
+            monthlySalary=updated_job["monthly_salary"]
+        )
+
+
 
 
     async def DeleteJob(self, request: job_pb2.JobId, context: grpc.aio.ServicerContext) -> job_pb2.JobId:
