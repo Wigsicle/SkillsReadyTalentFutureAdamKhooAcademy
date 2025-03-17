@@ -1,21 +1,42 @@
 // Simulate auth flow. Settle later
+
+import { makeRequest } from "./api";
+
 class AuthHandler{
     constructor(){
-        this.mockUser = {username: "test", password: "test", userRole: "student"}
     }
-    login(username, password){
-        if(username == this.mockUser.username && password == this.mockUser.password){
-            const newToken = this.createToken(this.mockUser.username, this.mockUser.userRole);
-            localStorage.setItem("token", JSON.stringify(newToken));
-            return true;
+    async login(username, password) {
+        var newFormData = new FormData();
+        newFormData.append("username", username);
+        newFormData.append("password", password);
+
+        try {
+            const newResponse = await makeRequest(`/token`, "POST", newFormData, null);
+            console.log(newResponse);
+            if (newResponse.error) {
+                return false;
+            }
+            if (newResponse.access_token) {
+                const newToken = this.createToken(username, newResponse.access_token);
+                localStorage.setItem("token", JSON.stringify(newToken));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error during login:", error);
+            return false;
         }
-        return false;
     }
     logout(){
         localStorage.removeItem("token");
+        window.location.reload();
     }
-    createToken(username, userRole){
-        const newToken = {username: username, userRole: userRole};
+    handleTokenExpired(){
+        alert("Session Expired. Please login again.");
+        this.logout();
+    }
+    createToken(username, token){
+        const newToken = {username: username, token: token};
         return newToken;
     }
     checkAuth(){

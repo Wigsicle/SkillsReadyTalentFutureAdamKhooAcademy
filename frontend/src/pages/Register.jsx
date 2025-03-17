@@ -1,21 +1,40 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { registerUser } from "../static/api";
 
 function Register() {
-    const [username, setUsername] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [userRole, setUserRole] = useState("student"); // Default role is 'student'
+    const [countryId, setCountryId] = useState(1); // Default countryId
+    const [address, setAddress] = useState("");
+    const [userTypeId, setUserTypeId] = useState(1); // Default userTypeId
     const [errorMessage, setErrorMessage] = useState("");
     const [registered, setRegistered] = useState(false);
 
     const navigate = useNavigate(); // Initialize the navigate function
 
-    const handleRegister = (e) => {
+    const handleRegister = async(e) => {
         e.preventDefault();
 
         // Simulate a successful registration process
-        if (username && password) {
+        if (firstname && lastname && email && password && address && countryId && userTypeId) {
+            const queryString = new URLSearchParams({
+                firstname,
+                lastname,
+                email,
+                password,  
+                country_id: countryId, 
+                address,
+                user_type_id: userTypeId  
+            }).toString();
+            const newResponse = await registerUser(queryString); // Call the registerUser function from the API
+            if (newResponse.error) {
+                setErrorMessage(newResponse.error);
+                return;
+            }
             setRegistered(true); // Set the state to indicate that registration is successful
         } else {
             setErrorMessage("Please fill in all fields.");
@@ -29,19 +48,41 @@ function Register() {
     }
 
     return (
-        <div className="container-fluid w-100 vh-100 position-relative">
-            <div className="center">
+        <div className="container-fluid vh-100 position-relative">
+            <div className="container p-5 w-25">
                 <h1>Register Page</h1>
                 {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                 <form onSubmit={handleRegister}>
                     <div className="mb-3">
-                        <label htmlFor="usernameField" className="form-label"><strong>Username</strong></label>
+                        <label htmlFor="firstnameField" className="form-label"><strong>First Name</strong></label>
                         <input
                             type="text"
                             className="form-control"
-                            id="usernameField"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            id="firstnameField"
+                            value={firstname}
+                            onChange={(e) => setFirstname(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="lastnameField" className="form-label"><strong>Last Name</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="lastnameField"
+                            value={lastname}
+                            onChange={(e) => setLastname(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="emailField" className="form-label"><strong>Email</strong></label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            id="emailField"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -57,15 +98,40 @@ function Register() {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="roleField" className="form-label"><strong>User Role</strong></label>
+                        <label htmlFor="countryField" className="form-label"><strong>Country</strong></label>
                         <select
-                            id="roleField"
+                            id="countryField"
                             className="form-control"
-                            value={userRole}
-                            onChange={(e) => setUserRole(e.target.value)}
+                            value={countryId}
+                            onChange={(e) => setCountryId(Number(e.target.value))}
                         >
-                            <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
+                            <option value="1">Country 1</option>
+                            <option value="2">Country 2</option>
+                            {/* Add more countries as needed */}
+                        </select>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="addressField" className="form-label"><strong>Address</strong></label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="addressField"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="userTypeField" className="form-label"><strong>User Type</strong></label>
+                        <select
+                            id="userTypeField"
+                            className="form-control"
+                            value={userTypeId}
+                            onChange={(e) => setUserTypeId(Number(e.target.value))}
+                        >
+                            <option value="1">Student</option>
+                            <option value="2">Teacher</option>
+                            {/* Add more user types as needed */}
                         </select>
                     </div>
                     <button type="submit" className="btn btn-dark">Register</button>
