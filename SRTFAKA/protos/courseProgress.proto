@@ -4,10 +4,16 @@ package CourseProgress;
 
 service CourseProgress {
   rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
+  rpc UpdateCourseProgress (CourseProgressId) returns (CourseProgressId) {}
 }
 
 message CourseProgressData {
   bool cleared = 1;
   int32 student_id = 2;
   int32 course_id = 3;
+}
+
+message CourseProgressId {
+  int32 id = 1;
+  bool cleared = 2;
 }
