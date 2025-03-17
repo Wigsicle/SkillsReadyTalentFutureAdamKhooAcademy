@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import createAccessToken, verifyPassword
-from .gRPCHandler import getAccountByUsername
+from .gRPCHandler import getAccountByEmail
 from .api.account import account
 from .api.courses import course
 from .api.assessment import assessment
@@ -30,7 +30,7 @@ app.add_middleware(
 
 @app.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await getAccountByUsername(form_data.username)
+    user = await getAccountByEmail(form_data.username)
     if not user or not verifyPassword(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
