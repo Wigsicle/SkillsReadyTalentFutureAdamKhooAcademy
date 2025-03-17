@@ -25,8 +25,17 @@ class AccountResponse(Account):
     accountStatus: str
 
 class Course(BaseModel):
+    id: int
     name: str
-    instructor: str
+    details: str
+    industry_id: int
+    industry_name: str
+    cert_id: int
+
+class CourseProgress(BaseModel):
+    cleared: bool
+    student_id: int
+    course_id: int
     
 class CourseResponse(Course):
     courseId: str

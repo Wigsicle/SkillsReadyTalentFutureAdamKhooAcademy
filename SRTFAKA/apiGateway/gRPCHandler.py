@@ -1,5 +1,5 @@
-from generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
-from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Certificate
+from ..generated import account_pb2_grpc, account_pb2, course_pb2, course_pb2_grpc, courseProgress_pb2, courseProgress_pb2_grpc, assessment_pb2, assessment_pb2_grpc, job_pb2, job_pb2_grpc, certificate_pb2, certificate_pb2_grpc
+from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Certificate, CourseProgress
 from fastapi import HTTPException
 from dotenv import load_dotenv
 from typing import Optional
@@ -69,7 +69,6 @@ async def deleteAccount(accountId: str) -> None:
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-
 async def getCourse() -> course_pb2.CourseList:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
         stub = course_pb2_grpc.CourseStub(channel)
@@ -78,12 +77,42 @@ async def getCourse() -> course_pb2.CourseList:
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+        
+async def getCourseById(course_id: int) -> course_pb2.CourseList:
+    async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
+        stub = course_pb2_grpc.CourseStub(channel)
+        try:
+            request = course_pb2.CourseId(id=course_id)
+            response = await stub.GetCourseById(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
+
+async def joinCourse(course_progress: CourseProgress) -> courseProgress_pb2.CourseProgressData:
+    async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
+        stub = courseProgress_pb2_grpc.CourseProgressStub(channel)
+        try:
+
+            response = await stub.JoinCourse(courseProgress_pb2.CourseProgressData(
+                cleared=course_progress.cleared, 
+                student_id=course_progress.student_id, 
+                course_id=course_progress.course_id
+            ))
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
 async def createCourse(course: Course) -> course_pb2.CourseData:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
         stub = course_pb2_grpc.CourseStub(channel)
         try:
-            response = await stub.CreateCourse(course_pb2.CourseData(name=course.name, instructor=course.instructor))
+            # Creating a CourseData object with additional fields like details, industry_id, and cert_id
+            response = await stub.CreateCourse(course_pb2.CourseData(
+                name=course.name,
+                details=course.details,  # Including the details field
+                industry_id=course.industry_id,  # Including the industry_id
+                cert_id=course.cert_id  # Including the cert_id
+            ))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")

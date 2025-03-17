@@ -1,15 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from ..gRPCHandler import getCourse, createCourse, updateCourse, deleteCourse
+from ..gRPCHandler import getCourse, createCourse, updateCourse, deleteCourse, joinCourse, getCourseById
 from google.protobuf.json_format import MessageToDict
-from ..models import CourseResponse, Course
+from ..models import CourseResponse, Course, CourseProgress
 from ..auth import getCurrentUser
 
 course = APIRouter()
+
+courseProgress = APIRouter()
 
 @course.get("/course")
 async def get_course():
     courses = MessageToDict(await getCourse())
     return {"message": "Courses retrieved", "data": courses}
+
+@course.get("/course/{course_id}")
+async def get_course_by_id(course_id: int):
+    course_data = MessageToDict(await getCourseById(course_id))
+    return {"message": "Course retrieved", "data": course_data}
+
     
 @course.post("/course/create") 
 async def create_course(course: Course): 
@@ -31,3 +39,17 @@ async def delete_course(courseId: str, currentUser: CourseResponse = Depends(get
     if deletedCourse is None:
         raise HTTPException(status_code=500, detail="Error occured")
     return {"message": "Course deleted successfully"}
+
+@courseProgress.post("/courseProgress/join")
+async def join_course(course_progress: CourseProgress):
+    # Ensure the courseProgress object is correctly passed and contains necessary data
+        # You can directly use the course_progress object here
+        response = await joinCourse(course_progress)
+
+        if response is None:
+            raise HTTPException(status_code=500, details="Join Course failed")
+        return {"message": "Joined Course", "data": MessageToDict(response)}
+    
+
+
+

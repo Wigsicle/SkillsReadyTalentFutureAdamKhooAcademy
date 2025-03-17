@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base, Country
 from services.jobService.db import Application
-from services.certificateService.db import UserCertificate
+from certificateService.db import UserCertificate
 from services.courseService.db import CourseProgress
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")

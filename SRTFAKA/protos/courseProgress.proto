@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package CourseProgress;
+
+service CourseProgress {
+  rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
+}
+
+message CourseProgressData {
+  bool cleared = 1;
+  int32 student_id = 2;
+  int32 course_id = 3;
+}
