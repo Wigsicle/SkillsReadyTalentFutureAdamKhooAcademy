@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .auth import createAccessToken, verifyPassword
 from .gRPCHandler import getAccountByEmail
 from .api.account import account
-from .api.courses import course
+from .api.courses import course, courseProgress
 from .api.assessment import assessment
 from .api.job import job
 from .api.certificate import certificate
@@ -46,4 +46,5 @@ app.include_router(course)
 app.include_router(assessment)
 app.include_router(job)
 app.include_router(certificate)
+app.include_router(courseProgress)
 app.mount("/", StaticFiles(directory=currentPath + "/public", html = True), name="static")

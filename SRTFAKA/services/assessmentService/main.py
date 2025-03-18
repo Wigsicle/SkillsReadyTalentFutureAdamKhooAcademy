@@ -18,7 +18,8 @@ import grpc
 from generated import assessment_pb2
 from generated import assessment_pb2_grpc
 from common.utils import generateRandomId
-from .db import AssessmentDB
+from .db import AssessmentDB, Assessment, AssessmentAttempt
+from datetime import datetime
 
 assessmentDB = AssessmentDB()
 
@@ -28,46 +29,74 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
         request: assessment_pb2.AssessmentData,
         context: grpc.aio.ServicerContext,
     ) -> assessment_pb2.AssessmentList:
-        rows = assessmentDB.getAllAssessment()
-        if rows is None:
+        assessments = assessmentDB.getAllAssessment()
+        if assessments is None:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details("No assessments found.")
             return assessment_pb2.AssessmentList()
-        assessments = [assessment_pb2.AssessmentData(assessmentId=row["assessmentId"], name=row["name"],
-                                           courseId=row["courseId"]) for row in rows]
-        return assessment_pb2.AssessmentList(assessments=assessments)
 
+        # Log the retrieved assessments
+        for assessment in assessments:
+            print(f"Retrieved Assessment: ID={assessment.id}, Name={assessment.name}, CourseID={assessment.course_id}, TotalMarks={assessment.total_marks}")
 
-    async def CreateAssessment(
-                self,
-                request: assessment_pb2.AssessmentData,
-                context: grpc.aio.ServicerContext,
-            ) -> assessment_pb2.AssessmentData:
-                newAssessmentId = generateRandomId()
-                print(f"GRPC Server: {request}")
-                assessment = assessmentDB.createAssessment((newAssessmentId, request.name, request.courseId))
-                if assessment is None:
-                    context.set_code(grpc.StatusCode.INTERNAL)
-                    context.set_details("Assessment creation failed or error occured.")
-                    return assessment_pb2.AssessmentData()
-                return assessment_pb2.AssessmentData(assessmentId=newAssessmentId, name=request.name, courseId=request.courseId)
+        return assessment_pb2.AssessmentList(assessments=[assessment_pb2.AssessmentData(
+            assessmentId=int(assessment.id) if assessment.id is not None else 0,
+            name=assessment.name if assessment.name is not None else "",
+            courseId=int(assessment.course_id) if assessment.course_id is not None else 0,
+            total_marks=float(assessment.total_marks) if assessment.total_marks is not None else 0.0
+        ) for assessment in assessments])
 
-    async def UpdateAssessment(self, request: assessment_pb2.AssessmentData, context: grpc.aio.ServicerContext) -> assessment_pb2.AssessmentData:
-        updated = assessmentDB.updateAssessment(
-            {"assessmentId": request.assessmentId, "name": request.name, "courseId": request.courseId}
-        )
-        if not updated:
-            context.set_code(grpc.StatusCode.INTERNAL)
-            context.set_details("Assessment update failed or error occured.")
-            return assessment_pb2.AssessmentData()
-        return assessment_pb2.AssessmentData(assessmentId=request.assessmentId)
-    
-    async def DeleteAssessment(self, request: assessment_pb2.AssessmentId, context: grpc.aio.ServicerContext) -> assessment_pb2.AssessmentId:
-        deleted = assessmentDB.deleteAssessment(request.assessmentId)
-        if not deleted:
+    async def GetAllAssessmentAttempts(
+        self,
+        request: assessment_pb2.AssessmentData,
+        context: grpc.aio.ServicerContext,
+    ) -> assessment_pb2.AssessmentAttemptList:
+        attempts = assessmentDB.getAllAssessmentAttempts()
+        if attempts is None:
             context.set_code(grpc.StatusCode.NOT_FOUND)
-            context.set_details("Assessment not found for deletion or error occured.")
-        return assessment_pb2.AssessmentId()
+            context.set_details("No assessment attempts found.")
+            return assessment_pb2.AssessmentAttemptList()
+
+        # Log the retrieved attempts
+        for attempt in attempts:
+            print(f"Retrieved Assessment Attempt: ID={attempt.id}, Earned Marks={attempt.earned_marks}, Attempted On={attempt.attempted_on}, Remarks={attempt.remarks}")
+
+        return assessment_pb2.AssessmentAttemptList(attempts=[assessment_pb2.AssessmentAttemptData(
+            attemptId=int(attempt.id) if attempt.id is not None else 0,
+            earnedMarks=float(attempt.earned_marks) if attempt.earned_marks is not None else 0.0,
+            attemptedOn=str(attempt.attempted_on) if attempt.attempted_on is not None else "",
+            remarks=attempt.remarks if attempt.remarks is not None else ""
+        ) for attempt in attempts])
+
+    async def AddAssessmentAttempt(
+        self,
+        request: assessment_pb2.AssessmentAttemptData,
+        context: grpc.aio.ServicerContext,
+    ) -> assessment_pb2.AssessmentAttemptData:
+        """Add a new assessment attempt."""
+        try:
+            new_attempt = AssessmentAttempt(
+                earned_marks=request.earnedMarks,
+                attempted_on=datetime.now(),  # Set to current date
+                remarks=request.remarks,
+                student_id=request.studentId,  # Set student_id from request
+                assessment_id=request.assessmentId  # Set assessment_id from request
+            )
+            
+            assessmentDB.session.add(new_attempt)
+            assessmentDB.session.commit()
+            
+            return assessment_pb2.AssessmentAttemptData(
+                attemptId=new_attempt.id,
+                earnedMarks=new_attempt.earned_marks,
+                attemptedOn=new_attempt.attempted_on.isoformat(),
+                remarks=new_attempt.remarks
+            )
+        except Exception as e:
+            assessmentDB.session.rollback()  # Rollback the session on error
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Failed to add assessment attempt: {str(e)}")
+            return assessment_pb2.AssessmentAttemptData()
 
 
 async def serve() -> None:

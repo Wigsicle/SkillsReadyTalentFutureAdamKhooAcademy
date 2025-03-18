@@ -34,9 +34,16 @@ async def create_job(job: Job, currentUser: JobResponse = Depends(getCurrentUser
 @job.put("/job/update")
 async def update_job(jobId: int, job: Job, currentUser: JobResponse = Depends(getCurrentUser)):
     response = await updateJob(jobId, job)
-    if response is None:
-        raise HTTPException(status_code=500, detail="Error occured")
-    return {"message": "Job updated", "data": MessageToDict(response)}
+
+    if response is None or response.jobId == 0:
+        print(f"ERROR: Job update failed for job_id={jobId}")
+        raise HTTPException(status_code=500, detail="Job update failed.")
+
+    print(f"DEBUG: Job updated successfully: {response}")
+    
+    return {"message": "Job updated successfully", "data": MessageToDict(response)}
+
+
 
 @job.delete("/job")
 async def delete_job(jobId: int, currentUser: JobResponse = Depends(getCurrentUser)):
