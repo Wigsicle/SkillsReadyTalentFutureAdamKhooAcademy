@@ -9,6 +9,7 @@ from apiGateway.base import Base
 
 if TYPE_CHECKING:
     from services.courseService.db import Course
+    from services.accountService.db import User
 
 class Assessment(Base):
     __tablename__ = 'assessment'
@@ -44,6 +45,7 @@ class AssessmentAttempt(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
     assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
     
+    student: Mapped["User"] = relationship("User", back_populates='assess_attempts')
     assessment: Mapped["Assessment"] = relationship("Assessment", back_populates='attempts')
     
 

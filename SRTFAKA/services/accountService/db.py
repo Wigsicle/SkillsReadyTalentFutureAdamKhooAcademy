@@ -3,7 +3,7 @@ import os
 import pathlib
 from typing import Optional, TYPE_CHECKING, List
 from datetime import datetime
-from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, sessionmaker
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional
@@ -12,6 +12,7 @@ from services.jobService.db import Application
 from services.certificateService.db import UserCertificate
 from services.courseService.db import CourseProgress
 from services.assessmentService.db import AssessmentAttempt
+import traceback
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
@@ -38,14 +39,14 @@ class User(Base):
     country_id: Mapped[int] = mapped_column(Integer, ForeignKey('country.id'))
     user_type_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_type.id'))
     #RS
-    country: Mapped[Country] = relationship("Country", back_populates='residents')
-    user_type: Mapped[UserType] = relationship("UserType", back_populates="users")
+    country: Mapped["Country"] = relationship("Country", back_populates='residents')
+    user_type: Mapped["UserType"] = relationship("UserType", back_populates="users")
     
     # RS objects connected from other classes
-    applications: Mapped[List['Application']] = relationship("Application", back_populates='applicant')  #jobService
-    certs_attained: Mapped[List['UserCertificate']] = relationship("UserCertificate", back_populates='user')    #certService
-    courses_enrolled: Mapped[List['CourseProgress']] = relationship("CourseProgress", back_populates='user')   #courseService
-    assess_attempts: Mapped[List['AssessmentAttempt']] = relationship("AssessmentAttempt", back_populates='student')
+    applications: Mapped[List["Application"]] = relationship("Application", back_populates='applicant')  #jobService
+    certs_attained: Mapped[List["UserCertificate"]] = relationship("UserCertificate", back_populates='user')    #certService
+    courses_enrolled: Mapped[List["CourseProgress"]] = relationship("CourseProgress", back_populates='user')   #courseService
+    assess_attempts: Mapped[List["AssessmentAttempt"]] = relationship("AssessmentAttempt", back_populates='student')
 
 
 
