@@ -7,12 +7,12 @@ from ..auth import getCurrentUser
 job = APIRouter()
 
 @job.get("/job")
-async def get_job():
+async def get_job(currentUser: JobResponse = Depends(getCurrentUser)):
     jobs = MessageToDict(await getJobs())
     return {"message": "Jobs retrieved", "data": jobs}
 
 @job.get("/job/{jobId}")
-async def get_job_details(jobId: int):
+async def get_job_details(jobId: int, currentUser: JobResponse = Depends(getCurrentUser)):
     """Retrieve details of a specific job by jobId."""
     
     print(f"DEBUG: Fetching job details for job_id={jobId}")
@@ -25,21 +25,28 @@ async def get_job_details(jobId: int):
     return {"message": "Job details retrieved", "data": MessageToDict(job_details)}
     
 @job.post("/job/create") 
-async def create_job(job: Job): 
+async def create_job(job: Job, currentUser: JobResponse = Depends(getCurrentUser)): 
     newJob = await createJob(job) 
     if newJob is None:
         raise HTTPException(status_code=500, detail="Error occured")
     return {"message": "Job created", "data": MessageToDict(newJob)}
 
 @job.put("/job/update")
-async def update_job(jobId: int, job: Job):
+async def update_job(jobId: int, job: Job, currentUser: JobResponse = Depends(getCurrentUser)):
     response = await updateJob(jobId, job)
-    if response is None:
-        raise HTTPException(status_code=500, detail="Error occured")
-    return {"message": "Job updated", "data": MessageToDict(response)}
+
+    if response is None or response.jobId == 0:
+        print(f"ERROR: Job update failed for job_id={jobId}")
+        raise HTTPException(status_code=500, detail="Job update failed.")
+
+    print(f"DEBUG: Job updated successfully: {response}")
+    
+    return {"message": "Job updated successfully", "data": MessageToDict(response)}
+
+
 
 @job.delete("/job")
-async def delete_job(jobId: int):
+async def delete_job(jobId: int, currentUser: JobResponse = Depends(getCurrentUser)):
     deletedJob = await deleteJob(jobId)
     if deletedJob is None:
         raise HTTPException(status_code=500, detail="Error occured")
@@ -47,7 +54,7 @@ async def delete_job(jobId: int):
 
 
 @job.post("/job/apply")
-async def apply_job(application: JobApplication):
+async def apply_job(application: JobApplication, currentUser: JobApplicationResponse = Depends(getCurrentUser)):
     """Allows a user to apply for a job."""
     
     print(f"DEBUG: Sending applicant_id={application.applicantId} to ApplyJob gRPC call")
@@ -66,7 +73,7 @@ async def apply_job(application: JobApplication):
 
 
 @job.get("/job/applications/{userId}")
-async def get_applications_by_user(userId: int):
+async def get_applications_by_user(userId: int, currentUser: JobApplicationResponse = Depends(getCurrentUser)):
     """Retrieve job applications for a specific user."""
     
     print(f"DEBUG: Fetching job applications for user_id={userId}")
@@ -80,7 +87,7 @@ async def get_applications_by_user(userId: int):
 
 
 @job.get("/job/application/{applicationId}")
-async def get_application_details(applicationId: int):
+async def get_application_details(applicationId: int, currentUser: JobApplicationResponse = Depends(getCurrentUser)):
     """Retrieve details of a specific job application by applicationId."""
     
     print(f"DEBUG: Fetching job application details for application_id={applicationId}")

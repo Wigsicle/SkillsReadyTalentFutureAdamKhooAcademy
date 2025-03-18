@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { MdWork, MdLibraryBooks, MdAssessment } from "react-icons/md";
 import { PiCertificateFill } from "react-icons/pi";
 
-function Navbar() {
+function Navbar({username}) {
     const [loggedOut, setLoggedOut] = useState(false);
     const navigate = useNavigate();
 
@@ -56,8 +56,7 @@ function Navbar() {
           {/* Dropdown for profile */}
           <div className="dropdown">
               <a href="#" className="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                  <img src="https://github.com/mdo.png" alt="" width="32" height="32" className="rounded-circle me-2" />
-                  <strong>mdo</strong>
+                  <strong>{username}</strong>
               </a>
               <ul className="dropdown-menu text-small shadow">
                   <li><Link to="/profile" className="dropdown-item">Profile</Link></li>

@@ -13,14 +13,15 @@ import { AuthProvider, useAuth } from './static/AuthContext'; // Import AuthProv
 
 function MainApp(){
     const newAuthHandler = useAuth();
-    const loggedIn = newAuthHandler.checkAuth();
+    const loggedIn = newAuthHandler.getToken();
+    
     return(
         <main className="w-100 container-fluid h-100">
             
         {loggedIn ? 
         <div className="row h-100">
             <div className="col-3 vh-100">
-                <Navbar/>
+                <Navbar username={loggedIn.username}/>
             </div>
             <div className="col-9 p-5 contentContainer">
                     <Routes>

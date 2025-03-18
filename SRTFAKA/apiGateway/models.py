@@ -39,8 +39,21 @@ class AccountResponse(Account):
     user_type_id: int
 
 class Course(BaseModel):
+    id: int
     name: str
-    instructor: str
+    details: str
+    industry_id: int
+    industry_name: str
+    cert_id: int
+
+class CourseProgress(BaseModel):
+    cleared: bool
+    student_id: int
+    course_id: int
+
+class CourseProgressId(BaseModel):
+    id: int
+    cleared: bool
     
 class CourseResponse(Course):
     courseId: str
@@ -59,7 +72,7 @@ class Job(BaseModel):
     startDate: str
     endDate: str
     availableSpotCount: int
-    companyId: int
+    companyId: Optional[int] = None
     companyName: Optional[str] = None
     employmentTypeId: int
     employmentValue: Optional[str] = None

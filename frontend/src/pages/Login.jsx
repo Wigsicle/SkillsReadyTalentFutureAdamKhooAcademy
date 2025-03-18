@@ -12,9 +12,9 @@ function Login() {
     const navigate = useNavigate(); // Initialize the navigate function
     const authHandler = useAuth();  // Use the useAuth hook to get authHandler
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        const isValid = authHandler.login(username, password) // Call the login method from AuthHandler
+        const isValid = await authHandler.login(username, password) // Call the login method from AuthHandler
         if (isValid) {
             setLoggedIn(true);
         } else {
