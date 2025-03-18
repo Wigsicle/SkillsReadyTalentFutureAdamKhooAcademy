@@ -62,7 +62,7 @@ class Account(account_pb2_grpc.AccountServicer):
         if existing_account:
             context.set_code(grpc.StatusCode.ALREADY_EXISTS)
             context.set_details("Email is already in use.")
-        return account_pb2.AccountResponse()
+            return account_pb2.AccountResponse()
         newUserId = generateRandomId()  # Generate a new user ID
         # Insert the account data into the database
         account = accountDB.createAccount(
