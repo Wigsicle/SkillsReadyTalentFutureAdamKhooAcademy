@@ -39,12 +39,23 @@ class CourseProgressStub(object):
                 request_serializer=courseProgress__pb2.CourseProgressData.SerializeToString,
                 response_deserializer=courseProgress__pb2.CourseProgressData.FromString,
                 _registered_method=True)
+        self.UpdateCourseProgress = channel.unary_unary(
+                '/CourseProgress.CourseProgress/UpdateCourseProgress',
+                request_serializer=courseProgress__pb2.CourseProgressId.SerializeToString,
+                response_deserializer=courseProgress__pb2.CourseProgressId.FromString,
+                _registered_method=True)
 
 
 class CourseProgressServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def JoinCourse(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateCourseProgress(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -57,6 +68,11 @@ def add_CourseProgressServicer_to_server(servicer, server):
                     servicer.JoinCourse,
                     request_deserializer=courseProgress__pb2.CourseProgressData.FromString,
                     response_serializer=courseProgress__pb2.CourseProgressData.SerializeToString,
+            ),
+            'UpdateCourseProgress': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateCourseProgress,
+                    request_deserializer=courseProgress__pb2.CourseProgressId.FromString,
+                    response_serializer=courseProgress__pb2.CourseProgressId.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -86,6 +102,33 @@ class CourseProgress(object):
             '/CourseProgress.CourseProgress/JoinCourse',
             courseProgress__pb2.CourseProgressData.SerializeToString,
             courseProgress__pb2.CourseProgressData.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateCourseProgress(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/CourseProgress.CourseProgress/UpdateCourseProgress',
+            courseProgress__pb2.CourseProgressId.SerializeToString,
+            courseProgress__pb2.CourseProgressId.FromString,
             options,
             channel_credentials,
             insecure,

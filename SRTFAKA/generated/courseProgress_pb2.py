@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x63ourseProgress.proto\x12\x0e\x43ourseProgress\"L\n\x12\x43ourseProgressData\x12\x0f\n\x07\x63leared\x18\x01 \x01(\x08\x12\x12\n\nstudent_id\x18\x02 \x01(\x05\x12\x11\n\tcourse_id\x18\x03 \x01(\x05\x32h\n\x0e\x43ourseProgress\x12V\n\nJoinCourse\x12\".CourseProgress.CourseProgressData\x1a\".CourseProgress.CourseProgressData\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14\x63ourseProgress.proto\x12\x0e\x43ourseProgress\"L\n\x12\x43ourseProgressData\x12\x0f\n\x07\x63leared\x18\x01 \x01(\x08\x12\x12\n\nstudent_id\x18\x02 \x01(\x05\x12\x11\n\tcourse_id\x18\x03 \x01(\x05\"/\n\x10\x43ourseProgressId\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0f\n\x07\x63leared\x18\x02 \x01(\x08\x32\xc6\x01\n\x0e\x43ourseProgress\x12V\n\nJoinCourse\x12\".CourseProgress.CourseProgressData\x1a\".CourseProgress.CourseProgressData\"\x00\x12\\\n\x14UpdateCourseProgress\x12 .CourseProgress.CourseProgressId\x1a .CourseProgress.CourseProgressId\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,6 +33,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_COURSEPROGRESSDATA']._serialized_start=40
   _globals['_COURSEPROGRESSDATA']._serialized_end=116
-  _globals['_COURSEPROGRESS']._serialized_start=118
-  _globals['_COURSEPROGRESS']._serialized_end=222
+  _globals['_COURSEPROGRESSID']._serialized_start=118
+  _globals['_COURSEPROGRESSID']._serialized_end=165
+  _globals['_COURSEPROGRESS']._serialized_start=168
+  _globals['_COURSEPROGRESS']._serialized_end=366
 # @@protoc_insertion_point(module_scope)
