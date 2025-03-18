@@ -42,8 +42,8 @@ async def add_assessment(attempt: AssessmentAttemptData):
         earnedMarks=attempt.earnedMarks,
         attemptedOn=attempt.attemptedOn,
         remarks=attempt.remarks,
-        studentId=attempt.studentId,  # Keep as studentId
-        assessmentId=attempt.assessmentId
+        studentId=attempt.studentId,  # Include studentId
+        assessmentId=attempt.assessmentId  # Include assessmentId
     )
     
     # Call the gRPC service to add the assessment attempt

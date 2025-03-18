@@ -34,18 +34,22 @@ class AssessmentAttempt(Base):
     earned_marks: Mapped[float] = mapped_column(nullable=False)
     attempted_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     remarks: Mapped[str] = mapped_column(String(255), nullable=True)
-    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Keep as student_id but reference user.id
-    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False)  # Foreign key to assessment
     
+    #student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+    student_id: Mapped[int] = mapped_column(Integer, nullable=False)  # Just an integer
+    
+    # Add assessment_id as a foreign key to maintain the relationship
+    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False)  # Foreign key to assessment
+
     @hybrid_property
     def score_str(self) -> str:
         result = ""
         if self.earned_marks is not None:
-            result = f"{self.earned_marks}/{self.assessment.total_marks}"
+            result = f"{self.earned_marks}/{self.total_marks}"  # Adjusted to use total_marks directly
         return result
-    
+
+    # Relationship with Assessment
     assessment: Mapped[Assessment] = relationship("Assessment", back_populates="attempts")
-    
 
 class AssessmentDB:
     def __init__(self):

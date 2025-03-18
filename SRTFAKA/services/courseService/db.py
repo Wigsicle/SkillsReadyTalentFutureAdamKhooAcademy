@@ -5,10 +5,10 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase,
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from apiGateway.base import Base, Industry
-from services.assessmentService.db import Assessment
-from services.certificateService.db import Certificate
-from common.utils import generateRandomId
+from ...apiGateway.base import Base, Industry
+from ..assessmentService.db import Assessment
+from ..certificateService.db import Certificate
+from ...common.utils import generateRandomId
 from contextlib import contextmanager
 from sqlalchemy.sql import text
 

@@ -80,8 +80,8 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
                 earned_marks=request.earnedMarks,
                 attempted_on=datetime.now(),  # Set to current date
                 remarks=request.remarks,
-                student_id=request.studentId,  # Keep as student_id
-                assessment_id=request.assessmentId
+                student_id=request.studentId,  # Set student_id from request
+                assessment_id=request.assessmentId  # Set assessment_id from request
             )
             
             assessmentDB.session.add(new_attempt)

@@ -25,8 +25,8 @@ message AssessmentAttemptData {
   float earnedMarks = 2;
   string attemptedOn = 3;
   string remarks = 4;
-  int32 studentId = 5;  // Ensure this field is included
-  int32 assessmentId = 6; // Ensure this field is included
+  int32 studentId = 5;
+  int32 assessmentId = 6;
 }
 
 message AssessmentAttemptList {
