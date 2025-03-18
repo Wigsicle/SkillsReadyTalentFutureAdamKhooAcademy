@@ -162,10 +162,12 @@ function JobPortal() {
                                     <p className="card-text">{job.employmentValue}</p>
                                     <p className="card-text">{job.startDate}</p>
 
+                                </div>
+                                <div class="card-footer text-body-secondary">
                                     {/* Apply Button */}
                                     <button
-                                        className="btn btn-primary"
-                                        disabled={appliedJobs.some(app => app.jobId === job.jobId)} // Disable if the jobId is in appliedJobs
+                                    className="btn btn-primary"
+                                    disabled={appliedJobs.some(app => app.jobId === job.jobId)} // Disable if the jobId is in appliedJobs
                                     >
                                         {appliedJobs.some(app => app.jobId === job.jobId) ? "Already Applied" : "Apply"}
                                     </button>
