@@ -24,11 +24,11 @@ async def getAccountById(accountId: str) -> account_pb2.AccountResponse:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
 
 
-async def getAccountByUsername(accountUsername: str) -> account_pb2.AccountResponse:
+async def getAccountByEmail(accountEmail: str) -> account_pb2.AccountResponse:
     async with grpc.aio.insecure_channel(ACCOUNT_SERVICE_ADDRESS) as channel:
         stub = account_pb2_grpc.AccountStub(channel)
         try:
-            response = await stub.GetAccountByUsername(account_pb2.AccountRequestByUsername(username=accountUsername))
+            response = await stub.GetAccountByEmail(account_pb2.AccountRequestByEmail(email=accountEmail))
             return response
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
@@ -38,9 +38,13 @@ async def createAccount(account: AccountCreation) -> account_pb2.AccountResponse
         stub = account_pb2_grpc.AccountStub(channel)
         try:
             response = await stub.CreateAccount(account_pb2.CreateAccountRequest(
-                name=account.name, 
-                username=account.username,
-                password=account.password
+                password=account.password,
+                firstname=account.firstname,
+                lastname=account.lastname,
+                country_id=account.country_id,
+                address=account.address,
+                email=account.email,
+                user_type_id=account.user_type_id
             ))
             return response
         except grpc.aio.AioRpcError as e:
@@ -52,7 +56,10 @@ async def updateAccount(accountId: str, account: AccountUpdate) -> account_pb2.A
         try:
             response = await stub.UpdateAccount(account_pb2.UpdateAccountRequest(
                 userId=accountId,
-                name=account.name,
+                firstname=account.first_name,
+                lastname=account.last_name,
+                country_id=account.country_id,
+                address=account.address,
                 password=account.password
             ))
             return response

@@ -10,19 +10,33 @@ class TokenData(BaseModel):
     userId: str
     
 class Account(BaseModel):
-    name: str 
+    email: str 
     
 class AccountCreation(Account):
     password: str
-    username: str
+    firstname: str
+    lastname: str
+    country_id: int
+    address: str
+    email: str
+    user_type_id: int
     
 class AccountUpdate(Account):
+    first_name: str
+    last_name: str
+    country_id: int
+    address: str
     password: str
     
 class AccountResponse(Account):
     userId: str
     password: str
-    accountStatus: str
+    firstname: str
+    lastname: str
+    country_id: int
+    address: str
+    email: str
+    user_type_id: int
 
 class Course(BaseModel):
     id: int

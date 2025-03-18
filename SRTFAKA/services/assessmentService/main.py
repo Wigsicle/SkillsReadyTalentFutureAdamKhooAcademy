@@ -15,9 +15,9 @@
 import asyncio
 import logging
 import grpc
-from ..generated import assessment_pb2
-from ..generated import assessment_pb2_grpc
-from ..common.utils import generateRandomId
+from generated import assessment_pb2
+from generated import assessment_pb2_grpc
+from common.utils import generateRandomId
 from .db import AssessmentDB
 
 assessmentDB = AssessmentDB()

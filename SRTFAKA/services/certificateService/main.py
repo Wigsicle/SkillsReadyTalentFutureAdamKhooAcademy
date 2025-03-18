@@ -15,9 +15,9 @@
 import asyncio
 import logging
 import grpc
-from ..generated import certificate_pb2
-from ..generated import certificate_pb2_grpc
-from ..common.utils import generateRandomId
+from generated import certificate_pb2
+from generated import certificate_pb2_grpc
+from common.utils import generateRandomId
 from .db import CertificateDB
 
 certificateDB = CertificateDB()
