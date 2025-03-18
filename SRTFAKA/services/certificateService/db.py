@@ -44,7 +44,7 @@ class UserCertificate(Base):
     cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates='certs_attained')
-    cert_info: Mapped[Certificate] = relationship("Certificate", back_populates='issued_certs')
+    cert_info: Mapped["Certificate"] = relationship("Certificate", back_populates='issued_certs')
     
     
 currentPath = os.path.dirname(os.path.abspath(__file__))

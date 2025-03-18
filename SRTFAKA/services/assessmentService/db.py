@@ -44,7 +44,7 @@ class AssessmentAttempt(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
     assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
     
-    assessment: Mapped[Assessment] = relationship("Assessment", back_populates='attempts')
+    assessment: Mapped["Assessment"] = relationship("Assessment", back_populates='attempts')
     
 
 currentPath = os.path.dirname(os.path.abspath(__file__))
