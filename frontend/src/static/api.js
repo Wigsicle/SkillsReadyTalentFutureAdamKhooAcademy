@@ -48,7 +48,7 @@ export const applyJob = async (userData, token) => {
     return await makeRequest("/job/apply", "POST", userData, token);
 };
 export const getApplications = async (userId, token) => {
-    return await makeRequest("/job/applications", "GET", userId, token);
+    return await makeRequest(`/job/applications/${userId}`, "GET", userId, token);
 };
 
 

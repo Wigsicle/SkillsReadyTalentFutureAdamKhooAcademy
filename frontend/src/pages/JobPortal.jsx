@@ -1,54 +1,52 @@
 import React, { useState, useEffect } from "react";
 import "../styles.css"; // Import global styles
 import BreadCrumb from "../components/Breadcrumb";
-import { getUser, getJob, applyJob } from "../static/api"; // Assuming you have an applyForJob API function for submitting job applications
+import { getUser, getJob, applyJob, getApplications } from "../static/api"; // Assuming you have an applyForJob API function for submitting job applications
 import { useAuth } from '../static/AuthContext';
 
 function JobPortal() {
-
-    const authHandler = useAuth(); 
-    const [userId, setUserId] = useState(0)
-    // State for jobs and selected job
+    const authHandler = useAuth();
+    const [userId, setUserId] = useState(0);
     const [jobs, setJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-
-    // State for job application form
-    const [applicationData, setApplicationData] = useState({
-        applicantId: 0,
-        jobId: 0,
-        resumeLink: "",
-        additionalInfo: "",
-        industryId: 0
-    });
-
+    const [appliedJobs, setAppliedJobs] = useState([]); // Now stores jobId along with application data
+    const [view, setView] = useState('available'); // Toggle between 'available' and 'applied' jobs
     const [loading, setLoading] = useState(true); // Loading state for API call
+    const [applicationData, setApplicationData] = useState(null); // Store the user's application data for a selected job
 
-    // Fetch jobs when the component is mounted
+    // Fetch jobs and user's applications when the component is mounted
     useEffect(() => {
         const fetchJobs = async () => {
             try {
                 const token = authHandler.getToken(); // Get token from localStorage
                 const currentUser = await getUser(token.token);
-                setUserId(currentUser.data.userId);
-                const response = await getJob(token.token); // Make the API call to get jobs
+                const response = await getJob(token.token); // Get jobs data
                 if (currentUser.data && response.data) {
-                    const jobData = response.data.jobs; // Assuming the response is structured as in the provided example
+                    setUserId(currentUser.data.userId);
+                    const jobData = response.data.jobs;
                     setJobs(jobData);
+
+                    // Fetch the user's job applications
+                    const applications = await getApplications(currentUser.data.userId, token.token);
+                    if (applications.data) {
+                        // Store applied jobs with full application data (including resumeLink, additionalInfo)
+                        setAppliedJobs(applications.data.applications);
+                    }
                 } else {
-                    if(response.error === "Unauthorized"){
+                    if (response.error === "Unauthorized") {
                         authHandler.handleTokenExpired();
                     }
                 }
-  
             } catch (error) {
                 console.error("Error fetching jobs:", error);
             } finally {
                 setLoading(false); // Set loading to false after the data is fetched
             }
         };
+
         fetchJobs();
-    }, []);
+    }, [authHandler]);
 
     // Filter jobs based on search term
     const filteredJobs = jobs.filter((job) =>
@@ -63,6 +61,7 @@ function JobPortal() {
             ...prevData,
             [name]: value,
             jobId: selectedJob ? selectedJob.jobId : prevData.jobId, // Ensure jobId is set from selectedJob
+            industryId: selectedJob ? selectedJob.industryId : prevData.industryId, // Include industryId from selectedJob
         }));
     };
 
@@ -70,7 +69,6 @@ function JobPortal() {
     const handleApplySubmit = async (e) => {
         e.preventDefault();
         try {
-            // Make the API call to apply for the job
             const token = authHandler.getToken(); // Get token from localStorage
             applicationData.applicantId = userId;
             const response = await applyJob(applicationData, token.token);
@@ -78,7 +76,7 @@ function JobPortal() {
                 alert("Successfully applied for the job");
                 window.location.reload();
             } else {
-                if(response.error === "Unauthorized"){
+                if (response.error === "Unauthorized") {
                     authHandler.handleTokenExpired();
                 }
                 console.error("Error applying for job:", response.error);
@@ -93,15 +91,50 @@ function JobPortal() {
         return <div>Loading...</div>;
     }
 
+    // Handle job selection for the modal
+    const handleJobClick = (job) => {
+        setSelectedJob(job);
+
+        // If the job has been applied for, fetch the application data
+        const appliedJobData = appliedJobs.find((app) => app.jobId === job.jobId);
+        if (appliedJobData) {
+            setApplicationData({
+                resumeLink: appliedJobData.resumeLink || "",
+                additionalInfo: appliedJobData.additionalInfo || "",
+                jobId: job.jobId,
+                industryId: job.industryId || "", // Set industryId when job is selected
+            });
+        } else {
+            setApplicationData(null); // Reset application data if the job hasn't been applied for
+        }
+    };
+
     return (
         <div className="job-portal">
             <BreadCrumb title={"Jobs"} homeRoute={"/"} />
 
             {/* Search Bar */}
             <div className="job-portal-container">
-                <h1>Available Jobs</h1>
+                <h1>{view === 'available' ? 'Available Jobs' : 'Applied Jobs'}</h1>
                 <p>A sea of opportunities awaits.</p>
 
+
+                <div class="btn-group mb-3">
+                    <button
+                        className={`btn ${view === 'available' ? 'btn-light' : 'btn-light'}`}
+                        onClick={() => setView('available')}
+                    >
+                        Available Jobs
+                    </button>
+                    <button
+                        className={`btn ${view === 'applied' ? 'btn-dark' : 'btn-dark'}`}
+                        onClick={() => setView('applied')}
+                    >
+                        Applied Jobs
+                    </button>
+                </div>
+         
+            
                 <div className="mb-3">
                     <input
                         type="text"
@@ -114,22 +147,43 @@ function JobPortal() {
 
                 {/* Job List */}
                 <div className="card-list">
-                    {filteredJobs.map((job) => (
-                        <div
-                            key={job.jobId}
-                            className={`card ${selectedJob?.jobId === job.jobId ? "selected" : ""}`}
-                            onClick={() => setSelectedJob(job)}
-                            data-bs-toggle="modal"
-                            data-bs-target="#jobModal"
-                        >
-                            <div className="card-body">
-                                <h3 className="card-title">{job.name}</h3>
-                                <p className="card-text">{job.companyName}</p>
-                                <p className="card-text">{job.employmentValue}</p>
-                                <p className="card-text">{job.startDate}</p>
+                    {view === 'available'
+                        ? filteredJobs.map((job) => (
+                            <div
+                                key={job.jobId}
+                                className={`card ${selectedJob?.jobId === job.jobId ? "selected" : ""}`}
+                                onClick={() => handleJobClick(job)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#jobModal"
+                            >
+                                <div className="card-body">
+                                    <h3 className="card-title">{job.name}</h3>
+                                    <p className="card-text">{job.companyName}</p>
+                                    <p className="card-text">{job.employmentValue}</p>
+                                    <p className="card-text">{job.startDate}</p>
+
+                                    {/* Apply Button */}
+                                    <button
+                                        className="btn btn-primary"
+                                        disabled={appliedJobs.some(app => app.jobId === job.jobId)} // Disable if the jobId is in appliedJobs
+                                    >
+                                        {appliedJobs.some(app => app.jobId === job.jobId) ? "Already Applied" : "Apply"}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                        : jobs
+                            .filter((job) => appliedJobs.some(app => app.jobId === job.jobId)) // Show only jobs the user has applied for
+                            .map((job) => (
+                                <div key={job.jobId} className="card" onClick={() => handleJobClick(job)} data-bs-toggle="modal" data-bs-target="#jobModal">
+                                    <div className="card-body">
+                                        <h3 className="card-title">{job.name}</h3>
+                                        <p className="card-text">{job.companyName}</p>
+                                        <p className="card-text">{job.employmentValue}</p>
+                                        <p className="card-text">{job.startDate}</p>
+                                    </div>
+                                </div>
+                            ))}
                 </div>
             </div>
 
@@ -155,34 +209,46 @@ function JobPortal() {
                                     </ul>
 
                                     {/* Application Form */}
-                                    <form onSubmit={handleApplySubmit}>
-                                        <div className="mb-3">
-                                            <label htmlFor="resumeLink" className="form-label">Resume Link</label>
-                                            <input
-                                                type="url"
-                                                id="resumeLink"
-                                                name="resumeLink"
-                                                className="form-control"
-                                                value={applicationData.resumeLink}
-                                                onChange={handleApplicationChange}
-                                                required
-                                            />
-                                        </div>
+                                    {view === 'available' && (
+                                        <form onSubmit={handleApplySubmit}>
+                                            <div className="mb-3">
+                                                <label htmlFor="resumeLink" className="form-label">Resume Link</label>
+                                                <input
+                                                    type="url"
+                                                    id="resumeLink"
+                                                    name="resumeLink"
+                                                    className="form-control"
+                                                    value={applicationData ? applicationData.resumeLink : ''}
+                                                    onChange={handleApplicationChange}
+                                                    disabled={appliedJobs.some(app => app.jobId === selectedJob.jobId)}
+                                                    required
+                                                />
+                                            </div>
 
-                                        <div className="mb-3">
-                                            <label htmlFor="additionalInfo" className="form-label">Additional Information</label>
-                                            <textarea
-                                                id="additionalInfo"
-                                                name="additionalInfo"
-                                                className="form-control"
-                                                value={applicationData.additionalInfo}
-                                                onChange={handleApplicationChange}
-                                            />
-                                        </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="additionalInfo" className="form-label">Additional Information</label>
+                                                <textarea
+                                                    id="additionalInfo"
+                                                    name="additionalInfo"
+                                                    className="form-control"
+                                                    value={applicationData ? applicationData.additionalInfo : ''}
+                                                    onChange={handleApplicationChange}
+                                                    disabled={appliedJobs.some(app => app.jobId === selectedJob.jobId)}
+                                                />
+                                            </div>
 
-                                        {/* Submit Button */}
-                                        <button type="submit" className="btn btn-primary">Apply for Job</button>
-                                    </form>
+                                            <button type="submit" className="btn btn-primary" disabled={appliedJobs.some(app => app.jobId === selectedJob.jobId)}>
+                                                {appliedJobs.some(app => app.jobId === selectedJob.jobId) ? "Already Applied" : "Apply"}
+                                            </button>
+                                        </form>
+                                    )}
+
+                                    {view === 'applied' && applicationData && (
+                                        <div>
+                                            <p><strong>Resume Link:</strong> {applicationData.resumeLink}</p>
+                                            <p><strong>Additional Info:</strong> {applicationData.additionalInfo}</p>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <p>No selected job</p>
