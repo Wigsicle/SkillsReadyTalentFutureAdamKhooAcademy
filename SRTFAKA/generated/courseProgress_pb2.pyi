@@ -13,3 +13,11 @@ class CourseProgressData(_message.Message):
     student_id: int
     course_id: int
     def __init__(self, cleared: bool = ..., student_id: _Optional[int] = ..., course_id: _Optional[int] = ...) -> None: ...
+
+class CourseProgressId(_message.Message):
+    __slots__ = ("id", "cleared")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    CLEARED_FIELD_NUMBER: _ClassVar[int]
+    id: int
+    cleared: bool
+    def __init__(self, id: _Optional[int] = ..., cleared: bool = ...) -> None: ...

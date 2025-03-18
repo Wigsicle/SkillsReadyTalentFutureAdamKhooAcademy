@@ -5,10 +5,10 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase,
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from ...apiGateway.base import Base, Industry
-from ..assessmentService.db import Assessment
-from ..certificateService.db import Certificate
-from ...common.utils import generateRandomId
+from apiGateway.base import Base, Industry
+from services.assessmentService.db import Assessment
+from services.certificateService.db import Certificate
+from common.utils import generateRandomId
 from contextlib import contextmanager
 from sqlalchemy.sql import text
 
@@ -95,6 +95,38 @@ class CourseProgressDB:
             print(f"ERROr in joinCourse: {e}")
             self.session.rollback()
             return None
+    
+    def updateCourseProgress(self, course_progress_id: int, cleared: bool):
+        """Update course progress using course_progress_id"""
+
+        sql = text("""
+            UPDATE course_progress
+            SET cleared = :cleared
+            WHERE id = :course_progress_id
+            RETURNING id;
+        """)
+
+        values = {
+            "cleared": cleared,
+            "course_progress_id": course_progress_id
+        }
+
+        try:
+            result = self.session.execute(sql, values)
+            self.session.commit()
+            updated_id = result.scalar()
+            
+            if updated_id:
+                print(f"Updated course_progress ID: {updated_id}")
+            else:
+                print("No matching record found to update.")
+
+            return updated_id
+        except SQLAlchemyError as e:
+            print(f"Error in update_course_progress: {e}")
+            self.session.rollback()
+            return None
+
 
 class CourseDB:
     def __init__(self):

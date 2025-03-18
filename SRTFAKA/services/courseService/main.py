@@ -47,7 +47,42 @@ class CourseProgress(courseProgress_pb2_grpc.CourseProgressServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Error during joining course creation: {e}")
             return courseProgress_pb2.CourseProgressData()
-        
+
+    async def UpdateCourseProgress(
+        self,
+        request: courseProgress_pb2.CourseProgressId,  # Accept CourseProgressId
+        context: grpc.aio.ServicerContext,
+    ) -> courseProgress_pb2.CourseProgressData:
+        try:
+            print(f"GRPC Server: {request}")
+
+            # Instantiate the database handler (replace with actual DB interaction)
+            courseProgressDB = CourseProgressDB()
+
+            # Pass the course_progress_id and cleared flag to update course progress
+            updated_course_progress = courseProgressDB.updateCourseProgress(
+                request.id, request.cleared  # Use the 'id' and 'cleared' from CourseProgressId
+            )
+
+            if not updated_course_progress:
+                context.set_code(grpc.StatusCode.NOT_FOUND)
+                context.set_details("Update course progress failed or no matching record found.")
+                return courseProgress_pb2.CourseProgressId()
+
+            # Return updated CourseProgressData
+            return courseProgress_pb2.CourseProgressId(
+                id=request.id,  # Use the 'id' from CourseProgressId
+                cleared=request.cleared  # Use 'cleared' from CourseProgressId
+            )
+
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(f"Error during course progress update: {e}")
+            return courseProgress_pb2.CourseProgressId()
+
+
+
+
 class Course(course_pb2_grpc.CourseServicer):
     async def GetAllCourse(
         self,

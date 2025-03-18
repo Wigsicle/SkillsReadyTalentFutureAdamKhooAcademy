@@ -50,6 +50,10 @@ class CourseProgress(BaseModel):
     cleared: bool
     student_id: int
     course_id: int
+
+class CourseProgressId(BaseModel):
+    id: int
+    cleared: bool
     
 class CourseResponse(Course):
     courseId: str
