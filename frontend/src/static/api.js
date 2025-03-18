@@ -32,7 +32,7 @@ export const makeRequest = async (endpoint, method, data = null, token = null) =
 
 // Jobs APIs
 export const getJob = async (token) => {
-    return await makeRequest("/job", "GET", null, null);
+    return await makeRequest("/job", "GET", null, token);
 };
 export const createJob = async (userData, token) => {
     return await makeRequest("/job/create", "POST", userData, null);
@@ -41,10 +41,16 @@ export const createJob = async (userData, token) => {
 export const updateJob = async (userData, token) => {
     return await makeRequest("/job/update", "PUT", userData, null);
 };
-
 export const deleteJob = async (token) => {
     return await makeRequest("/job", "DELETE", null, null);
 };
+export const applyJob = async (userData, token) => {
+    return await makeRequest("/job/apply", "POST", userData, token);
+};
+export const getApplications = async (userId, token) => {
+    return await makeRequest("/job/applications", "GET", userId, token);
+};
+
 
 // User APIs
 export const registerUser = async (userData, token) => {

@@ -1,23 +1,50 @@
 import React, { useState, useEffect } from "react";
 import "../styles.css"; // Import global styles
 import BreadCrumb from "../components/Breadcrumb";
-import { getJob } from "../static/api"; // Assuming getJob is already defined for fetching jobs
+import { getUser, getJob, applyJob } from "../static/api"; // Assuming you have an applyForJob API function for submitting job applications
+import { useAuth } from '../static/AuthContext';
 
 function JobPortal() {
+
+    const authHandler = useAuth(); 
+    const [userId, setUserId] = useState(0)
     // State for jobs and selected job
     const [jobs, setJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
 
+    // State for job application form
+    const [applicationData, setApplicationData] = useState({
+        applicantId: 0,
+        jobId: 0,
+        resumeLink: "",
+        additionalInfo: "",
+        industryId: 0
+    });
+
+    const [loading, setLoading] = useState(true); // Loading state for API call
+
     // Fetch jobs when the component is mounted
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const response = await getJob(); // Make the API call to get jobs
-                const jobData = response.data.jobs; // Assuming the response is structured as in the provided example
-                setJobs(jobData);
+                const token = authHandler.getToken(); // Get token from localStorage
+                const currentUser = await getUser(token.token);
+                setUserId(currentUser.data.userId);
+                const response = await getJob(token.token); // Make the API call to get jobs
+                if (currentUser.data && response.data) {
+                    const jobData = response.data.jobs; // Assuming the response is structured as in the provided example
+                    setJobs(jobData);
+                } else {
+                    if(response.error === "Unauthorized"){
+                        authHandler.handleTokenExpired();
+                    }
+                }
+  
             } catch (error) {
                 console.error("Error fetching jobs:", error);
+            } finally {
+                setLoading(false); // Set loading to false after the data is fetched
             }
         };
         fetchJobs();
@@ -28,6 +55,43 @@ function JobPortal() {
         job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         job.companyName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Handle input changes for job application form
+    const handleApplicationChange = (e) => {
+        const { name, value } = e.target;
+        setApplicationData((prevData) => ({
+            ...prevData,
+            [name]: value,
+            jobId: selectedJob ? selectedJob.jobId : prevData.jobId, // Ensure jobId is set from selectedJob
+        }));
+    };
+
+    // Handle form submission for applying to a job
+    const handleApplySubmit = async (e) => {
+        e.preventDefault();
+        try {
+            // Make the API call to apply for the job
+            const token = authHandler.getToken(); // Get token from localStorage
+            applicationData.applicantId = userId;
+            const response = await applyJob(applicationData, token.token);
+            if (response.data) {
+                alert("Successfully applied for the job");
+                window.location.reload();
+            } else {
+                if(response.error === "Unauthorized"){
+                    authHandler.handleTokenExpired();
+                }
+                console.error("Error applying for job:", response.error);
+            }
+        } catch (error) {
+            console.error("Error submitting job application:", error);
+        }
+    };
+
+    // If data is still loading, show a loading spinner
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="job-portal">
@@ -69,7 +133,7 @@ function JobPortal() {
                 </div>
             </div>
 
-            {/* Modal for Job Details */}
+            {/* Modal for Job Details and Application Form */}
             <div className="modal fade" tabindex="-1" id="jobModal" aria-labelledby="jobModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
@@ -89,6 +153,36 @@ function JobPortal() {
                                         <li>Monthly Salary: ${selectedJob.monthlySalary}</li>
                                         <li>Available Spot Count: {selectedJob.availableSpotCount}</li>
                                     </ul>
+
+                                    {/* Application Form */}
+                                    <form onSubmit={handleApplySubmit}>
+                                        <div className="mb-3">
+                                            <label htmlFor="resumeLink" className="form-label">Resume Link</label>
+                                            <input
+                                                type="url"
+                                                id="resumeLink"
+                                                name="resumeLink"
+                                                className="form-control"
+                                                value={applicationData.resumeLink}
+                                                onChange={handleApplicationChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="additionalInfo" className="form-label">Additional Information</label>
+                                            <textarea
+                                                id="additionalInfo"
+                                                name="additionalInfo"
+                                                className="form-control"
+                                                value={applicationData.additionalInfo}
+                                                onChange={handleApplicationChange}
+                                            />
+                                        </div>
+
+                                        {/* Submit Button */}
+                                        <button type="submit" className="btn btn-primary">Apply for Job</button>
+                                    </form>
                                 </div>
                             ) : (
                                 <p>No selected job</p>
@@ -96,7 +190,6 @@ function JobPortal() {
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" className="btn btn-primary">Apply</button>
                         </div>
                     </div>
                 </div>
