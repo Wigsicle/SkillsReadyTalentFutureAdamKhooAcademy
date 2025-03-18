@@ -1,11 +1,15 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, Any
+from typing import Optional, Any, TYPE_CHECKING
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, Date
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base
+
+if TYPE_CHECKING:
+    from services.courseService.db import Course
+    from services.accountService.db import User
 
 class Certificate(Base):
     """
@@ -24,6 +28,9 @@ class Certificate(Base):
     
     #FK
     course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id'), nullable=True) # 1:1 
+
+    course: Mapped["Course"] = relationship("Course", back_populates='certificate')
+    issued_certs: Mapped["UserCertificate"] = relationship("UserCertificate", back_populates='cert_info')
     
 class UserCertificate(Base):
     __tablename__ = 'user_cert'
@@ -36,7 +43,8 @@ class UserCertificate(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)    # Use this to access user obj
     cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
 
-    cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
+    user: Mapped["User"] = relationship("User", back_populates='certs_attained')
+    cert_info: Mapped[Certificate] = relationship("Certificate", back_populates='issued_certs')
     
     
 currentPath = os.path.dirname(os.path.abspath(__file__))
