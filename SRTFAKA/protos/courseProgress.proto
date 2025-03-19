@@ -4,7 +4,7 @@ package CourseProgress;
 
 service CourseProgress {
   rpc JoinCourse (CourseProgressData) returns (CourseProgressData) {}
-  rpc UpdateCourseProgress (CourseProgressId) returns (CourseProgressId) {}
+  rpc UpdateCourseProgress (CourseProgressData) returns (CourseProgressData) {}
 }
 
 message CourseProgressData {
