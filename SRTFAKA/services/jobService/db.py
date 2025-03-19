@@ -193,18 +193,32 @@ class JobDB:
             return None
 
 
-    def update_job(self, job_id: int, update_data: dict) -> bool:
+    def update_job(self, job_id: int, update_data: dict) -> Optional[dict]:
         """Update an existing job listing using raw SQL in PostgreSQL."""
-        
-        if not update_data:
-            print("ERROR in update_job: No update data provided.")
-            return False
 
-        updates = [f"{key} = :{key}" for key in update_data.keys()]
+        # Allowed fields that employers can update
+        allowed_fields = {"name", "description", "start_date", "end_date", "available_spot_count", "employment_type_id"}
+        update_data = {key: value for key, value in update_data.items() if key in allowed_fields}
+
+        if not update_data:
+            print(f"ERROR in update_job: No valid update fields provided.")
+            return None
+
+        # Check if job exists
+        check_sql = text("SELECT id FROM job_listing WHERE id = :job_id")
+        result = self.session.execute(check_sql, {"job_id": job_id}).fetchone()
+        
+        if not result:
+            print(f"ERROR in update_job: Job ID {job_id} not found.")
+            return None
+
+        # Generate dynamic SET clause for SQL update
+        updates = ", ".join([f"{key} = :{key}" for key in update_data.keys()])
         sql = text(f"""
             UPDATE job_listing 
-            SET {", ".join(updates)}
+            SET {updates}
             WHERE id = :job_id
+            RETURNING id, name, description, start_date, end_date, available_spot_count, company_id, employment_type_id, monthly_salary;
         """)
 
         update_data["job_id"] = job_id  # Add job_id to the parameter dictionary
@@ -212,11 +226,42 @@ class JobDB:
         try:
             result = self.session.execute(sql, update_data)
             self.session.commit()
-            return result.rowcount > 0  # True if at least one row was updated
+            updated_job = result.fetchone()
+
+            if updated_job:
+                # Retrieve company and industry names
+                company_name = self.get_company_name(updated_job.company_id)
+                industry_id = self.get_company_industry_id(updated_job.company_id)
+                industry_name = self.get_industry_name(industry_id)
+                employment_value = self.get_employment_value(updated_job.employment_type_id)
+
+                updated_job_data = {
+                    "job_id": updated_job.id,
+                    "name": updated_job.name,
+                    "description": updated_job.description,
+                    "start_date": updated_job.start_date.strftime("%Y-%m-%d"),
+                    "end_date": updated_job.end_date.strftime("%Y-%m-%d"),
+                    "available_spot_count": updated_job.available_spot_count,
+                    "company_id": updated_job.company_id,
+                    "company_name": company_name,
+                    "employment_type_id": updated_job.employment_type_id, 
+                    "employment_value": employment_value,  
+                    "industry_id": industry_id,
+                    "industry_name": industry_name,
+                    "monthly_salary": updated_job.monthly_salary
+                }
+
+                print(f"DEBUG: Job Updated Successfully - {updated_job_data}")
+                return updated_job_data
+
+            print(f"ERROR: Update failed for job_id={job_id}")
+            return None
+
         except SQLAlchemyError as e:
             print(f"ERROR in update_job: {e}")
             self.session.rollback()
-            return False
+            return None
+
 
         
     def get_job(self):

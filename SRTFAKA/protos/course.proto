@@ -5,6 +5,7 @@ package Course;
 // The Course service definition.
 service Course {
   rpc GetAllCourse (CourseData) returns (CourseList) {}
+  rpc GetCourseById (CourseId) returns (CourseData) {}
   rpc CreateCourse (CourseData) returns (CourseData) {}
   rpc UpdateCourse (CourseData) returns (CourseData) {}
   rpc DeleteCourse (CourseId) returns (CourseId) {}
@@ -12,9 +13,12 @@ service Course {
 
 // Message representing a single course record
 message CourseData {
-  string name = 1;
-  string instructor = 2;
-  string courseId = 3;
+  int32 id = 1;
+  string name = 2;
+  string details = 3;
+  int32 industry_id = 4;
+  string industry_name = 5;
+  int32 cert_id = 6;
 }
 
 // Response message containing a list of courses
@@ -23,5 +27,6 @@ message CourseList {
 }
 
 message CourseId{
-  string courseId = 1;
+  int32 id = 1;
 }
+
