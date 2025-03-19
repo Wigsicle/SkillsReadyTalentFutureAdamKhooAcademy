@@ -41,8 +41,8 @@ class CourseProgressStub(object):
                 _registered_method=True)
         self.UpdateCourseProgress = channel.unary_unary(
                 '/CourseProgress.CourseProgress/UpdateCourseProgress',
-                request_serializer=courseProgress__pb2.CourseProgressId.SerializeToString,
-                response_deserializer=courseProgress__pb2.CourseProgressId.FromString,
+                request_serializer=courseProgress__pb2.CourseProgressData.SerializeToString,
+                response_deserializer=courseProgress__pb2.CourseProgressData.FromString,
                 _registered_method=True)
 
 
@@ -71,8 +71,8 @@ def add_CourseProgressServicer_to_server(servicer, server):
             ),
             'UpdateCourseProgress': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateCourseProgress,
-                    request_deserializer=courseProgress__pb2.CourseProgressId.FromString,
-                    response_serializer=courseProgress__pb2.CourseProgressId.SerializeToString,
+                    request_deserializer=courseProgress__pb2.CourseProgressData.FromString,
+                    response_serializer=courseProgress__pb2.CourseProgressData.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -127,8 +127,8 @@ class CourseProgress(object):
             request,
             target,
             '/CourseProgress.CourseProgress/UpdateCourseProgress',
-            courseProgress__pb2.CourseProgressId.SerializeToString,
-            courseProgress__pb2.CourseProgressId.FromString,
+            courseProgress__pb2.CourseProgressData.SerializeToString,
+            courseProgress__pb2.CourseProgressData.FromString,
             options,
             channel_credentials,
             insecure,
