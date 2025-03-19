@@ -5,7 +5,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, Date, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-from ...apiGateway.base import Base
+from apiGateway.base import Base
 from dateutil.relativedelta import relativedelta
 
 # Database Connection
@@ -25,15 +25,6 @@ def get_db():
     Minimal stub model for referencing the 'couse' and 'user' table. 
     This prevents circular imports with the accountService.
 """
-
-class Course(Base):
-    __tablename__ = "course"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
-class User(Base):
-    __tablename__ = "user"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-
 
 class Certificate(Base):
     """

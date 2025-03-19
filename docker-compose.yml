@@ -11,5 +11,16 @@ services:
       - acad_db:/data/postgres/jobs
     ports:
       - 5433:5432
+
+  assessment_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: services/assessmentService/Dockerfile
+    restart: always
+    ports:
+      - "50054:50053"  # Expose the port for the assessment service
+    depends_on:
+      - job_database  # Ensure the database is started before the service
+
 volumes:
   acad_db:
