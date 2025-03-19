@@ -2,6 +2,13 @@ syntax = "proto3";
 
 package Assessment;
 
+message AssessmentQuestion{
+  string question = 1;
+  int32 marks = 2;
+  string answer = 3;
+  repeated string options = 4;
+}
+
 // The Assessment service definition.
 service Assessment {
   rpc GetAllAssessment (AssessmentData) returns (AssessmentList) {}
@@ -18,6 +25,7 @@ message AssessmentData {
   int32 courseId = 2;      // Course ID (should be int32)
   int32 assessmentId = 3;  // Assessment ID (should be int32)
   float total_marks = 4;   // Total marks (should be int32)
+  repeated AssessmentQuestion questionAnswer = 5; // List of key-value pairs
 }
 
 message AssessmentAttemptData {

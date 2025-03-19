@@ -65,3 +65,14 @@ export const updateUser = async (userData, token) => {
     console.log(userData);
     return await makeRequest(`/accounts/`, "PUT", userData, token);
 };
+
+// Assessment APIs
+export const getAsssessment = async (token) => {
+    return await makeRequest("/assessment", "GET", null, token);
+};
+export const submitAssessmentResults = async (assessmentData, token) => {
+    return await makeRequest("/assessment/attempts", "POST", assessmentData, token);
+};
+export const getAttempts = async (token) => {
+    return await makeRequest("/assessment/attempts", "GET", null, token);
+};

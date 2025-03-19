@@ -24,23 +24,25 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61ssessment.proto\x12\nAssessment\"[\n\x0e\x41ssessmentData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08\x63ourseId\x18\x02 \x01(\x05\x12\x14\n\x0c\x61ssessmentId\x18\x03 \x01(\x05\x12\x13\n\x0btotal_marks\x18\x04 \x01(\x02\"\x8e\x01\n\x15\x41ssessmentAttemptData\x12\x11\n\tattemptId\x18\x01 \x01(\x05\x12\x13\n\x0b\x65\x61rnedMarks\x18\x02 \x01(\x02\x12\x13\n\x0b\x61ttemptedOn\x18\x03 \x01(\t\x12\x0f\n\x07remarks\x18\x04 \x01(\t\x12\x11\n\tstudentId\x18\x05 \x01(\x05\x12\x14\n\x0c\x61ssessmentId\x18\x06 \x01(\x05\"L\n\x15\x41ssessmentAttemptList\x12\x33\n\x08\x61ttempts\x18\x01 \x03(\x0b\x32!.Assessment.AssessmentAttemptData\"A\n\x0e\x41ssessmentList\x12/\n\x0b\x61ssessments\x18\x01 \x03(\x0b\x32\x1a.Assessment.AssessmentData\"$\n\x0c\x41ssessmentId\x12\x14\n\x0c\x61ssessmentId\x18\x01 \x01(\x05\x32\xfd\x03\n\nAssessment\x12L\n\x10GetAllAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentList\"\x00\x12L\n\x10\x43reateAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentData\"\x00\x12L\n\x10UpdateAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentData\"\x00\x12H\n\x10\x44\x65leteAssessment\x12\x18.Assessment.AssessmentId\x1a\x18.Assessment.AssessmentId\"\x00\x12[\n\x18GetAllAssessmentAttempts\x12\x1a.Assessment.AssessmentData\x1a!.Assessment.AssessmentAttemptList\"\x00\x12^\n\x14\x41\x64\x64\x41ssessmentAttempt\x12!.Assessment.AssessmentAttemptData\x1a!.Assessment.AssessmentAttemptData\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61ssessment.proto\x12\nAssessment\"V\n\x12\x41ssessmentQuestion\x12\x10\n\x08question\x18\x01 \x01(\t\x12\r\n\x05marks\x18\x02 \x01(\x05\x12\x0e\n\x06\x61nswer\x18\x03 \x01(\t\x12\x0f\n\x07options\x18\x04 \x03(\t\"\x93\x01\n\x0e\x41ssessmentData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08\x63ourseId\x18\x02 \x01(\x05\x12\x14\n\x0c\x61ssessmentId\x18\x03 \x01(\x05\x12\x13\n\x0btotal_marks\x18\x04 \x01(\x02\x12\x36\n\x0equestionAnswer\x18\x05 \x03(\x0b\x32\x1e.Assessment.AssessmentQuestion\"\x8e\x01\n\x15\x41ssessmentAttemptData\x12\x11\n\tattemptId\x18\x01 \x01(\x05\x12\x13\n\x0b\x65\x61rnedMarks\x18\x02 \x01(\x02\x12\x13\n\x0b\x61ttemptedOn\x18\x03 \x01(\t\x12\x0f\n\x07remarks\x18\x04 \x01(\t\x12\x11\n\tstudentId\x18\x05 \x01(\x05\x12\x14\n\x0c\x61ssessmentId\x18\x06 \x01(\x05\"L\n\x15\x41ssessmentAttemptList\x12\x33\n\x08\x61ttempts\x18\x01 \x03(\x0b\x32!.Assessment.AssessmentAttemptData\"A\n\x0e\x41ssessmentList\x12/\n\x0b\x61ssessments\x18\x01 \x03(\x0b\x32\x1a.Assessment.AssessmentData\"$\n\x0c\x41ssessmentId\x12\x14\n\x0c\x61ssessmentId\x18\x01 \x01(\x05\x32\xfd\x03\n\nAssessment\x12L\n\x10GetAllAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentList\"\x00\x12L\n\x10\x43reateAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentData\"\x00\x12L\n\x10UpdateAssessment\x12\x1a.Assessment.AssessmentData\x1a\x1a.Assessment.AssessmentData\"\x00\x12H\n\x10\x44\x65leteAssessment\x12\x18.Assessment.AssessmentId\x1a\x18.Assessment.AssessmentId\"\x00\x12[\n\x18GetAllAssessmentAttempts\x12\x1a.Assessment.AssessmentData\x1a!.Assessment.AssessmentAttemptList\"\x00\x12^\n\x14\x41\x64\x64\x41ssessmentAttempt\x12!.Assessment.AssessmentAttemptData\x1a!.Assessment.AssessmentAttemptData\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'assessment_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_ASSESSMENTDATA']._serialized_start=32
-  _globals['_ASSESSMENTDATA']._serialized_end=123
-  _globals['_ASSESSMENTATTEMPTDATA']._serialized_start=126
-  _globals['_ASSESSMENTATTEMPTDATA']._serialized_end=268
-  _globals['_ASSESSMENTATTEMPTLIST']._serialized_start=270
-  _globals['_ASSESSMENTATTEMPTLIST']._serialized_end=346
-  _globals['_ASSESSMENTLIST']._serialized_start=348
-  _globals['_ASSESSMENTLIST']._serialized_end=413
-  _globals['_ASSESSMENTID']._serialized_start=415
-  _globals['_ASSESSMENTID']._serialized_end=451
-  _globals['_ASSESSMENT']._serialized_start=454
-  _globals['_ASSESSMENT']._serialized_end=963
+  _globals['_ASSESSMENTQUESTION']._serialized_start=32
+  _globals['_ASSESSMENTQUESTION']._serialized_end=118
+  _globals['_ASSESSMENTDATA']._serialized_start=121
+  _globals['_ASSESSMENTDATA']._serialized_end=268
+  _globals['_ASSESSMENTATTEMPTDATA']._serialized_start=271
+  _globals['_ASSESSMENTATTEMPTDATA']._serialized_end=413
+  _globals['_ASSESSMENTATTEMPTLIST']._serialized_start=415
+  _globals['_ASSESSMENTATTEMPTLIST']._serialized_end=491
+  _globals['_ASSESSMENTLIST']._serialized_start=493
+  _globals['_ASSESSMENTLIST']._serialized_end=558
+  _globals['_ASSESSMENTID']._serialized_start=560
+  _globals['_ASSESSMENTID']._serialized_end=596
+  _globals['_ASSESSMENT']._serialized_start=599
+  _globals['_ASSESSMENT']._serialized_end=1108
 # @@protoc_insertion_point(module_scope)

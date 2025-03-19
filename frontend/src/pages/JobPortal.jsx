@@ -163,10 +163,10 @@ function JobPortal() {
                                     <p className="card-text">{job.startDate}</p>
 
                                 </div>
-                                <div class="card-footer text-body-secondary">
+                                <div class="card-footer text-body-light">
                                     {/* Apply Button */}
                                     <button
-                                    className="btn btn-primary"
+                                    className="btn btn-dark"
                                     disabled={appliedJobs.some(app => app.jobId === job.jobId)} // Disable if the jobId is in appliedJobs
                                     >
                                         {appliedJobs.some(app => app.jobId === job.jobId) ? "Already Applied" : "Apply"}
@@ -239,7 +239,7 @@ function JobPortal() {
                                                 />
                                             </div>
 
-                                            <button type="submit" className="btn btn-primary" disabled={appliedJobs.some(app => app.jobId === selectedJob.jobId)}>
+                                            <button type="submit" className="btn btn-dark" disabled={appliedJobs.some(app => app.jobId === selectedJob.jobId)}>
                                                 {appliedJobs.some(app => app.jobId === selectedJob.jobId) ? "Already Applied" : "Apply"}
                                             </button>
                                         </form>
@@ -257,7 +257,7 @@ function JobPortal() {
                             )}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" className="btn btn-light" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>

@@ -20,6 +20,7 @@ from generated import assessment_pb2_grpc
 from common.utils import generateRandomId
 from .db import AssessmentDB, Assessment, AssessmentAttempt
 from datetime import datetime
+import json
 
 assessmentDB = AssessmentDB()
 
@@ -38,12 +39,13 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
         # Log the retrieved assessments
         for assessment in assessments:
             print(f"Retrieved Assessment: ID={assessment.id}, Name={assessment.name}, CourseID={assessment.course_id}, TotalMarks={assessment.total_marks}")
-
+        
         return assessment_pb2.AssessmentList(assessments=[assessment_pb2.AssessmentData(
             assessmentId=int(assessment.id) if assessment.id is not None else 0,
             name=assessment.name if assessment.name is not None else "",
             courseId=int(assessment.course_id) if assessment.course_id is not None else 0,
-            total_marks=float(assessment.total_marks) if assessment.total_marks is not None else 0.0
+            total_marks=float(assessment.total_marks) if assessment.total_marks is not None else 0.0,
+            questionAnswer=[assessment_pb2.AssessmentQuestion(question=question["q"], marks=question["marks"], answer=question["answer"], options=question["options"]) for question in assessment.question_paper["questions"]] if assessment.question_paper is not None else []
         ) for assessment in assessments])
 
     async def GetAllAssessmentAttempts(
@@ -65,7 +67,9 @@ class Assessment(assessment_pb2_grpc.AssessmentServicer):
             attemptId=int(attempt.id) if attempt.id is not None else 0,
             earnedMarks=float(attempt.earned_marks) if attempt.earned_marks is not None else 0.0,
             attemptedOn=str(attempt.attempted_on) if attempt.attempted_on is not None else "",
-            remarks=attempt.remarks if attempt.remarks is not None else ""
+            remarks=attempt.remarks if attempt.remarks is not None else "",
+            studentId=int(attempt.student_id) if attempt.student_id is not None else 0,
+            assessmentId=int(attempt.assessment_id) if attempt.assessment_id is not None else 0
         ) for attempt in attempts])
 
     async def AddAssessmentAttempt(
