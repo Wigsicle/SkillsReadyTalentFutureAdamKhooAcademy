@@ -10,49 +10,65 @@ class AccountRequestById(_message.Message):
     userId: str
     def __init__(self, userId: _Optional[str] = ...) -> None: ...
 
-class AccountRequestByUsername(_message.Message):
-    __slots__ = ("username",)
-    USERNAME_FIELD_NUMBER: _ClassVar[int]
-    username: str
-    def __init__(self, username: _Optional[str] = ...) -> None: ...
+class AccountRequestByEmail(_message.Message):
+    __slots__ = ("email",)
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    email: str
+    def __init__(self, email: _Optional[str] = ...) -> None: ...
 
 class CreateAccountRequest(_message.Message):
-    __slots__ = ("name", "username", "password")
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("firstname", "lastname", "password", "email", "country_id", "address", "user_type_id")
+    FIRSTNAME_FIELD_NUMBER: _ClassVar[int]
+    LASTNAME_FIELD_NUMBER: _ClassVar[int]
     PASSWORD_FIELD_NUMBER: _ClassVar[int]
-    name: str
-    username: str
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    COUNTRY_ID_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    USER_TYPE_ID_FIELD_NUMBER: _ClassVar[int]
+    firstname: str
+    lastname: str
     password: str
-    def __init__(self, name: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ...) -> None: ...
+    email: str
+    country_id: int
+    address: str
+    user_type_id: int
+    def __init__(self, firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., password: _Optional[str] = ..., email: _Optional[str] = ..., country_id: _Optional[int] = ..., address: _Optional[str] = ..., user_type_id: _Optional[int] = ...) -> None: ...
 
 class UpdateAccountRequest(_message.Message):
-    __slots__ = ("userId", "name", "username", "password", "accountStatus")
+    __slots__ = ("userId", "firstname", "lastname", "password", "country_id", "address")
     USERID_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    FIRSTNAME_FIELD_NUMBER: _ClassVar[int]
+    LASTNAME_FIELD_NUMBER: _ClassVar[int]
     PASSWORD_FIELD_NUMBER: _ClassVar[int]
-    ACCOUNTSTATUS_FIELD_NUMBER: _ClassVar[int]
+    COUNTRY_ID_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
     userId: str
-    name: str
-    username: str
+    firstname: str
+    lastname: str
     password: str
-    accountStatus: str
-    def __init__(self, userId: _Optional[str] = ..., name: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ..., accountStatus: _Optional[str] = ...) -> None: ...
+    country_id: int
+    address: str
+    def __init__(self, userId: _Optional[str] = ..., firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., password: _Optional[str] = ..., country_id: _Optional[int] = ..., address: _Optional[str] = ...) -> None: ...
 
 class AccountResponse(_message.Message):
-    __slots__ = ("userId", "name", "username", "password", "accountStatus")
+    __slots__ = ("userId", "firstname", "lastname", "password", "email", "country_id", "address", "user_type_id")
     USERID_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    FIRSTNAME_FIELD_NUMBER: _ClassVar[int]
+    LASTNAME_FIELD_NUMBER: _ClassVar[int]
     PASSWORD_FIELD_NUMBER: _ClassVar[int]
-    ACCOUNTSTATUS_FIELD_NUMBER: _ClassVar[int]
+    EMAIL_FIELD_NUMBER: _ClassVar[int]
+    COUNTRY_ID_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
+    USER_TYPE_ID_FIELD_NUMBER: _ClassVar[int]
     userId: str
-    name: str
-    username: str
+    firstname: str
+    lastname: str
     password: str
-    accountStatus: int
-    def __init__(self, userId: _Optional[str] = ..., name: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ..., accountStatus: _Optional[int] = ...) -> None: ...
+    email: str
+    country_id: int
+    address: str
+    user_type_id: int
+    def __init__(self, userId: _Optional[str] = ..., firstname: _Optional[str] = ..., lastname: _Optional[str] = ..., password: _Optional[str] = ..., email: _Optional[str] = ..., country_id: _Optional[int] = ..., address: _Optional[str] = ..., user_type_id: _Optional[int] = ...) -> None: ...
 
 class DeleteResponse(_message.Message):
     __slots__ = ("status", "message")

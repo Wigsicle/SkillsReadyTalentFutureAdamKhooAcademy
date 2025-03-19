@@ -40,9 +40,9 @@ class AccountStub(object):
                 request_serializer=account__pb2.AccountRequestById.SerializeToString,
                 response_deserializer=account__pb2.AccountResponse.FromString,
                 _registered_method=True)
-        self.GetAccountByUsername = channel.unary_unary(
-                '/account.Account/GetAccountByUsername',
-                request_serializer=account__pb2.AccountRequestByUsername.SerializeToString,
+        self.GetAccountByEmail = channel.unary_unary(
+                '/account.Account/GetAccountByEmail',
+                request_serializer=account__pb2.AccountRequestByEmail.SerializeToString,
                 response_deserializer=account__pb2.AccountResponse.FromString,
                 _registered_method=True)
         self.UpdateAccount = channel.unary_unary(
@@ -72,7 +72,7 @@ class AccountServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetAccountByUsername(self, request, context):
+    def GetAccountByEmail(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -104,9 +104,9 @@ def add_AccountServicer_to_server(servicer, server):
                     request_deserializer=account__pb2.AccountRequestById.FromString,
                     response_serializer=account__pb2.AccountResponse.SerializeToString,
             ),
-            'GetAccountByUsername': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAccountByUsername,
-                    request_deserializer=account__pb2.AccountRequestByUsername.FromString,
+            'GetAccountByEmail': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAccountByEmail,
+                    request_deserializer=account__pb2.AccountRequestByEmail.FromString,
                     response_serializer=account__pb2.AccountResponse.SerializeToString,
             ),
             'UpdateAccount': grpc.unary_unary_rpc_method_handler(
@@ -164,7 +164,7 @@ class Account(object):
             _registered_method=True)
 
     @staticmethod
-    def GetAccountByUsername(request,
+    def GetAccountByEmail(request,
             target,
             options=(),
             channel_credentials=None,
@@ -177,8 +177,8 @@ class Account(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/account.Account/GetAccountByUsername',
-            account__pb2.AccountRequestByUsername.SerializeToString,
+            '/account.Account/GetAccountByEmail',
+            account__pb2.AccountRequestByEmail.SerializeToString,
             account__pb2.AccountResponse.FromString,
             options,
             channel_credentials,

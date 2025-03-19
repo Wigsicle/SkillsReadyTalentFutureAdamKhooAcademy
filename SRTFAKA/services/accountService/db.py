@@ -1,16 +1,20 @@
 import sqlite3
 import os
 import pathlib
-from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
+from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, sessionmaker
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
+from typing import Optional
 from apiGateway.base import Base, Country
-from services.jobService.db import Application
-from certificateService.db import UserCertificate
-from services.courseService.db import CourseProgress
+# from services.jobService.db import Application
+# from services.certificateService.db import UserCertificate
+# from services.courseService.db import CourseProgress
+import traceback
+
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class UserType(Base):
     __tablename__ = 'user_type'
@@ -22,7 +26,7 @@ class User(Base):
     __tablename__ = 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     first_name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -35,103 +39,89 @@ class User(Base):
     user_type: Mapped[UserType] = relationship("UserType")
     
     # RS objects connected from other classes
-    applications: Mapped[list['Application']] = relationship()  #jobService
-    certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
-    courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
+    # applications: Mapped[Optional[list['Application']]] = relationship()  #jobService
+    # certs_attained: Mapped[list['UserCertificate']] = relationship()    #certService
+    # courses_enrolled: Mapped[list['CourseProgress']] = relationship()   #courseService
 
 
 class AccountDB:
+    """Account database management using SQLAlchemy."""
     def __init__(self):
-        # SQLite database file (creates a new file if it doesn't exist)
-        db_path = currentPath + '/accounts.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # To access rows as dictionaries
-        self.cursor = self.conn.cursor()
-
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS accounts (
-            accountId TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            accountStatus BOOLEAN NOT NULL
-        );
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'accounts' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
+        self.session = SessionLocal()
     
     def getAccountById(self, accountId):
-        """Fetch account details by accountId."""
+        """Fetch account details by accountId using SQLAlchemy."""
         try:
-            sql = 'SELECT * FROM accounts WHERE accountId = ?'
-            self.cursor.execute(sql, (accountId,))
-            result = self.cursor.fetchone()
-            return dict(result) if result else False
-        except sqlite3.Error as e:
-            print(f"Database error during getAccountById: {e}")
-            self.conn.rollback()
-            return False
+            account = self.session.query(User).filter(User.id == accountId).first()
+            return account if account else None
+        except Exception as e:
+            print(f"Error during getAccountById: {e}")
+            return None
 
-    def getAccountByUsername(self, username):
-        """Fetch account details by username."""
+    def getAccountByEmail(self, email):
+        """Fetch account details by username using SQLAlchemy."""
         try:
-            sql = 'SELECT * FROM accounts WHERE username = ?'
-            self.cursor.execute(sql, (username,))
-            result = self.cursor.fetchone()
-            return dict(result) if result else False
-        except sqlite3.Error as e:
-            print(f"Database error during getAccountByUsername: {e}")
-            self.conn.rollback()
-            return False
+            account = self.session.query(User).filter(User.email == email).first()
+            return account if account else None
+        except Exception as e:
+            print(f"Error during getAccountByEmail: {e}")
+            return None
 
     def createAccount(self, accountData):
-        """Insert a new account into the database."""
-        sql = '''
-            INSERT INTO accounts (accountId, name, username, password, accountStatus) 
-            VALUES (?, ?, ?, ?, ?)
-        '''
+        """Insert a new account into the database using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, accountData)
-            self.conn.commit()
-            return accountData[0]  # Return created account's accountId
-        except sqlite3.Error as e:
-            print(f"Database error during createAccount: {e}")
-            self.conn.rollback()
-            return False
+            print(accountData)
+            new_account = User(
+                first_name=accountData[1],
+                last_name=accountData[2],
+                email=accountData[3], 
+                password=accountData[4],
+                country_id=accountData[5],
+                address=accountData[6],
+                user_type_id=accountData[7]
+            )
+            self.session.add(new_account)
+            self.session.commit()
+            return new_account.id  # Return created account's id
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Error during createAccount: {e}")
+            self.session.rollback()
+            return None
 
     def updateAccount(self, accountId, updateData):
-        """Update account information for the given accountId."""
-        sql = '''
-            UPDATE accounts 
-            SET name = ?, password = ?
-            WHERE accountId = ?
-        '''
+        """Update account information using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, (updateData['name'], updateData['password'], accountId))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if the account was updated
-        except sqlite3.Error as e:
-            print(f"Database error during updateAccount: {e}")
-            self.conn.rollback()
+            account = self.session.query(User).filter(User.id == accountId).first()
+            if account:
+                account.first_name = updateData['firstname']
+                account.last_name = updateData['lastname']
+                account.password = updateData['password']
+                account.country_id = updateData['country_id']
+                account.address = updateData['address']
+                self.session.commit()
+                return True
+            return False
+        except Exception as e:
+            print(f"Error during updateAccount: {e}")
+            self.session.rollback()
             return False
 
     def deleteAccount(self, accountId):
-        """Delete account by accountId."""
-        sql = 'DELETE FROM accounts WHERE accountId = ?'
+        """Delete account by accountId using SQLAlchemy."""
         try:
-            self.cursor.execute(sql, (accountId,))
-            self.conn.commit()
-            return self.cursor.rowcount > 0  # True if the account was deleted
-        except sqlite3.Error as e:
-            print(f"Database error during deleteAccount: {e}")
-            self.conn.rollback()
+            account = self.session.query(User).filter(User.id == accountId).first()
+            if account:
+                self.session.delete(account)
+                self.session.commit()
+                return True
             return False
-    
+        except Exception as e:
+            print(f"Error during deleteAccount: {e}")
+            self.session.rollback()
+            return False
+
     def close(self):
-        self.cursor.close()
-        self.conn.close()
+        """Close the session."""
+        self.session.close()
+
