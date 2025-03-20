@@ -5,17 +5,31 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class AssessmentQuestion(_message.Message):
+    __slots__ = ("question", "marks", "answer", "options")
+    QUESTION_FIELD_NUMBER: _ClassVar[int]
+    MARKS_FIELD_NUMBER: _ClassVar[int]
+    ANSWER_FIELD_NUMBER: _ClassVar[int]
+    OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    question: str
+    marks: int
+    answer: str
+    options: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, question: _Optional[str] = ..., marks: _Optional[int] = ..., answer: _Optional[str] = ..., options: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class AssessmentData(_message.Message):
-    __slots__ = ("name", "courseId", "assessmentId", "total_marks")
+    __slots__ = ("name", "courseId", "assessmentId", "total_marks", "questionAnswer")
     NAME_FIELD_NUMBER: _ClassVar[int]
     COURSEID_FIELD_NUMBER: _ClassVar[int]
     ASSESSMENTID_FIELD_NUMBER: _ClassVar[int]
     TOTAL_MARKS_FIELD_NUMBER: _ClassVar[int]
+    QUESTIONANSWER_FIELD_NUMBER: _ClassVar[int]
     name: str
     courseId: int
     assessmentId: int
     total_marks: float
-    def __init__(self, name: _Optional[str] = ..., courseId: _Optional[int] = ..., assessmentId: _Optional[int] = ..., total_marks: _Optional[float] = ...) -> None: ...
+    questionAnswer: _containers.RepeatedCompositeFieldContainer[AssessmentQuestion]
+    def __init__(self, name: _Optional[str] = ..., courseId: _Optional[int] = ..., assessmentId: _Optional[int] = ..., total_marks: _Optional[float] = ..., questionAnswer: _Optional[_Iterable[_Union[AssessmentQuestion, _Mapping]]] = ...) -> None: ...
 
 class AssessmentAttemptData(_message.Message):
     __slots__ = ("attemptId", "earnedMarks", "attemptedOn", "remarks", "studentId", "assessmentId")

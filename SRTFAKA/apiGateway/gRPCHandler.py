@@ -3,8 +3,10 @@ from .models import AccountCreation, AccountUpdate, Course, Assessment, Job, Cer
 from fastapi import HTTPException
 from dotenv import load_dotenv
 from typing import Optional
+from google.protobuf.timestamp_pb2 import Timestamp
 import grpc
 import os
+import json
 
 load_dotenv()
 
@@ -341,38 +343,158 @@ async def getApplicationDetails(applicationId: int) -> job_pb2.ApplicationData:
             raise HTTPException(status_code=500, detail=f"gRPC Error: {e.details()}")
 
         
-async def getCertificate() -> certificate_pb2.CertificateList:
-    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
-        stub = certificate_pb2_grpc.CertificateStub(channel)
-        try:
-            response = await stub.GetAllCertificate(certificate_pb2.CertificateData())
-            return response
-        except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=404, detail=f"Error: {e.details()}")
 
-async def createCertificate(certificate: Certificate) -> certificate_pb2.CertificateData:
+async def createCertificate(
+    name: str,
+    course_id: Optional[int],
+    years_valid: Optional[int],
+    description: Optional[str],
+    additional_info: dict
+) -> certificate_pb2.CertificateData:
+    """
+    Calls the gRPC CreateCertificate method.
+    """
     async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
-        stub = certificate_pb2_grpc.CertificateStub(channel)
-        try:
-            response = await stub.CreateCertificate(certificate_pb2.CertificateData(name=certificate.name, courseId=certificate.courseId))
-            return response
-        except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
+        
+        # Convert None -> 0 for courseId and yearsValid as per your proto definitions
+        course_id_val = course_id if course_id is not None else 0
+        years_valid_val = years_valid if years_valid is not None else 0
 
-async def updateCertificate(certificateId: str, certificate: Certificate) -> certificate_pb2.CertificateData:
-    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
-        stub = certificate_pb2_grpc.CertificateStub(channel)
-        try:
-            response = await stub.UpdateCertificate(certificate_pb2.CertificateData(certificateId=certificateId, name=certificate.name, courseId=certificate.courseId))
-            return response
-        except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+        request = certificate_pb2.CertificateData(
+            name=name,
+            courseId=course_id_val,
+            yearsValid=years_valid_val,
+            description=description or "",
+            additionalInfo=json.dumps(additional_info) if additional_info else "{}"
+        )
 
-async def deleteCertificate(certificateId: str) -> certificate_pb2.CertificateId:
-    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
-        stub = certificate_pb2_grpc.CertificateStub(channel)
         try:
-            response = await stub.DeleteCertificate(certificate_pb2.CertificateId(certificateId=certificateId))
+            response = await stub.CreateCertificate(request)
             return response
         except grpc.aio.AioRpcError as e:
-            raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"CreateCertificate Error: {e.details()}"
+            )
+
+async def issueCertificate(
+    user_id: int,
+    cert_id: int,
+    issued_on: Timestamp,
+    expires_on: Optional[Timestamp],
+    additional_info: dict
+) -> certificate_pb2.UserCertificateData:
+    """
+    Calls the gRPC IssueCertificate method.
+    """
+    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
+
+        # Build the request
+        request = certificate_pb2.UserCertificateData(
+            userId=user_id,
+            certId=cert_id,
+            issuedOn=issued_on,
+            additionalInfo=json.dumps(additional_info) if additional_info else "{}"
+        )
+        # Only set expiresOn if provided
+        if expires_on is not None:
+            request.expiresOn.CopyFrom(expires_on)
+
+        try:
+            response = await stub.IssueCertificate(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"IssueCertificate Error: {e.details()}"
+            )
+
+async def getUserCertificates(user_id: str) -> certificate_pb2.UserCertificateList:
+    """
+    Calls the gRPC GetUserCertificates method.
+    """
+    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
+
+        request = certificate_pb2.UserId(userId=user_id)
+        try:
+            response = await stub.GetUserCertificates(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(
+                status_code=404,
+                detail=f"GetUserCertificates Error: {e.details()}"
+            )
+
+async def updateCertificate(
+    certificate_id: int,
+    name: Optional[str],
+    course_id: Optional[int],
+    years_valid: Optional[int],
+    description: Optional[str],
+    additional_info: Optional[dict]
+) -> certificate_pb2.CertificateData:
+    """
+    Calls the gRPC UpdateCertificate method.
+    """
+    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
+
+        course_id_val = course_id if course_id is not None else 0
+        years_valid_val = years_valid if years_valid is not None else 0
+        add_info_str = json.dumps(additional_info) if additional_info else "{}"
+
+        request = certificate_pb2.CertificateData(
+            id=certificate_id,
+            name=name or "",
+            courseId=course_id_val,
+            yearsValid=years_valid_val,
+            description=description or "",
+            additionalInfo=add_info_str
+        )
+
+        try:
+            response = await stub.UpdateCertificate(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"UpdateCertificate Error: {e.details()}"
+            )
+
+async def updateUserCertificate(
+    user_cert_id: int,
+    user_id: Optional[int],
+    cert_id: Optional[int],
+    issued_on: Optional[Timestamp],
+    expires_on: Optional[Timestamp],
+    additional_info: Optional[dict]
+) -> certificate_pb2.UserCertificateData:
+    """
+    Calls the gRPC UpdateUserCertificate method.
+    """
+    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
+
+        request = certificate_pb2.UserCertificateData(
+            id=user_cert_id,
+            userId=user_id if user_id else 0,
+            certId=cert_id if cert_id else 0,
+            additionalInfo=json.dumps(additional_info) if additional_info else "{}"
+        )
+
+        if issued_on is not None:
+            request.issuedOn.CopyFrom(issued_on)
+        if expires_on is not None:
+            request.expiresOn.CopyFrom(expires_on)
+
+        try:
+            response = await stub.UpdateUserCertificate(request)
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"UpdateUserCertificate Error: {e.details()}"
+            )

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-
+from datetime import datetime
 
 class Token(BaseModel):
     access_token: str
@@ -94,7 +94,22 @@ class JobApplicationResponse(JobApplication):
 
 class Certificate(BaseModel):
     name: str
-    courseId: str
-    
+    # Convert courseId to int if you store it as an int in your DB/proto
+    courseId: Optional[int] = None  
+    yearsValid: Optional[int] = None
+    description: Optional[str] = None
+    additionalInfo: Optional[str] = None  # JSON string
+
 class CertificateResponse(Certificate):
-    certificateId: str
+    certificateId: int
+
+class UserCertificate(BaseModel):
+    userId: int
+    certId: int
+    #issuedOn: Optional[datetime] = None
+    #expiresOn: Optional[datetime] = None
+    # additionalInfo as a JSON string or dictionary, depending on how you want to handle it
+    additionalInfo: Optional[str] = None
+
+class UserCertificateResponse(UserCertificate):
+    id: int

@@ -19,7 +19,7 @@ class AssessmentAttemptData(BaseModel):
 assessment = APIRouter()
 
 @assessment.get("/assessment")
-async def get_assessment():
+async def get_assessment(currentUser: AssessmentResponse = Depends(getCurrentUser)):
     # Get the protobuf message
     response = await getAssessment()
     # Convert the protobuf message to a dictionary
@@ -27,7 +27,7 @@ async def get_assessment():
     return {"message": "Assessments retrieved", "data": assessments}
 
 @assessment.get("/assessment/attempts")
-async def get_assessment_attempts():
+async def get_assessment_attempts(currentUser: AssessmentResponse = Depends(getCurrentUser)):
     # Get the protobuf message
     response = await getAssessmentAttempts()
     # Convert the protobuf message to a dictionary
@@ -35,7 +35,7 @@ async def get_assessment_attempts():
     return {"message": "Assessment attempts retrieved", "data": attempts}
 
 @assessment.post("/assessment/attempts")
-async def add_assessment(attempt: AssessmentAttemptData):
+async def add_assessment(attempt: AssessmentAttemptData, currentUser: AssessmentResponse = Depends(getCurrentUser)):
     """Add a new assessment attempt."""
     # Convert the Pydantic model to Protobuf message
     attempt_proto = assessment_pb2.AssessmentAttemptData(

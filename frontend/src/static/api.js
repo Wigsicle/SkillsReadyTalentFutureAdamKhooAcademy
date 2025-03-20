@@ -88,3 +88,14 @@ export const updateCourseProgress = async (progressId, courseProgressData, token
     return await makeRequest(`/api/course-progress/${progressId}`, "PUT", courseProgressData, token);
 };
 
+
+// Assessment APIs
+export const getAsssessment = async (token) => {
+    return await makeRequest("/assessment", "GET", null, token);
+};
+export const submitAssessmentResults = async (assessmentData, token) => {
+    return await makeRequest("/assessment/attempts", "POST", assessmentData, token);
+};
+export const getAttempts = async (token) => {
+    return await makeRequest("/assessment/attempts", "GET", null, token);
+};
