@@ -15,16 +15,20 @@ function Certificates() {
             try {
                 const token = authHandler.getToken(); // Get token from localStorage
                 const currentUser = await getUser(token.token);
-                const response = await getCertificates(currentUser.data.userId, token.token); // Fetch certificates from the API
-                if (currentUser.data && response.data) {
-                    setCertificates(response.data); // Assuming the API returns a 'certificates' field
+                if (currentUser.data) {
+                    const response = await getCertificates(currentUser.data.userId, token.token); // Fetch certificates from the API
+                    if(response.data && currentUser.data){
+                        setCertificates(response.data); // Assuming the API returns a 'certificates' field
+                        setLoading(false); // Set loading to false once the fetch is complete
+                    }
+                    else{
+                        throw new Error(response.error || "Failed to fetch certificates");
+                    }
                 } else {
-                    if (response.error === "Unauthorized" || currentUser.error === "Unauthorized") {
+                    if (currentUser.error === "Unauthorized") {
                         authHandler.handleTokenExpired(); // Handle token expiration
                     }
-                    throw new Error(response.error || "Failed to fetch certificates");
                 }
-                setLoading(false); // Set loading to false once the fetch is complete
             } catch (err) {
                 setError(err.message); // Set error message if fetch fails
                 setLoading(false); // Set loading to false on error
