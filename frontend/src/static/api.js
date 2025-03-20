@@ -66,26 +66,26 @@ export const updateUser = async (userData, token) => {
     return await makeRequest(`/accounts/`, "PUT", userData, token);
 };
 
-// Course APISSSS, no need CRUD for now
+// Course APIs
 export const getCourses = async (token) => {
-    return await makeRequest("/api/courses", "GET", null, token); 
+    return await makeRequest("/course", "GET", null, token);
 };
 
 export const getCourseById = async (courseId, token) => {
-    return await makeRequest(`/api/courses/${courseId}`, "GET", null, token); //filter by course id
+    return await makeRequest(`/courses/${courseId}`, "GET", null, token); //filter by course id
 };
 
 export const updateCourse = async (courseId, courseData, token) => {
-    return await makeRequest(`/api/courses/${courseId}`, "PUT", courseData, token);
+    return await makeRequest(`/courses/${courseId}`, "PUT", courseData, token);
 };
 
 // Course-Progress APISSSSS
 export const joinCourse = async (courseProgressData, token) => {
-    return await makeRequest("/api/course-progress", "POST", courseProgressData, token); //once joined, the course will be added to the user's course list
+    return await makeRequest("/course-progress", "POST", courseProgressData, token); //once joined, the course will be added to the user's course list
 };
 
 export const updateCourseProgress = async (progressId, courseProgressData, token) => {
-    return await makeRequest(`/api/course-progress/${progressId}`, "PUT", courseProgressData, token);
+    return await makeRequest(`/course-progress/${progressId}`, "PUT", courseProgressData, token);
 };
 
 
@@ -98,11 +98,6 @@ export const submitAssessmentResults = async (assessmentData, token) => {
 };
 export const getAttempts = async (token) => {
     return await makeRequest("/assessment/attempts", "GET", null, token);
-};
-
-// Course APIs
-export const getCourses = async (token) => {
-    return await makeRequest("/course", "GET", null, token);
 };
 
 // Certificate APIs
