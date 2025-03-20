@@ -1,12 +1,15 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List, TYPE_CHECKING
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 from apiGateway.base import Base
 
+if TYPE_CHECKING:
+    from services.courseService.db import Course
+    from services.accountService.db import User
 
 class Assessment(Base):
     __tablename__ = 'assessment'
@@ -17,6 +20,8 @@ class Assessment(Base):
     
     course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False) # Many assessments - 1 course, M:1
     
+    course: Mapped["Course"] = relationship("Course", back_populates='assessments')
+    attempts: Mapped[List["AssessmentAttempt"]] = relationship("AssessmentAttempt", back_populates='assessment')
     # list of attempts that markers can mark
      
 
@@ -40,7 +45,8 @@ class AssessmentAttempt(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
     assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
     
-    assessment: Mapped[Assessment] = relationship
+    student: Mapped["User"] = relationship("User", back_populates='assess_attempts')
+    assessment: Mapped["Assessment"] = relationship("Assessment", back_populates='attempts')
     
 
 currentPath = os.path.dirname(os.path.abspath(__file__))

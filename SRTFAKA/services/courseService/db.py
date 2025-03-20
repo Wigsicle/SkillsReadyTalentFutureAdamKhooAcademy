@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 import os
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase, Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey
@@ -11,6 +12,9 @@ from services.certificateService.db import Certificate
 from common.utils import generateRandomId
 from contextlib import contextmanager
 from sqlalchemy.sql import text
+
+if TYPE_CHECKING:
+    from services.accountService.db import User
 
 indFKey = 'industry.id'
 courseFKey = 'course.id'
@@ -29,9 +33,9 @@ class Course(Base):
     cert_id: Mapped[int] = mapped_column(nullable=True)    # 1 to 1 RS 
     
     students_enrolled: Mapped[list['CourseProgress']] = relationship(back_populates='course_info')
-    assessments: Mapped[list['Assessment']] = relationship()
-    certificate: Mapped['Certificate'] = relationship()
-    industry: Mapped['Industry'] = relationship()
+    assessments: Mapped[list['Assessment']] = relationship("Assessment", back_populates='course')
+    certificate: Mapped['Certificate'] = relationship("Certificate", back_populates='course')
+    industry: Mapped['Industry'] = relationship("Industry", back_populates='courses')
     
 class CourseProgress(Base):
     """Tracks the progress of the student enrolled in the course.
@@ -50,6 +54,7 @@ class CourseProgress(Base):
     student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     course_id: Mapped[int] = mapped_column(ForeignKey('course.id'), nullable=False)
     
+    user: Mapped["User"] = relationship("User", back_populates='courses_enrolled')
     course_info: Mapped['Course'] = relationship(back_populates='students_enrolled')
     
     

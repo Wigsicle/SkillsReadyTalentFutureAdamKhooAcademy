@@ -8,8 +8,8 @@ from alembic import context
 # metadata of models will be stored in DeclarativeBase
 from apiGateway.base import Base, Country, Industry
 from services.jobService.db import Application, JobListing, Company, EmploymentType
-from certificateService.db import Certificate, UserCertificate
-from accountService.db import User, UserType
+from services.certificateService.db import Certificate, UserCertificate
+from services.accountService.db import User, UserType
 from services.courseService.db import Course, CourseProgress
 from services.assessmentService.db import Assessment, AssessmentAttempt
 
