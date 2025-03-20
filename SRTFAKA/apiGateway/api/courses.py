@@ -50,13 +50,12 @@ async def join_course(course_progress: CourseProgress):
             raise HTTPException(status_code=500, details="Join Course failed")
         return {"message": "Joined Course", "data": MessageToDict(response)}
 
-@courseProgress.post("/courseProgress/update")
-async def update_course_progress(course_progress: CourseProgressId):  # Accept the new CourseProgressId model
-    # Pass course_progress object, which includes id and cleared, to the gRPC function
+@courseProgress.put("/courseProgress/update")
+async def update_course_progress(course_progress: CourseProgress):
     response = await updateCourseProgress(course_progress)
 
     # Check for a successful response
-    if not response or response.id == 0:
+    if response is None:
         raise HTTPException(status_code=500, detail="Update Course Progress failed")
 
     # Return success message and the updated data

@@ -111,14 +111,14 @@ async def joinCourse(course_progress: CourseProgress) -> courseProgress_pb2.Cour
         except grpc.aio.AioRpcError as e:
             raise HTTPException(status_code=500, detail=f"Error: {e.details()}")
 
-async def updateCourseProgress(course_progress: CourseProgressId) -> courseProgress_pb2.CourseProgressData:
+async def updateCourseProgress(course_progress: CourseProgress) -> courseProgress_pb2.CourseProgressData:
     async with grpc.aio.insecure_channel(COURSE_SERVICE_ADDRESS) as channel:
         stub = courseProgress_pb2_grpc.CourseProgressStub(channel)
         try:
-            # Sending id and cleared in the CourseProgressId message
-            response = await stub.UpdateCourseProgress(courseProgress_pb2.CourseProgressId(
-                id=course_progress.id,  # Use 'id' from CourseProgressId
-                cleared=course_progress.cleared  # Pass 'cleared' from CourseProgressId
+            response = await stub.UpdateCourseProgress(courseProgress_pb2.CourseProgressData(
+                cleared=course_progress.cleared,
+                student_id=course_progress.student_id,
+                course_id=course_progress.course_id
             ))
             return response
         except grpc.aio.AioRpcError as e:

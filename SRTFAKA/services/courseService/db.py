@@ -96,19 +96,20 @@ class CourseProgressDB:
             self.session.rollback()
             return None
     
-    def updateCourseProgress(self, course_progress_id: int, cleared: bool):
-        """Update course progress using course_progress_id"""
-
+    def updateCourseProgress(self, cleared: bool, student_id: int, course_id: int):
+        """Update course progress using student_id and course_id"""
+    
         sql = text("""
             UPDATE course_progress
             SET cleared = :cleared
-            WHERE id = :course_progress_id
+            WHERE student_id = :student_id AND course_id = :course_id
             RETURNING id;
         """)
 
         values = {
             "cleared": cleared,
-            "course_progress_id": course_progress_id
+            "student_id": student_id,
+            "course_id": course_id
         }
 
         try:
@@ -126,7 +127,6 @@ class CourseProgressDB:
             print(f"Error in update_course_progress: {e}")
             self.session.rollback()
             return None
-
 
 class CourseDB:
     def __init__(self):
