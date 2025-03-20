@@ -1,20 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from ..gRPCHandler import getAssessment, getAssessmentAttempts, addAssessmentAttempt
 from google.protobuf.json_format import MessageToDict
-from ..models import AssessmentResponse, Assessment
+from ..models import AssessmentResponse, Assessment, UserCertificate, AssessmentAttemptData
 from ..auth import getCurrentUser
 from ...generated import assessment_pb2
 from pydantic import BaseModel
 from typing import Optional
+from .certificate import issue_certificate_api
 
-# Define the Pydantic model for AssessmentAttemptData here
-class AssessmentAttemptData(BaseModel):
-    attemptId: int
-    earnedMarks: float
-    attemptedOn: str
-    remarks: Optional[str] = None
-    studentId: int  # Ensure this field is included
-    assessmentId: int  # Ensure this field is included
 
 assessment = APIRouter()
 
@@ -48,8 +41,8 @@ async def add_assessment(attempt: AssessmentAttemptData, currentUser: Assessment
     
     # Call the gRPC service to add the assessment attempt
     response = await addAssessmentAttempt(attempt_proto)
-    
-    if response is None:
+    certResonse = await issue_certificate_api(UserCertificate(userId=attempt.studentId, certId=attempt.certId))  
+    if response is None and certResonse is None:
         raise HTTPException(status_code=500, detail="Error occurred while adding assessment attempt")
     
     # Convert the Protobuf response to a dictionary

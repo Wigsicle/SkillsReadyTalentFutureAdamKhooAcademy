@@ -410,7 +410,23 @@ async def issueCertificate(
                 status_code=400,
                 detail=f"IssueCertificate Error: {e.details()}"
             )
+            
+async def getAllCertificates() -> certificate_pb2.CertificateList:
+    """
+    Calls the gRPC GetAllCertificates method to fetch all available certificates.
+    """
+    async with grpc.aio.insecure_channel(CERTIFICATE_SERVICE_ADDRESS) as channel:
+        stub = certificate_pb2_grpc.CertificateServiceStub(channel)
 
+        try:
+            response = await stub.GetAllCertificates(certificate_pb2.Empty())
+            return response
+        except grpc.aio.AioRpcError as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"GetAllCertificates Error: {e.details()}"
+            )
+            
 async def getUserCertificates(user_id: str) -> certificate_pb2.UserCertificateList:
     """
     Calls the gRPC GetUserCertificates method.

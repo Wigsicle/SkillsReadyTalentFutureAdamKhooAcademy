@@ -44,8 +44,18 @@ class UserCertificateList(_message.Message):
     userCertificates: _containers.RepeatedCompositeFieldContainer[UserCertificateData]
     def __init__(self, userCertificates: _Optional[_Iterable[_Union[UserCertificateData, _Mapping]]] = ...) -> None: ...
 
+class CertificateList(_message.Message):
+    __slots__ = ("certificates",)
+    CERTIFICATES_FIELD_NUMBER: _ClassVar[int]
+    certificates: _containers.RepeatedCompositeFieldContainer[CertificateData]
+    def __init__(self, certificates: _Optional[_Iterable[_Union[CertificateData, _Mapping]]] = ...) -> None: ...
+
 class UserId(_message.Message):
     __slots__ = ("userId",)
     USERID_FIELD_NUMBER: _ClassVar[int]
     userId: str
     def __init__(self, userId: _Optional[str] = ...) -> None: ...
+
+class Empty(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...

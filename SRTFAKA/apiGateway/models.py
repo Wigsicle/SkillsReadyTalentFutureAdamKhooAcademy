@@ -113,3 +113,13 @@ class UserCertificate(BaseModel):
 
 class UserCertificateResponse(UserCertificate):
     id: int
+    
+# Define the Pydantic model for AssessmentAttemptData here
+class AssessmentAttemptData(BaseModel):
+    attemptId: int
+    earnedMarks: float
+    attemptedOn: str
+    remarks: Optional[str] = None
+    studentId: int  # Ensure this field is included
+    assessmentId: int  # Ensure this field is included
+    certId: int

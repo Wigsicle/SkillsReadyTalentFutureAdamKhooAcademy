@@ -5,7 +5,7 @@ from typing import Optional, Any
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, Date, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
-from ...apiGateway.base import Base
+from apiGateway.base import Base
 from dateutil.relativedelta import relativedelta
 
 # Database Connection
@@ -189,6 +189,24 @@ def get_user_certificates(db: Session, user_id: int) -> list[UserCertificate]:
     print(f"✅ Retrieved {len(user_certs)} certificates for user {user_id}")
 
     return user_certs
+
+def get_all_certificates(db: Session) -> list[Certificate]:
+    """
+    Retrieves all certificates from the database.
+
+    Args:
+        db (Session): The active database session.
+
+    Returns:
+        list[Certificate]: A list of all Certificate objects in the database.
+    """
+    # Query the Certificate table to get all certificates
+    certificates = db.query(Certificate).all()
+    
+    # Debugging Logs
+    print(f"✅ Retrieved {len(certificates)} certificates from the database.")
+
+    return certificates
 
 def update_certificate(
     db: Session,

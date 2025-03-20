@@ -76,3 +76,13 @@ export const submitAssessmentResults = async (assessmentData, token) => {
 export const getAttempts = async (token) => {
     return await makeRequest("/assessment/attempts", "GET", null, token);
 };
+
+// Course APIs
+export const getCourses = async (token) => {
+    return await makeRequest("/course", "GET", null, token);
+};
+
+// Certificate APIs
+export const getCertificates = async (userId, token) => {
+    return await makeRequest(`/certificate/all?userId=${userId}`, "GET", null, token);
+};

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../styles.css"; // Import global styles
 import BreadCrumb from "../components/Breadcrumb";
-import { getUser, getAsssessment, getAttempts, submitAssessmentResults } from "../static/api"; // Assuming submitAssessmentResults is the API call to submit results
+import { getUser, getAsssessment, getAttempts, submitAssessmentResults, getCourses } from "../static/api"; // Assuming getCourses is the API call to fetch courses
 import { useAuth } from '../static/AuthContext';
 
 function Assessments() {
     const authHandler = useAuth();
     const [assessments, setAssessments] = useState([]); // State to hold assessment data
     const [attempts, setAttempts] = useState([]); // State to hold assessment attempts
+    const [courses, setCourses] = useState([]); // State to hold courses data
     const [loading, setLoading] = useState(true); // State to manage loading state
     const [error, setError] = useState(null); // State to manage error messages
     const [searchTerm, setSearchTerm] = useState(""); // State for search term
@@ -17,6 +18,7 @@ function Assessments() {
     const [score, setScore] = useState(0); // Store total score
     const [submitted, setSubmitted] = useState(false); // Flag to check if assessment has been submitted
     const [userId, setUserId] = useState(null); // Store the user ID
+    const [selectedCertId, setSelectedCertId] = useState(null); // State to store the certId for selected assessment
 
     // Function to fetch assessments from the backend
     const fetchAssessments = async () => {
@@ -56,6 +58,25 @@ function Assessments() {
         }
     };
 
+    // Function to fetch courses from the backend
+    const fetchCourses = async () => {
+        try {
+            const token = authHandler.getToken(); // Get token from localStorage
+
+            const response = await getCourses(token.token); // Assuming getCourses is the API call to fetch courses
+            if (response.data) {
+                setCourses(response.data.courses); // Set the courses data
+            } else {
+                if (response.error === "Unauthorized") {
+                    authHandler.handleTokenExpired();
+                }
+                throw new Error(response.error || "Failed to fetch courses");
+            }
+        } catch (err) {
+            setError(err.message); // Set error message if fetch fails
+        }
+    };
+
     // Fetch the user ID and assess their attempts on mount
     const fetchUserData = async () => {
         try {
@@ -71,17 +92,19 @@ function Assessments() {
         }
     };
 
-    // Use useEffect to fetch assessments and attempts when the component mounts
+    // Use useEffect to fetch assessments, attempts, courses, and user data when the component mounts
     useEffect(() => {
         fetchAssessments();
         fetchAssessmentAttempts();
         fetchUserData(); // Fetch user ID
+        fetchCourses(); // Fetch courses data
     }, []);
 
     // Check if the user has attempted the assessment (based on both userId and assessmentId)
     const hasUserAttemptedAssessment = (assessmentId) => {
         return attempts.some((attempt) => attempt.assessmentId == assessmentId && attempt.studentId == userId);
     };
+
     // Filter assessments based on search term and view state
     const filteredAssessments = assessments.filter((assessment) => {
         if (view === "available") {
@@ -97,16 +120,16 @@ function Assessments() {
         setView(viewType);
     };
 
-
     // Get the result (score) of the completed assessment
     const getUserAssessmentResult = (assessmentId) => {
         const attempt = attempts.find(attempt => attempt.assessmentId == assessmentId && attempt.studentId == userId);
         return attempt ? attempt.earnedMarks : null; // Return the marks earned by the user, or null if not completed
     };
 
-    // Handle assessment click to open modal
+    // Handle assessment click to open modal and set the certId based on the selected assessment's course
     const handleAssessmentClick = (assessment) => {
         setSelectedAssessment(assessment);
+        setSelectedCertId(courses.find(course => course.id === assessment.courseId)?.certId || null); // Set certId based on course
         setUserAnswers({}); // Reset user answers when new assessment is selected
         setScore(0); // Reset score
         setSubmitted(false); // Reset submit flag
@@ -130,7 +153,7 @@ function Assessments() {
     // Calculate total score
     const calculateScore = (updatedAnswers = userAnswers) => {
         if (!selectedAssessment) return;
-        
+
         let totalScore = 0;
         selectedAssessment.questionAnswer.forEach((question, index) => {
             const userAnswer = updatedAnswers[index];
@@ -156,7 +179,9 @@ function Assessments() {
                 attemptedOn: new Date().toISOString(), 
                 remarks: "Submitted by student", 
                 studentId: currentUser.data.userId, 
-                assessmentId: selectedAssessment.assessmentId
+                assessmentId: selectedAssessment.assessmentId,
+                certId: selectedCertId,
+                userId: currentUser.data.userId
             };
             const response = await submitAssessmentResults(submissionData, token.token);
             if (currentUser.data && response.data) {
@@ -222,7 +247,12 @@ function Assessments() {
                         <div className="card-body">
                             <h3 className="card-title">{assessment.name}</h3>
                             <p className="card-text">Total Marks: {assessment.totalMarks}</p>
-                            <p className="card-text">Course ID: {assessment.courseId}</p>
+                            
+                            {/* Display Course and CertId */}
+                            <p className="card-text">
+                                Course: {courses.find(course => course.id === assessment.courseId)?.name || "Unknown"} 
+                                <br />
+                            </p>
                         </div>
                         <div className="card-footer">
                             <button 
@@ -256,7 +286,13 @@ function Assessments() {
                                 <div>
                                     <h2>{selectedAssessment.name}</h2>
                                     <p>Total Marks: {selectedAssessment.totalMarks}</p>
-                                    <p>Course ID: {selectedAssessment.courseId}</p>
+                                    
+                                    {/* Display Course and CertId */}
+                                    <p>
+                                        Course: {courses.find(course => course.id === selectedAssessment.courseId)?.name || "Unknown"} 
+                                        <br />
+                                        Cert ID: {selectedCertId || "N/A"} {/* Display selectedCertId */}
+                                    </p>
 
                                     {/* Show results if the assessment is completed */}
                                     {hasUserAttemptedAssessment(selectedAssessment.assessmentId) ? (

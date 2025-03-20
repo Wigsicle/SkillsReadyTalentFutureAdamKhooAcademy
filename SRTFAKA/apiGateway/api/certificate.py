@@ -12,7 +12,8 @@ from ..gRPCHandler import (
     issueCertificate,
     getUserCertificates,
     updateCertificate,
-    updateUserCertificate
+    updateUserCertificate,
+    getAllCertificates
 )
 
 certificate = APIRouter()
@@ -62,19 +63,52 @@ async def issue_certificate_api(user_cert: UserCertificate):
     user_cert_response = UserCertificateResponse(**response_dict)
     return {"message": "User certificate issued", "data": user_cert_response.dict()}
 
-@certificate.get("/certificate/user")
-async def get_user_certificates_api(userId: str):
+# @certificate.get("/certificate/user")
+# async def get_user_certificates_api(userId: str):
+#     """
+#     Retrieve all certificates for a given user.
+#     """
+#     response = await getUserCertificates(userId)
+#     response_dict = MessageToDict(response)
+#     # The response_dict should contain a key "userCertificates" which is a list.
+#     user_cert_list = []
+#     for cert_dict in response_dict.get("userCertificates", []):
+#         user_cert_response = UserCertificateResponse(**cert_dict)
+#         user_cert_list.append(user_cert_response.dict())
+#     return {"message": "User certificates retrieved", "data": user_cert_list}
+
+@certificate.get("/certificate/all")
+async def get_all_certificates_api(userId: str):
     """
-    Retrieve all certificates for a given user.
+    Retrieve all certificates that the user has, including the certificate name
+    and other details.
     """
-    response = await getUserCertificates(userId)
-    response_dict = MessageToDict(response)
-    # The response_dict should contain a key "userCertificates" which is a list.
-    user_cert_list = []
-    for cert_dict in response_dict.get("userCertificates", []):
-        user_cert_response = UserCertificateResponse(**cert_dict)
-        user_cert_list.append(user_cert_response.dict())
-    return {"message": "User certificates retrieved", "data": user_cert_list}
+    # First, get the list of user certificates associated with the user
+    user_cert_response = await getUserCertificates(userId)
+    user_cert_response_dict = MessageToDict(user_cert_response)
+    
+    # Extract the cert_ids from the user's certificates
+    user_cert_ids = {cert['certId'] for cert in user_cert_response_dict.get("userCertificates", [])}
+    
+    # Now, retrieve all certificates in the system
+    all_certificates_response = await getAllCertificates()  # Call the gRPC function to get all certificates
+    all_certificates_response_dict = MessageToDict(all_certificates_response)
+    
+    # Filter out certificates that the user has (match certId)
+    matching_certificates = [
+        {
+            "certificateId": cert["id"],
+            "name": cert["name"],
+            "courseId": cert.get("course_id"),
+            "yearsValid": cert.get("yearsValid"),
+            "description": cert.get("description"),
+            "additionalInfo": cert.get("additionalInfo"),
+        }
+        for cert in all_certificates_response_dict.get("certificates", [])
+        if cert["id"] in user_cert_ids
+    ]
+    
+    return {"message": "Certificates matching user retrieved", "data": matching_certificates}
 
 @certificate.put("/certificate/update")
 async def update_certificate_api(cert: Certificate, certificateId: int):

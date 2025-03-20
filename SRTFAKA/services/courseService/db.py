@@ -20,6 +20,7 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class Course(Base):
     __tablename__ = 'course'
+    __table_args__ = {'extend_existing': True}
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     details: Mapped[str] = mapped_column(String(255))

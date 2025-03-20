@@ -15,8 +15,8 @@
 import asyncio
 import logging
 import grpc
-from generated import course_pb2
-from generated import course_pb2_grpc
+from generated import course_pb2, courseProgress_pb2
+from generated import course_pb2_grpc, courseProgress_pb2_grpc
 from common.utils import generateRandomId
 from .db import CourseDB
 from .db import CourseProgressDB

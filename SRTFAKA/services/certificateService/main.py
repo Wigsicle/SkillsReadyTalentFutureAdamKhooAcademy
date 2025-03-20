@@ -31,9 +31,9 @@ import json
 from google.protobuf.json_format import MessageToDict
 
 
-from SRTFAKA.common.utils import generateRandomId
+from common.utils import generateRandomId
 #from .db import CertificateDB
-from .db import get_db, Certificate, UserCertificate, create_certificate, issue_certificate, get_user_certificates, update_certificate, update_user_certificate 
+from .db import get_db, Certificate, UserCertificate, create_certificate, issue_certificate, get_user_certificates, update_certificate, update_user_certificate, get_all_certificates 
 #from .fabric_gateway import FabricClient
 
 
@@ -230,7 +230,39 @@ class CertificateService(certificate_pb2_grpc.CertificateService):
             description=updated_cert.description if updated_cert.description else "",
             additionalInfo=json.dumps(updated_cert.additional_info) if updated_cert.additional_info else "{}"
         )
-    
+
+    async def GetAllCertificates(self, request, context):
+        """
+        Retrieves all certificates from the database.
+        Returns a CertificateList containing all certificates.
+        """
+        try:
+            # Fetch all certificates from the database
+            all_certs = get_all_certificates(self.db)
+        except Exception as e:
+            context.set_details("Error retrieving certificates: " + str(e))
+            context.set_code(grpc.StatusCode.INTERNAL)
+            return certificate_pb2.CertificateList()
+
+        # Convert each database Certificate object into a proto message.
+        certificates_proto = []
+        for cert in all_certs:
+            # Convert any fields if necessary (e.g., additional_info can be converted to JSON).
+            additional_info_proto = json.dumps(cert.additional_info) if cert.additional_info else "{}"
+
+            certificate_proto = certificate_pb2.CertificateData(
+                id=cert.id,
+                name=cert.name,
+                yearsValid=cert.years_valid,
+                description=cert.description,
+                additionalInfo=additional_info_proto,
+                courseId=cert.course_id
+            )
+            certificates_proto.append(certificate_proto)
+
+        # Return the list of certificates.
+        return certificate_pb2.CertificateList(certificates=certificates_proto)
+
     async def UpdateUserCertificate(self, request, context):
         """
         Updates an existing user-issued certificate.
