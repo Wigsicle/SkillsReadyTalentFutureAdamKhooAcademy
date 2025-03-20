@@ -1,53 +1,95 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import "../styles.css"; // Import global styles
 import BreadCrumb from "../components/Breadcrumb";
+import {getUser, getCourses, getCourseById, updateCourse, joinCourse, updateCourseProgress} from "../static/api";
+import {useAuth} from "../static/AuthContext";
+
 
 function Courses() {
-    const navigate = useNavigate(); // ✅ Initialize navigate function
+    const authHandler = useAuth(); 
+    const [userId, setUserId] = useState(0);
+    const [course, setCourse] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState(null);
+    const [searchCourseTerm, setSearchCourseTerm] = useState("");
+    const [appliedCourse, setAppliedCourse] = useState([]);
+    const [progressId, setProgressId] = useState(0);
+    const [viewCourse, setViewCourse] = useState('available');
+    const [loading, setLoading] = useState(true);
+    const [courseData, setCourseData] = useState(null);
 
-    // Dummy categories
-    const categories = ["Data Science", "IT Certifications", "Leadership", "Web Development", "Communication", "Business Analytics"];
-    const [selectedCategory, setSelectedCategory] = useState("Data Science");
+
 
     // Dummy course data
-    const courses = [
-        {
-            id: 1,
-            title: "Invest like Adam Khoo",
-            instructor: "Julian Melanson",
-            rating: 4.5,
-            reviews: "44,829",
-            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=", // Placeholder image
-        },
-        {
-            id: 2,
-            title: "The Complete Crypto Trading Course",
-            instructor: "Ing. Tomas Moravek",
-            rating: 4.2,
-            reviews: "1,773",
-            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
-        },
-        {
-            id: 3,
-            title: "How to get rich 101",
-            instructor: "Anton Voroniuk",
-            rating: 4.5,
-            reviews: "508",
-            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
-        },
-        {
-            id: 4,
-            title: "Mastering SEO With ChatGPT: Ultimate Beginner's Guide",
-            instructor: "Anton Voroniuk",
-            rating: 4.5,
-            reviews: "260",
-            image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
-        },
-    ];
+    // const courses = [
+    //     {
+    //         id: 1,
+    //         title: "Invest like Adam Khoo",
+    //         instructor: "Julian Melanson",
+    //         rating: 4.5,
+    //         reviews: "44,829",
+    //         image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=", // Placeholder image
+    //     },
+    //     {
+    //         id: 2,
+    //         title: "The Complete Crypto Trading Course",
+    //         instructor: "Ing. Tomas Moravek",
+    //         rating: 4.2,
+    //         reviews: "1,773",
+    //         image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
+    //     },
+    //     {
+    //         id: 3,
+    //         title: "How to get rich 101",
+    //         instructor: "Anton Voroniuk",
+    //         rating: 4.5,
+    //         reviews: "508",
+    //         image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
+    //     },
+    //     {
+    //         id: 4,
+    //         title: "Mastering SEO With ChatGPT: Ultimate Beginner's Guide",
+    //         instructor: "Anton Voroniuk",
+    //         rating: 4.5,
+    //         reviews: "260",
+    //         image: "https://media.istockphoto.com/id/1361394182/photo/funny-british-shorthair-cat-portrait-looking-shocked-or-surprised.jpg?s=612x612&w=0&k=20&c=6yvVxdufrNvkmc50nCLCd8OFGhoJd6vPTNotl90L-vo=",
+    //     },
+    // ];
 
-    const [selectedCourse, setSelectedCourse] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
+    // fetch courses and users application
+    useEffect(() => {
+        const fetchCourses = async () => {
+          try {
+            const token = authHandler.getToken(); // Get token from local storage
+            const currentUser = await getUser(token.token); // Fetch user info
+            const response = await getCourses(token.token); // Fetch courses data
+            if (currentUser.data && response.data) {
+              setUserId(currentUser.data.id);
+              setCourses(response.data.courses);
+    
+              // Here you can also fetch the courses the user has already applied to
+              // Assume appliedCourses API exists that fetches applied courses
+              const appliedCoursesResponse = await getAppliedCourses(currentUser.data.id, token.token);
+              setAppliedCourses(appliedCoursesResponse.data.courses || []);
+            } else {
+              if (response.error === "Unauthorized") {
+                authHandler.handleTokenExpired();
+              }
+            }
+          } catch (error) {
+            console.error("Courses Fetch Error:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchCourses();
+      }, [authHandler]);
+    
+
+    // If data is still loading, show a loading spinner
+    if (loading) {
+        return <div>Loading...</div>;
+    }
     
     // Filter courses based on search term
     const filteredCourses = courses.filter((course) =>
@@ -55,6 +97,41 @@ function Courses() {
         course.instructor.toLowerCase().includes(searchTerm.toLowerCase()) ||
         course.reviews.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+  // Handle Join Course
+  const handleJoinCourse = async (courseId) => {
+    try {
+      const token = authHandler.getToken();
+      const response = await joinCourse({ courseId, userId }, token.token);
+
+      if (response.data) {
+        // If the user successfully joined the course, update the appliedCourses state
+        setAppliedCourses((prev) => [...prev, response.data]);
+        alert("Successfully joined the course!");
+      } else {
+        alert("Error joining course");
+      }
+    } catch (error) {
+      console.error("Error joining course:", error);
+    }
+  };
+//   const handleJobClick = (job) => {
+//     setSelectedJob(job);
+
+//     // If the job has been applied for, fetch the application data
+//     const appliedJobData = appliedJobs.find((app) => app.jobId === job.jobId);
+//     if (appliedJobData) {
+//         setApplicationData({
+//             resumeLink: appliedJobData.resumeLink || "",
+//             additionalInfo: appliedJobData.additionalInfo || "",
+//             jobId: job.jobId,
+//             industryId: job.industryId || "", // Set industryId when job is selected
+//         });
+//     } else {
+//         setApplicationData(null); // Reset application data if the job hasn't been applied for
+//     }
+// };
+
 
     return (
         <div className="container-fluid">
@@ -103,7 +180,7 @@ function Courses() {
                                 <p className="course-rating">Rating: {selectedCourse.rating}</p>
                                 <p className="course-reviews">Reviews: {selectedCourse.reviews}</p>
                                 
-                                {/* Accordion */}
+                                Accordion
                                 <div class="accordion" id="accordionExample">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header">

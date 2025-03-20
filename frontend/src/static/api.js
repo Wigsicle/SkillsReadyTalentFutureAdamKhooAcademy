@@ -65,3 +65,26 @@ export const updateUser = async (userData, token) => {
     console.log(userData);
     return await makeRequest(`/accounts/`, "PUT", userData, token);
 };
+
+// Course APISSSS, no need CRUD for now
+export const getCourses = async (token) => {
+    return await makeRequest("/api/courses", "GET", null, token); 
+};
+
+export const getCourseById = async (courseId, token) => {
+    return await makeRequest(`/api/courses/${courseId}`, "GET", null, token); //filter by course id
+};
+
+export const updateCourse = async (courseId, courseData, token) => {
+    return await makeRequest(`/api/courses/${courseId}`, "PUT", courseData, token);
+};
+
+// Course-Progress APISSSSS
+export const joinCourse = async (courseProgressData, token) => {
+    return await makeRequest("/api/course-progress", "POST", courseProgressData, token); //once joined, the course will be added to the user's course list
+};
+
+export const updateCourseProgress = async (progressId, courseProgressData, token) => {
+    return await makeRequest(`/api/course-progress/${progressId}`, "PUT", courseProgressData, token);
+};
+
