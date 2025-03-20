@@ -19,7 +19,7 @@ from ..gRPCHandler import (
 certificate = APIRouter()
 
 @certificate.post("/certificate/create")
-async def create_certificate_api(cert: Certificate):
+async def create_certificate_api(cert: Certificate, currentUser: CertificateResponse = Depends(getCurrentUser)):
     """
     Create a new generic certificate via the gRPC service.
     """
@@ -40,7 +40,7 @@ async def create_certificate_api(cert: Certificate):
     return {"message": "Certificate created", "data": cert_response.dict()}
 
 @certificate.post("/certificate/issue")
-async def issue_certificate_api(user_cert: UserCertificate):
+async def issue_certificate_api(user_cert: UserCertificate, currentUser: UserCertificateResponse = Depends(getCurrentUser)):
     """
     Issue a user certificate via the gRPC service.
     """
@@ -78,7 +78,7 @@ async def issue_certificate_api(user_cert: UserCertificate):
 #     return {"message": "User certificates retrieved", "data": user_cert_list}
 
 @certificate.get("/certificate/all")
-async def get_all_certificates_api(userId: str):
+async def get_all_certificates_api(userId: str, currentUser: CertificateResponse = Depends(getCurrentUser)):
     """
     Retrieve all certificates that the user has, including the certificate name
     and other details.
@@ -111,7 +111,7 @@ async def get_all_certificates_api(userId: str):
     return {"message": "Certificates matching user retrieved", "data": matching_certificates}
 
 @certificate.put("/certificate/update")
-async def update_certificate_api(cert: Certificate, certificateId: int):
+async def update_certificate_api(cert: Certificate, certificateId: int, currentUser: CertificateResponse = Depends(getCurrentUser)):
     """
     Update an existing certificate record via gRPC.
     """
@@ -130,7 +130,7 @@ async def update_certificate_api(cert: Certificate, certificateId: int):
     return {"message": "Certificate updated", "data": cert_response.dict()}
 
 @certificate.put("/certificate/user/update")
-async def update_user_certificate_api(user_cert: UserCertificate, userCertId: int):
+async def update_user_certificate_api(user_cert: UserCertificate, userCertId: int, currentUser: UserCertificateResponse = Depends(getCurrentUser)):
     """
     Update an existing user-issued certificate via gRPC.
     """
