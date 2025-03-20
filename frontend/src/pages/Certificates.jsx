@@ -18,6 +18,7 @@ function Certificates() {
                 if (currentUser.data) {
                     const response = await getCertificates(currentUser.data.userId, token.token); // Fetch certificates from the API
                     if(response.data && currentUser.data){
+                        console.log(response.data)
                         setCertificates(response.data); // Assuming the API returns a 'certificates' field
                         setLoading(false); // Set loading to false once the fetch is complete
                     }

@@ -45,13 +45,10 @@ function Assessments() {
             const token = authHandler.getToken(); // Get token from localStorage
 
             const response = await getAttempts(token.token);
-            if (response.data) {
+            if (response.data && response.data.attempts.length > 0) {
                 setAttempts(response.data.attempts); // Set the attempts data
             } else {
-                if (response.error === "Unauthorized") {
-                    authHandler.handleTokenExpired();
-                }
-                throw new Error(response.error || "Failed to fetch assessment attempts");
+                throw new Error("No attempts found.");
             }
         } catch (err) {
             setError(err.message); // Set error message if fetch fails
@@ -102,6 +99,10 @@ function Assessments() {
 
     // Check if the user has attempted the assessment (based on both userId and assessmentId)
     const hasUserAttemptedAssessment = (assessmentId) => {
+        if (!attempts || attempts.length === 0) {
+            return false;
+        }
+
         return attempts.some((attempt) => attempt.assessmentId == assessmentId && attempt.studentId == userId);
     };
 
@@ -306,37 +307,39 @@ function Assessments() {
                                                     <h5>{question.question}</h5>
                                                     {question.options.map((option, i) => (
                                                         <div className="container-fluid" key={i}>
-                                                            <input
-                                                                type="radio"
-                                                                name={`question-${index}`}
-                                                                value={option}
-                                                                checked={userAnswers[index] === option}
-                                                                onChange={() => handleAnswerChange(index, option)}
-                                                            />
-                                                            <label>{option}</label>
+                                                            <label>
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`question-${index}`}
+                                                                    value={option}
+                                                                    checked={userAnswers[index] === option}
+                                                                    onChange={() => handleAnswerChange(index, option)}
+                                                                />
+                                                                {option}
+                                                            </label>
                                                         </div>
                                                     ))}
                                                 </div>
                                             ))}
-
-                                            {/* Submit Button */}
-                                            <button className="btn btn-dark mt-3" onClick={handleSubmit} disabled={submitted}>
-                                                {submitted ? "Assessment Submitted" : "Submit Assessment"}
-                                            </button>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <p>No assessment selected</p>
+                                <p>Loading...</p>
                             )}
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-light" data-bs-dismiss="modal">Close</button>
+                            {hasUserAttemptedAssessment(selectedAssessment?.assessmentId) ? (
+                                <p>Assessment already completed</p>
+                            ) : (
+                                <button className="btn btn-primary" onClick={handleSubmit}>
+                                    Submit Assessment
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }
