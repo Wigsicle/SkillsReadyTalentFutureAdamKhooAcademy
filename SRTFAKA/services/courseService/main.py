@@ -49,7 +49,7 @@ class CourseProgress(courseProgress_pb2_grpc.CourseProgressServicer):
 
     async def UpdateCourseProgress(
         self,
-        request: courseProgress_pb2.CourseProgressId,  # Accept CourseProgressId
+        request: courseProgress_pb2.CourseProgressData, 
         context: grpc.aio.ServicerContext,
     ) -> courseProgress_pb2.CourseProgressData:
         try:
@@ -58,20 +58,20 @@ class CourseProgress(courseProgress_pb2_grpc.CourseProgressServicer):
             # Instantiate the database handler (replace with actual DB interaction)
             courseProgressDB = CourseProgressDB()
 
-            # Pass the course_progress_id and cleared flag to update course progress
             updated_course_progress = courseProgressDB.updateCourseProgress(
-                request.id, request.cleared  # Use the 'id' and 'cleared' from CourseProgressId
+               request.cleared, request.student_id, request.course_id
             )
 
             if not updated_course_progress:
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details("Update course progress failed or no matching record found.")
-                return courseProgress_pb2.CourseProgressId()
+                return courseProgress_pb2.CourseProgressData()
 
             # Return updated CourseProgressData
-            return courseProgress_pb2.CourseProgressId(
-                id=request.id,  # Use the 'id' from CourseProgressId
-                cleared=request.cleared  # Use 'cleared' from CourseProgressId
+            return courseProgress_pb2.CourseProgressData(
+                student_id=request.student_id,
+                course_id=request.course_id,
+                cleared=request.cleared 
             )
 
         except Exception as e:

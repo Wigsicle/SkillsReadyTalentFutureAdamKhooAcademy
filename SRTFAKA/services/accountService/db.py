@@ -13,6 +13,7 @@ from services.certificateService.db import UserCertificate
 from services.courseService.db import CourseProgress
 from services.assessmentService.db import AssessmentAttempt
 import traceback
+>>>>>>>>> Temporary merge branch 2
 
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
