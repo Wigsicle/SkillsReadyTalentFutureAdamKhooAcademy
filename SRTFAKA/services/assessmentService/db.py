@@ -3,9 +3,9 @@ import os
 from typing import Optional, Any, List, TYPE_CHECKING
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.hybrid import hybrid_property
+from apiGateway.base import Base
 
 DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db"
 engine = create_engine(DATABASE_URL)

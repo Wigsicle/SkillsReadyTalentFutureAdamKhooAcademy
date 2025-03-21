@@ -133,37 +133,37 @@ class CertificateDB:
             print(f"Database error during getCertificate: {e}")
             return False
         
-    def getCertificate(self, name=None, courseId=None):
-        try:
-            # Start SQL query and parameters list
-            sql = "SELECT * FROM certificates WHERE 1=1"
-            params = []
+    # def getCertificate(self, name=None, courseId=None):
+    #     try:
+    #         # Start SQL query and parameters list
+    #         sql = "SELECT * FROM certificates WHERE 1=1"
+    #         params = []
 
-            # Dynamic conditions based on provided filters
-            if name:
-                sql += " AND name = ?"
-                params.append(name)
+    #         # Dynamic conditions based on provided filters
+    #         if name:
+    #             sql += " AND name = ?"
+    #             params.append(name)
             
-            if courseId:
-                sql += " AND courseId = ?"
-                params.append(courseId)
+    #         if courseId:
+    #             sql += " AND courseId = ?"
+    #             params.append(courseId)
         
             
-            # Execute the query
-            self.cursor.execute(sql, tuple(params))
-            rows = self.cursor.fetchall()
+    #         # Execute the query
+    #         self.cursor.execute(sql, tuple(params))
+    #         rows = self.cursor.fetchall()
 
-            # If no rows found, return None
-            if not rows:
-                return None
+    #         # If no rows found, return None
+    #         if not rows:
+    #             return None
 
-            # Convert rows to a list of dictionaries
-            certificates = []
-            for row in rows:
-                row_dict = dict(row)
-                certificates.append(row_dict)
+    #         # Convert rows to a list of dictionaries
+    #         certificates = []
+    #         for row in rows:
+    #             row_dict = dict(row)
+    #             certificates.append(row_dict)
 
-    return certificates
+    # return certificates
 
 def update_certificate(
     db: Session,
