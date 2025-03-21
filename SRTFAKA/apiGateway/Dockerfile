@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \        
     postgresql-client \
     libpq-dev \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir alembic grpcio psycopg2
 
@@ -36,6 +37,7 @@ COPY ./generated /SRTFAKA/generated
 COPY ./common /SRTFAKA/common
 
 RUN mv /SRTFAKA/apiGateway/entrypoint.sh /entrypoint.sh
+RUN dos2unix /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expose port 8000 for FastAPI (or other port if needed)
