@@ -23,6 +23,7 @@ class UserType(Base):
 class User(Base):
     """User profile"""
     __tablename__ = 'user'
+    __table_args__ = {'extend_existing': True}
     id: Mapped[int] = mapped_column(primary_key=True)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)

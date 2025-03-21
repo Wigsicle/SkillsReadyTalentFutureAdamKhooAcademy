@@ -76,16 +76,16 @@ export const getCourseById = async (courseId, token) => {
 };
 
 export const updateCourse = async (courseId, courseData, token) => {
-    return await makeRequest(`/courses/${courseId}`, "PUT", courseData, token);
+    return await makeRequest(`/courses/update}`, "PUT", courseData, token);
 };
 
 // Course-Progress APISSSSS
 export const joinCourse = async (courseProgressData, token) => {
-    return await makeRequest("/course-progress", "POST", courseProgressData, token); //once joined, the course will be added to the user's course list
+    return await makeRequest("/courseProgress/join", "POST", courseProgressData, token); //once joined, the course will be added to the user's course list
 };
 
 export const updateCourseProgress = async (progressId, courseProgressData, token) => {
-    return await makeRequest(`/course-progress/${progressId}`, "PUT", courseProgressData, token);
+    return await makeRequest(`/courseProgress/${progressId}`, "PUT", courseProgressData, token);
 };
 
 

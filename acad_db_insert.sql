@@ -20,6 +20,7 @@ insert into public.user (password, email, first_name, last_name, address, countr
 ('123', 'diana@example.com', 'Diana', 'Evans', '321 Cedar St, Toronto, Indonesia', 4, 1),
 ('123', 'ethan@example.com', 'Ethan', 'Williams', '654 Birch St, Berlin, India', 5, 1),
 ('123', 'fiona@example.com', 'Fiona', 'Garcia', '987 Redwood St, Paris, Thailand', 6, 1);
+('test', 'test@example.com', 'test', 'test', '987 Redwood St, Paris, Singapore', 6, 1);
 
 -- Course/Assessment/Cert
 insert into public.course (name, details, industry_id, cert_id) values 
@@ -33,14 +34,928 @@ insert into public.course (name, details, industry_id, cert_id) values
 ('Environmental Science 2', 'Learn how to earth some MORE', 6, 8);
 
 INSERT INTO public.assessment (name, total_marks, question_paper, course_id) values 
-('Creative Writing Workshop', 100, '{"questions": [{"q": "Write a short story about adventure.", "marks": 50}, {"q": "Describe the importance of character development.", "marks": 50}]}', 1),
-('Nutrition and Wellness', 100, '{"questions": [{"q": "List five essential nutrients and their benefits.", "marks": 40}, {"q": "Explain the role of hydration in health.", "marks": 30}, {"q": "Create a balanced meal plan for a day.", "marks": 30}]}', 2),
-('Digital Marketing Strategies', 100, '{"questions": [{"q": "Define SEO and explain its importance.", "marks": 20}, {"q": "What are three key elements of a successful social media campaign?", "marks": 40}, {"q": "Describe the impact of content marketing.", "marks": 40}]}', 3),
-('Data Science', 100, '{"questions": [{"q": "What is the difference between supervised and unsupervised learning?", "marks": 30}, {"q": "Explain how regression analysis is used in data science.", "marks": 40}, {"q": "Discuss a real-world application of data science.", "marks": 30}]}', 4),
-('Advanced Calculus', 100, '{"questions": [{"q": "Solve the integral of x^2 dx.", "marks": 25}, {"q": "Prove the limit definition of a derivative.", "marks": 25}, {"q": "Find the Taylor series expansion of sin(x).", "marks": 50}]}', 5),
-('History of Art', 100, '{"questions": [{"q": "Analyze the impact of the Renaissance on modern art.", "marks": 40}, {"q": "Compare and contrast Baroque and Impressionist art styles.", "marks": 30}, {"q": "Describe a famous work of art and its historical significance.", "marks": 30}]}', 6),
-('Environmental Science', 100, '{"questions": [{"q": "What are the main causes of climate change?", "marks": 35}, {"q": "Explain how deforestation affects ecosystems.", "marks": 35}, {"q": "Discuss three methods to reduce carbon emissions.", "marks": 30}]}', 7),
-('Environmental Science 2', 100, '{"questions": [{"q": "Describe the process of carbon sequestration.", "marks": 30}, {"q": "Explain the significance of biodiversity conservation.", "marks": 40}, {"q": "Discuss the role of renewable energy in sustainability.", "marks": 30}]}', 8);
+('Creative Writing Workshop', 100, '{
+  "questions": [
+    {
+      "q": "Which of the following is NOT a key component of a short story?",
+      "marks": 10,
+      "options": [
+        "Characters",
+        "Setting",
+        "Conflict",
+        "Essay Structure"
+      ],
+      "answer": "Essay Structure"
+    },
+    {
+      "q": "Which of the following is true about first-person and third-person narrative perspectives?",
+      "marks": 15,
+      "options": [
+        "First-person perspective uses I or we, third-person uses he, she, or they",
+        "Both are written using I or we",
+        "First-person perspective is used in academic writing only",
+        "There is no difference between them"
+      ],
+      "answer": "First-person perspective uses I or we, third-person uses he, she, or they"
+    },
+    {
+      "q": "What does the theme of a story refer to?",
+      "marks": 10,
+      "options": [
+        "The plot of the story",
+        "The central idea or message explored in the story",
+        "The setting of the story",
+        "The characters names"
+      ],
+      "answer": "The central idea or message explored in the story"
+    },
+    {
+      "q": "What is the role of conflict in storytelling?",
+      "marks": 15,
+      "options": [
+        "To provide the storys conclusion",
+        "To drive the plot and character development by introducing challenges",
+        "To make the story longer",
+        "To keep the reader bored"
+      ],
+      "answer": "To drive the plot and character development by introducing challenges"
+    },
+    {
+      "q": "Which is true about showing and telling in writing?",
+      "marks": 10,
+      "options": [
+        "Showing provides sensory details, while telling gives direct information",
+        "Showing is always used in academic writing",
+        "Telling uses descriptive language to let the reader experience events",
+        "There is no difference between the two"
+      ],
+      "answer": "Showing provides sensory details, while telling gives direct information"
+    },
+    {
+      "q": "What is character development?",
+      "marks": 20,
+      "options": [
+        "The process by which a character evolves over the course of the story",
+        "The physical description of a character",
+        "The process of creating minor characters",
+        "The creation of an imaginary world"
+      ],
+      "answer": "The process by which a character evolves over the course of the story"
+    },
+    {
+      "q": "What is NOT one of the three main types of plots in storytelling?",
+      "marks": 15,
+      "options": [
+        "Linear",
+        "Non-linear",
+        "Episodic",
+        "Spiral"
+      ],
+      "answer": "Spiral"
+    },
+    {
+      "q": "What does setting in fiction refer to?",
+      "marks": 10,
+      "options": [
+        "The events that occur in the story",
+        "The time, place, and context of the story",
+        "The characters motivations",
+        "The conflict between the characters"
+      ],
+      "answer": "The time, place, and context of the story"
+    },
+    {
+      "q": "What is foreshadowing?",
+      "marks": 15,
+      "options": [
+        "Describing events in detail",
+        "Giving hints about future events in the story",
+        "The conclusion of the story",
+        "A method of revealing the characters backstories"
+      ],
+      "answer": "Giving hints about future events in the story"
+    },
+    {
+      "q": "Which of the following is NOT a primary element of a poem?",
+      "marks": 20,
+      "options": [
+        "Rhyme",
+        "Meter",
+        "Imagery",
+        "Prose Structure"
+      ],
+      "answer": "Prose Structure"
+    }
+  ]
+}
+', 1),
+('Nutrition and Wellness', 100, '{
+  "questions": [
+    {
+      "q": "Which of the following are the three macronutrients found in food?",
+      "marks": 15,
+      "options": [
+        "Carbohydrates, Proteins, Fats",
+        "Vitamins, Minerals, Water",
+        "Sugars, Salts, Fiber",
+        "Antioxidants, Minerals, Water"
+      ],
+      "answer": "Carbohydrates, Proteins, Fats"
+    },
+    {
+      "q": "What is the main role of fiber in the human diet?",
+      "marks": 15,
+      "options": [
+        "To provide energy",
+        "To aid in digestion and regulate blood sugar levels",
+        "To build muscles",
+        "To supply vitamins to the body"
+      ],
+      "answer": "To aid in digestion and regulate blood sugar levels"
+    },
+    {
+      "q": "Why are vitamins important for the human body?",
+      "marks": 15,
+      "options": [
+        "They provide energy to the body",
+        "They help regulate metabolism, immune function, and cell growth",
+        "They only aid in bone growth",
+        "They help in the digestion of food"
+      ],
+      "answer": "They help regulate metabolism, immune function, and cell growth"
+    },
+    {
+      "q": "What is the primary source of Omega-3 fatty acids?",
+      "marks": 20,
+      "options": [
+        "Red meat",
+        "Fish and flaxseeds",
+        "Dairy products",
+        "Processed sugars"
+      ],
+      "answer": "Fish and flaxseeds"
+    },
+    {
+      "q": "Which of the following is a good source of protein?",
+      "marks": 15,
+      "options": [
+        "Apples",
+        "Chicken breast",
+        "Carrots",
+        "White rice"
+      ],
+      "answer": "Chicken breast"
+    },
+    {
+      "q": "What vitamin is most associated with the absorption of calcium?",
+      "marks": 15,
+      "options": [
+        "Vitamin A",
+        "Vitamin B12",
+        "Vitamin C",
+        "Vitamin D"
+      ],
+      "answer": "Vitamin D"
+    },
+    {
+      "q": "Which of the following is a function of water in the body?",
+      "marks": 10,
+      "options": [
+        "Transports nutrients and regulates body temperature",
+        "Provides calories",
+        "Creates proteins in the body",
+        "Helps store energy"
+      ],
+      "answer": "Transports nutrients and regulates body temperature"
+    },
+    {
+      "q": "Which mineral is important for bone health?",
+      "marks": 10,
+      "options": [
+        "Iron",
+        "Calcium",
+        "Magnesium",
+        "Sodium"
+      ],
+      "answer": "Calcium"
+    },
+    {
+      "q": "Which of the following is NOT a healthy fat?",
+      "marks": 20,
+      "options": [
+        "Avocados",
+        "Olive oil",
+        "Butter",
+        "Nuts"
+      ],
+      "answer": "Butter"
+    },
+    {
+      "q": "What is the recommended daily intake of water for an average adult?",
+      "marks": 10,
+      "options": [
+        "1-2 cups",
+        "3-4 cups",
+        "8 cups or about 2 liters",
+        "12 cups"
+      ],
+      "answer": "8 cups or about 2 liters"
+    }
+  ]
+}
+', 2),
+('Digital Marketing Strategies', 100, '{
+  "questions": [
+    {
+      "q": "Which of the following is the primary goal of digital marketing?",
+      "marks": 15,
+      "options": [
+        "To generate leads and sales online",
+        "To increase the number of followers on social media",
+        "To create awareness about a brand offline",
+        "To promote traditional media campaigns"
+      ],
+      "answer": "To generate leads and sales online"
+    },
+    {
+      "q": "What is SEO (Search Engine Optimization)?",
+      "marks": 20,
+      "options": [
+        "The process of optimizing a website to rank higher on search engines",
+        "The process of creating paid ads for search engines",
+        "The process of improving email deliverability",
+        "The process of designing websites"
+      ],
+      "answer": "The process of optimizing a website to rank higher on search engines"
+    },
+    {
+      "q": "What does PPC (Pay-per-click) advertising refer to?",
+      "marks": 15,
+      "options": [
+        "A form of advertising where advertisers pay each time their ad is clicked",
+        "A form of SEO strategy",
+        "A form of organic social media marketing",
+        "A method of creating a websites structure"
+      ],
+      "answer": "A form of advertising where advertisers pay each time their ad is clicked"
+    },
+    {
+      "q": "What is the primary purpose of content marketing?",
+      "marks": 15,
+      "options": [
+        "To create and distribute valuable content to attract and engage a target audience",
+        "To create paid advertisements for social media",
+        "To create flashy designs for websites",
+        "To measure website traffic"
+      ],
+      "answer": "To create and distribute valuable content to attract and engage a target audience"
+    },
+    {
+      "q": "Which social media platform is best known for B2B marketing?",
+      "marks": 20,
+      "options": [
+        "Facebook",
+        "Instagram",
+        "LinkedIn",
+        "Twitter"
+      ],
+      "answer": "LinkedIn"
+    },
+    {
+      "q": "What is an email marketing campaign?",
+      "marks": 10,
+      "options": [
+        "Sending promotional emails to a list of recipients to promote a product or service",
+        "Sending invoices to customers",
+        "Sending welcome emails only to new customers",
+        "Sending newsletters without targeting a specific audience"
+      ],
+      "answer": "Sending promotional emails to a list of recipients to promote a product or service"
+    },
+    {
+      "q": "What is a call to action (CTA) in digital marketing?",
+      "marks": 10,
+      "options": [
+        "A command that encourages users to take an action, such as Click here or Buy now",
+        "A form of content marketing",
+        "A type of SEO strategy",
+        "A paid ad on social media"
+      ],
+      "answer": "A command that encourages users to take an action, such as Click here or Buy now"
+    },
+    {
+      "q": "What is the role of analytics in digital marketing?",
+      "marks": 15,
+      "options": [
+        "To track, measure, and analyze data from digital marketing campaigns to improve results",
+        "To design websites",
+        "To write content for blogs",
+        "To create social media posts"
+      ],
+      "answer": "To track, measure, and analyze data from digital marketing campaigns to improve results"
+    },
+    {
+      "q": "What is social media marketing?",
+      "marks": 10,
+      "options": [
+        "Using social media platforms to promote products or services",
+        "Designing social media profiles",
+        "Creating content for email marketing",
+        "Creating advertisements for television"
+      ],
+      "answer": "Using social media platforms to promote products or services"
+    },
+    {
+      "q": "Which of the following is NOT a benefit of digital marketing?",
+      "marks": 15,
+      "options": [
+        "It allows for targeting specific audiences with personalized content",
+        "It provides real-time metrics and performance tracking",
+        "It is always more expensive than traditional marketing",
+        "It allows businesses to reach a global audience"
+      ],
+      "answer": "It is always more expensive than traditional marketing"
+    }
+  ]
+}
+', 3),
+('Data Science', 100, '{
+  "questions": [
+    {
+      "q": "Which of the following is the main goal of data science?",
+      "marks": 15,
+      "options": [
+        "To analyze and interpret complex data to make informed decisions",
+        "To create websites",
+        "To design mobile applications",
+        "To manage social media campaigns"
+      ],
+      "answer": "To analyze and interpret complex data to make informed decisions"
+    },
+    {
+      "q": "Which of the following is a popular programming language used in data science?",
+      "marks": 10,
+      "options": [
+        "Java",
+        "Python",
+        "C++",
+        "HTML"
+      ],
+      "answer": "Python"
+    },
+    {
+      "q": "What does the term big data refer to?",
+      "marks": 20,
+      "options": [
+        "Large volumes of data that cannot be processed by traditional data management tools",
+        "A new data visualization tool",
+        "Data with no structure or organization",
+        "Data stored in cloud servers"
+      ],
+      "answer": "Large volumes of data that cannot be processed by traditional data management tools"
+    },
+    {
+      "q": "What is machine learning?",
+      "marks": 20,
+      "options": [
+        "A type of artificial intelligence that allows systems to learn from data and improve over time",
+        "A method for creating websites",
+        "A programming language",
+        "A form of data visualization"
+      ],
+      "answer": "A type of artificial intelligence that allows systems to learn from data and improve over time"
+    },
+    {
+      "q": "Which of the following is an example of unstructured data?",
+      "marks": 15,
+      "options": [
+        "Spreadsheets",
+        "Audio recordings",
+        "CSV files",
+        "Database tables"
+      ],
+      "answer": "Audio recordings"
+    },
+    {
+      "q": "What is the purpose of data preprocessing?",
+      "marks": 15,
+      "options": [
+        "To clean and organize raw data before analysis",
+        "To store data in a database",
+        "To design the layout of a website",
+        "To create charts and graphs"
+      ],
+      "answer": "To clean and organize raw data before analysis"
+    },
+    {
+      "q": "Which of the following is used to visualize data patterns?",
+      "marks": 10,
+      "options": [
+        "Data mining",
+        "Data visualization tools like charts and graphs",
+        "Data warehousing",
+        "Programming languages like Python"
+      ],
+      "answer": "Data visualization tools like charts and graphs"
+    },
+    {
+      "q": "What is the primary purpose of supervised learning in machine learning?",
+      "marks": 15,
+      "options": [
+        "To train a model using labeled data to make predictions",
+        "To analyze unstructured data",
+        "To create neural networks",
+        "To store large datasets"
+      ],
+      "answer": "To train a model using labeled data to make predictions"
+    },
+    {
+      "q": "What does feature engineering refer to in data science?",
+      "marks": 10,
+      "options": [
+        "The process of selecting, modifying, or creating features (input variables) for a model",
+        "The process of writing code for data analysis",
+        "The process of designing machine learning algorithms",
+        "The process of visualizing data"
+      ],
+      "answer": "The process of selecting, modifying, or creating features (input variables) for a model"
+    },
+    {
+      "q": "What is the purpose of a confusion matrix in machine learning?",
+      "marks": 10,
+      "options": [
+        "To evaluate the performance of a classification model",
+        "To store the raw data",
+        "To design the structure of a neural network",
+        "To generate random numbers"
+      ],
+      "answer": "To evaluate the performance of a classification model"
+    }
+  ]
+}
+', 4),
+('Advanced Calculus', 100, '{
+  "questions": [
+    {
+      "q": "What is the derivative of the function f(x) = x^2?",
+      "marks": 15,
+      "options": [
+        "2x",
+        "x",
+        "x^2",
+        "1"
+      ],
+      "answer": "2x"
+    },
+    {
+      "q": "Which of the following is the correct integral of f(x) = 3x^2?",
+      "marks": 20,
+      "options": [
+        "x^3 + C",
+        "3x^3 + C",
+        "x^3 + 3x + C",
+        "3x^3"
+      ],
+      "answer": "x^3 + C"
+    },
+    {
+      "q": "What is the limit of (sin(x)/x) as x approaches 0?",
+      "marks": 15,
+      "options": [
+        "1",
+        "0",
+        "Infinity",
+        "Does not exist"
+      ],
+      "answer": "1"
+    },
+    {
+      "q": "What is the Taylor series expansion of e^x at x = 0?",
+      "marks": 20,
+      "options": [
+        "1 + x + x^2/2! + x^3/3! + ...",
+        "1 + x + x^2 + x^3 + ...",
+        "1 + x^2 + x^4 + ...",
+        "1 + x^3 + x^5 + ..."
+      ],
+      "answer": "1 + x + x^2/2! + x^3/3! + ..."
+    },
+    {
+      "q": "What is the integral of cos(x) dx?",
+      "marks": 10,
+      "options": [
+        "sin(x) + C",
+        "cos(x) + C",
+        "sin(x)",
+        "cos(x)"
+      ],
+      "answer": "sin(x) + C"
+    },
+    {
+      "q": "What does the Fundamental Theorem of Calculus state?",
+      "marks": 20,
+      "options": [
+        "The integral of a functions derivative is the function itself",
+        "The derivative of a function is its rate of change",
+        "The integral of a function is the area under its curve",
+        "The derivative of a function is its slope"
+      ],
+      "answer": "The integral of a functions derivative is the function itself"
+    },
+    {
+      "q": "What is the second derivative of f(x) = x^3?",
+      "marks": 10,
+      "options": [
+        "6x",
+        "3x^2",
+        "x^2",
+        "3x"
+      ],
+      "answer": "6x"
+    },
+    {
+      "q": "What is the partial derivative of f(x, y) = x^2 + y^2 with respect to x?",
+      "marks": 15,
+      "options": [
+        "2x",
+        "2y",
+        "x^2",
+        "y^2"
+      ],
+      "answer": "2x"
+    },
+    {
+      "q": "What is the integral of 1/x dx?",
+      "marks": 15,
+      "options": [
+        "ln(x) + C",
+        "x + C",
+        "1/x + C",
+        "ln(x)"
+      ],
+      "answer": "ln(x) + C"
+    },
+    {
+      "q": "What is the derivative of sin(x)?",
+      "marks": 10,
+      "options": [
+        "cos(x)",
+        "-cos(x)",
+        "sin(x)",
+        "-sin(x)"
+      ],
+      "answer": "cos(x)"
+    }
+  ]
+}
+
+       
+', 5),
+('History of Art', 100, '{
+  "questions": [
+    {
+      "q": "Who painted the Mona Lisa?",
+      "marks": 15,
+      "options": [
+        "Vincent van Gogh",
+        "Pablo Picasso",
+        "Leonardo da Vinci",
+        "Claude Monet"
+      ],
+      "answer": "Leonardo da Vinci"
+    },
+    {
+      "q": "Which art movement is Pablo Picasso associated with?",
+      "marks": 20,
+      "options": [
+        "Impressionism",
+        "Cubism",
+        "Surrealism",
+        "Baroque"
+      ],
+      "answer": "Cubism"
+    },
+    {
+      "q": "What is the name of the famous painting by Edvard Munch?",
+      "marks": 15,
+      "options": [
+        "The Persistence of Memory",
+        "The Scream",
+        "Starry Night",
+        "Girl with a Pearl Earring"
+      ],
+      "answer": "The Scream"
+    },
+    {
+      "q": "What was the main subject matter of Impressionist paintings?",
+      "marks": 15,
+      "options": [
+        "Scenes of daily life and nature",
+        "Abstract concepts",
+        "Historical events",
+        "Religious themes"
+      ],
+      "answer": "Scenes of daily life and nature"
+    },
+    {
+      "q": "Who is known as the father of modern sculpture?",
+      "marks": 20,
+      "options": [
+        "Auguste Rodin",
+        "Michelangelo",
+        "Pablo Picasso",
+        "Alberto Giacometti"
+      ],
+      "answer": "Auguste Rodin"
+    },
+    {
+      "q": "Which period is known for its ornate and decorative art style?",
+      "marks": 10,
+      "options": [
+        "Renaissance",
+        "Baroque",
+        "Romanticism",
+        "Art Nouveau"
+      ],
+      "answer": "Baroque"
+    },
+    {
+      "q": "Which artist is associated with the Surrealist movement?",
+      "marks": 15,
+      "options": [
+        "Salvador Dalí",
+        "Vincent van Gogh",
+        "Claude Monet",
+        "Jackson Pollock"
+      ],
+      "answer": "Salvador Dalí"
+    },
+    {
+      "q": "What art style did Jackson Pollock help popularize?",
+      "marks": 20,
+      "options": [
+        "Pop Art",
+        "Abstract Expressionism",
+        "Cubism",
+        "Renaissance"
+      ],
+      "answer": "Abstract Expressionism"
+    },
+    {
+      "q": "What is the primary characteristic of Abstract art?",
+      "marks": 10,
+      "options": [
+        "It focuses on realistic depictions of people and objects",
+        "It uses geometric shapes and forms that do not resemble the real world",
+        "It incorporates religious symbols",
+        "It focuses on depicting historical events"
+      ],
+      "answer": "It uses geometric shapes and forms that do not resemble the real world"
+    },
+    {
+      "q": "Who is considered the leader of the Renaissance period in Italy?",
+      "marks": 10,
+      "options": [
+        "Leonardo da Vinci",
+        "Michelangelo",
+        "Raphael",
+        "Giotto"
+      ],
+      "answer": "Leonardo da Vinci"
+    }
+  ]
+}
+', 6),
+('Environmental Science', 100, '{
+  "questions": [
+    {
+      "q": "What is the greenhouse effect?",
+      "marks": 15,
+      "options": [
+        "The warming of the Earths surface due to the trapping of heat by gases in the atmosphere",
+        "The cooling of the Earths surface due to the depletion of ozone",
+        "The process of deforestation",
+        "The production of renewable energy from solar panels"
+      ],
+      "answer": "The warming of the Earths surface due to the trapping of heat by gases in the atmosphere"
+    },
+    {
+      "q": "Which of the following is a renewable source of energy?",
+      "marks": 10,
+      "options": [
+        "Coal",
+        "Natural gas",
+        "Solar power",
+        "Oil"
+      ],
+      "answer": "Solar power"
+    },
+    {
+      "q": "What is the main cause of ocean acidification?",
+      "marks": 15,
+      "options": [
+        "Increased levels of carbon dioxide in the atmosphere",
+        "Decreased levels of oxygen in the ocean",
+        "Water pollution from plastics",
+        "Overfishing"
+      ],
+      "answer": "Increased levels of carbon dioxide in the atmosphere"
+    },
+    {
+      "q": "Which of the following is a consequence of deforestation?",
+      "marks": 20,
+      "options": [
+        "Loss of biodiversity",
+        "Reduction in greenhouse gas emissions",
+        "Increased rainfall",
+        "Improved air quality"
+      ],
+      "answer": "Loss of biodiversity"
+    },
+    {
+      "q": "What is the purpose of recycling?",
+      "marks": 10,
+      "options": [
+        "To reduce waste and conserve natural resources",
+        "To create more plastic",
+        "To generate profit from waste materials",
+        "To increase global warming"
+      ],
+      "answer": "To reduce waste and conserve natural resources"
+    },
+    {
+      "q": "What is biodiversity?",
+      "marks": 15,
+      "options": [
+        "The variety of life in a particular habitat",
+        "The process of converting waste into usable energy",
+        "The impact of climate change on ecosystems",
+        "The study of weather patterns"
+      ],
+      "answer": "The variety of life in a particular habitat"
+    },
+    {
+      "q": "What is the main contributor to global warming?",
+      "marks": 20,
+      "options": [
+        "Carbon dioxide emissions from burning fossil fuels",
+        "Natural volcanic eruptions",
+        "Excessive rainfall",
+        "Deforestation"
+      ],
+      "answer": "Carbon dioxide emissions from burning fossil fuels"
+    },
+    {
+      "q": "What is the term for the study of ecosystems?",
+      "marks": 10,
+      "options": [
+        "Ecology",
+        "Economics",
+        "Geology",
+        "Biology"
+      ],
+      "answer": "Ecology"
+    },
+    {
+      "q": "What is the ozone layer?",
+      "marks": 15,
+      "options": [
+        "A layer of gas that protects Earth from harmful ultraviolet radiation",
+        "A layer of water in the atmosphere",
+        "A layer of oxygen in the ocean",
+        "A layer of nitrogen in the atmosphere"
+      ],
+      "answer": "A layer of gas that protects Earth from harmful ultraviolet radiation"
+    },
+    {
+      "q": "Which of the following is an example of nonrenewable resources?",
+      "marks": 10,
+      "options": [
+        "Wind",
+        "Sunlight",
+        "Coal",
+        "Water"
+      ],
+      "answer": "Coal"
+    }
+  ]
+}
+', 7),
+('Environmental Science 2', 100, '{
+  "questions": [
+    {
+      "q": "What is the main cause of the depletion of the ozone layer?",
+      "marks": 15,
+      "options": [
+        "The use of chlorofluorocarbons (CFCs) in aerosol sprays and refrigerants",
+        "Carbon dioxide emissions from vehicles",
+        "The burning of fossil fuels",
+        "Overfishing"
+      ],
+      "answer": "The use of chlorofluorocarbons (CFCs) in aerosol sprays and refrigerants"
+    },
+    {
+      "q": "Which of the following is considered a non-renewable resource?",
+      "marks": 20,
+      "options": [
+        "Solar energy",
+        "Wind energy",
+        "Natural gas",
+        "Geothermal energy"
+      ],
+      "answer": "Natural gas"
+    },
+    {
+      "q": "What is the primary purpose of the Paris Agreement on climate change?",
+      "marks": 20,
+      "options": [
+        "To reduce global greenhouse gas emissions to limit global warming to below 2°C above pre-industrial levels",
+        "To promote the use of fossil fuels",
+        "To create regulations for nuclear energy",
+        "To increase deforestation rates"
+      ],
+      "answer": "To reduce global greenhouse gas emissions to limit global warming to below 2°C above pre-industrial levels"
+    },
+    {
+      "q": "What does the term sustainability refer to in environmental science?",
+      "marks": 15,
+      "options": [
+        "Using resources in a way that meets present needs without compromising the ability of future generations to meet their own needs",
+        "Maximizing resource extraction for economic growth",
+        "Destroying natural habitats for urbanization",
+        "The reduction of human population"
+      ],
+      "answer": "Using resources in a way that meets present needs without compromising the ability of future generations to meet their own needs"
+    },
+    {
+      "q": "What is the greenhouse effect?",
+      "marks": 15,
+      "options": [
+        "The trapping of heat in the Earths atmosphere due to increased levels of greenhouse gases",
+        "The cooling of the Earths surface due to the depletion of the ozone layer",
+        "The natural absorption of solar energy by the Earths surface",
+        "The process of turning carbon dioxide into oxygen"
+      ],
+      "answer": "The trapping of heat in the Earths atmosphere due to increased levels of greenhouse gases"
+    },
+    {
+      "q": "What is the most significant environmental threat caused by deforestation?",
+      "marks": 20,
+      "options": [
+        "Loss of biodiversity and disruption of ecosystems",
+        "Increased agricultural productivity",
+        "Expansion of urban areas",
+        "Reduction in global temperatures"
+      ],
+      "answer": "Loss of biodiversity and disruption of ecosystems"
+    },
+    {
+      "q": "What is the term for the process by which trees and plants absorb carbon dioxide and release oxygen?",
+      "marks": 10,
+      "options": [
+        "Photosynthesis",
+        "Respiration",
+        "Transpiration",
+        "Evaporation"
+      ],
+      "answer": "Photosynthesis"
+    },
+    {
+      "q": "Which of the following is a consequence of acid rain?",
+      "marks": 15,
+      "options": [
+        "Soil degradation and damage to aquatic ecosystems",
+        "Increase in biodiversity",
+        "Reduction in air pollution",
+        "Improved plant growth"
+      ],
+      "answer": "Soil degradation and damage to aquatic ecosystems"
+    },
+    {
+      "q": "What is the concept of carbon footprint?",
+      "marks": 10,
+      "options": [
+        "The total amount of carbon dioxide and other greenhouse gases emitted by human activities",
+        "The amount of carbon dioxide absorbed by plants during photosynthesis",
+        "The weight of carbon in fossil fuels",
+        "The total amount of carbon stored in the oceans"
+      ],
+      "answer": "The total amount of carbon dioxide and other greenhouse gases emitted by human activities"
+    },
+    {
+      "q": "Which of the following is a renewable energy source?",
+      "marks": 10,
+      "options": [
+        "Coal",
+        "Oil",
+        "Solar power",
+        "Natural gas"
+      ],
+      "answer": "Solar power"
+    }
+  ]
+}
+', 8);
 
 INSERT INTO public.certificate(id, name, description, course_id, years_valid) VALUES 
 (1, 'Creative Writer', 'This certifies the holder has completed the "Creative Writing Workshop".', 1, 2),
