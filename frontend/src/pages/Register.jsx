@@ -76,7 +76,7 @@ function Register() {
                         />
                     </div>
                     <div className="mb-3">
-                        <label htmlFor="emailField" className="form-label"><strong>Email</strong></label>
+                        <label htmlFor="emailField" className="form-label"><strong>Email (username)</strong></label>
                         <input
                             type="email"
                             className="form-control"
@@ -129,8 +129,8 @@ function Register() {
                             value={userTypeId}
                             onChange={(e) => setUserTypeId(Number(e.target.value))}
                         >
-                            <option value="1">Student</option>
-                            <option value="2">Teacher</option>
+                            <option value="1">Job Seeker</option>
+                            <option value="2">Company</option>
                             {/* Add more user types as needed */}
                         </select>
                     </div>

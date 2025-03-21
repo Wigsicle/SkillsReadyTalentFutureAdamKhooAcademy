@@ -5,7 +5,7 @@ import "../styles.css"; // Ensure you import the CSS file
 function Home() {
     return (
         <div className="container-fluid">
-            <h1>Welcome to SkillsReadyTalentFutureAdamKhooAcademy!</h1>
+            <h1>Welcome to SRTFAKA!</h1>
             <p>Learn new skills, take assessments, earn certificates, and apply for jobs – all in one place!</p>
 
             <div className="container-fluid w-100 mt-5">
