@@ -18,7 +18,7 @@ function Courses() {
       try {
         const token = authHandler.getToken(); // Get token from localStorage
         const currentUser = await getUser(token.token); // Fetch current user info
-        setUserId(currentUser.data.id);
+        setUserId(currentUser.data.userId);
 
         // Fetch all courses from the backend
         const response = await getCourses(token.token);
@@ -40,9 +40,8 @@ function Courses() {
 
   // Filter courses based on the search term
   const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(searchCourseTerm.toLowerCase()) ||
-    course.instructor.toLowerCase().includes(searchCourseTerm.toLowerCase()) ||
-    course.reviews.toLowerCase().includes(searchCourseTerm.toLowerCase())
+    course.name.toLowerCase().includes(searchCourseTerm.toLowerCase()) ||
+    course.details.toLowerCase().includes(searchCourseTerm.toLowerCase())
   );
 
   // Handle joining a course
@@ -88,18 +87,16 @@ function Courses() {
             data-bs-toggle="modal"
             data-bs-target="#courseModal"
           >
-            <img src={course.image} alt={course.title} className="card-image-top" />
             <div className="card-body">
-              <h3 className="card-title">{course.title}</h3>
-              <p className="card-text">{course.instructor}</p>
-              <p className="card-text">{course.rating}</p>
-              <p className="card-text">{course.reviews}</p>
+              <h3 className="card-title">{course.name}</h3>
+              <p className="card-text">{course.industryName}</p>
+              <p className="card-text">{course.details}</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();  // Prevent triggering the parent div's onClick event
                   handleJoinCourse(course.id); // Join course on button click
                 }}
-                className="btn btn-primary"
+                className="btn btn-dark"
               >
                 Join Course
               </button>
@@ -122,9 +119,9 @@ function Courses() {
                 <div>
                   <img src={selectedCourse.image} alt={selectedCourse.title} className="course-detail-image w-100" />
                   <h2 className="pt-3"><b>{selectedCourse.title}</b></h2>
-                  <p className="course-instructor">Taught By: {selectedCourse.instructor}</p>
-                  <p className="course-rating">Rating: {selectedCourse.rating}</p>
-                  <p className="course-reviews">Reviews: {selectedCourse.reviews}</p>
+                  <p className="course-instructor">Name: {selectedCourse.name}</p>
+                  <p className="course-rating">Industry: {selectedCourse.industryName}</p>
+                  <p className="course-reviews">Details: {selectedCourse.details}</p>
                 </div>
               ) : (
                 <p>No selected course</p>
