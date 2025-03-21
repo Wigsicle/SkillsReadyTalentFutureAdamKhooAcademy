@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session, Mapped
 from sqlalchemy import Integer, String, DateTime, ForeignKey
@@ -14,12 +14,17 @@ indFKey = 'industry.id' #PK of Industry Table
 engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
+if TYPE_CHECKING:
+    from services.accountService.db import User
+
 class EmploymentType(Base):
     """Full-Time/Part-Time/Intern"""
     __tablename__ = "employment_type"
     id: Mapped[int] = mapped_column(primary_key=True)
     value: Mapped[str] = mapped_column(String(255), nullable=False)
     short_val: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    listings: Mapped[List["JobListing"]] = relationship(back_populates='employment')
 
 class Company(Base):
     __tablename__ = "company"
@@ -31,9 +36,9 @@ class Company(Base):
     industry_id: Mapped[int] = mapped_column(Integer, ForeignKey(indFKey))
     country_id: Mapped[int] = mapped_column(Integer, ForeignKey('country.id'))
 
-    listed_jobs: Mapped[list['JobListing']] = relationship("JobListing", foreign_keys='job_listing.company_id', back_populates="company")
-    industry: Mapped[Industry] = relationship(foreign_keys=indFKey)
-    country: Mapped[Country] = relationship("Country", foreign_keys='country.id')
+    listed_jobs: Mapped[list['JobListing']] = relationship("JobListing", back_populates="company")
+    industry: Mapped[Industry] = relationship("Industry", back_populates='companies')
+    country: Mapped[Country] = relationship("Country", back_populates='companies')
 
 class JobListing(Base):
     '''
@@ -62,7 +67,7 @@ class JobListing(Base):
 
     # Object Relations with Company and Applications
     company: Mapped[Company] = relationship('Company', back_populates='listed_jobs')
-    employment: Mapped[EmploymentType] = relationship('EmploymentType', foreign_keys='employment_type.id')
+    employment: Mapped[EmploymentType] = relationship('EmploymentType', back_populates='listings')
     applications: Mapped[list['Application']] = relationship('Application', back_populates='listing')
 
     @hybrid_property
@@ -103,9 +108,9 @@ class Application(Base):
     listing_id: Mapped[int] = mapped_column(Integer, ForeignKey('job_listing.id'), nullable=False)
     industry_id: Mapped[int] = mapped_column(Integer, ForeignKey(indFKey))
 
-    #applicant: Mapped[User] = relationship(back_populates='applications')
-    listing: Mapped[JobListing] = relationship('JobListing', back_populates='applications')
-    industry: Mapped[Industry] = relationship('Industry', foreign_keys=indFKey)
+    applicant: Mapped["User"] = relationship("User", back_populates='applications')
+    listing: Mapped["JobListing"] = relationship('JobListing', back_populates='applications')
+    industry: Mapped["Industry"] = relationship('Industry', back_populates='applications')
     
     
 

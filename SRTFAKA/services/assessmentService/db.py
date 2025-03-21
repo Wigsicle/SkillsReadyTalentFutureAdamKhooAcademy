@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, Any
+import os
+from typing import Optional, Any, List, TYPE_CHECKING
 from sqlalchemy.orm import mapped_column, relationship, Mapped, DeclarativeBase
 from sqlalchemy import create_engine, Integer, String, DateTime, ForeignKey, JSON
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,7 +11,9 @@ DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_d
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+if TYPE_CHECKING:
+    from services.courseService.db import Course
+    from services.accountService.db import User
 
 class Assessment(Base):
     __tablename__ = 'assessment'
@@ -24,6 +27,8 @@ class Assessment(Base):
     # Use a string reference for the relationship
     attempts: Mapped[list["AssessmentAttempt"]] = relationship("AssessmentAttempt", back_populates="assessment")
     
+    course: Mapped["Course"] = relationship("Course", back_populates='assessments')
+    attempts: Mapped[List["AssessmentAttempt"]] = relationship("AssessmentAttempt", back_populates='assessment')
     # list of attempts that markers can mark
      
 
@@ -47,10 +52,16 @@ class AssessmentAttempt(Base):
         if self.earned_marks is not None:
             result = f"{self.earned_marks}/{self.total_marks}"  # Adjusted to use total_marks directly
         return result
+    
+    #FK
+    student_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)  # Many Attempts - 1 Student, M:1
+    assessment_id: Mapped[int] = mapped_column(ForeignKey('assessment.id'), nullable=False) # Many Attempts to 1 Assessment, M:1
+    
+    student: Mapped["User"] = relationship("User", back_populates='assess_attempts')
+    assessment: Mapped["Assessment"] = relationship("Assessment", back_populates='attempts')
+    
 
-    # Relationship with Assessment
-    assessment: Mapped[Assessment] = relationship("Assessment", back_populates="attempts")
-
+currentPath = os.path.dirname(os.path.abspath(__file__))
 class AssessmentDB:
     def __init__(self):
         self.session = SessionLocal()

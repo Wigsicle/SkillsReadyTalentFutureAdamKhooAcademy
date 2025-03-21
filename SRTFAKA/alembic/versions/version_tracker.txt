@@ -4,3 +4,4 @@ Name, Revision_Id,
 3. Set a nullable field for course.cert_id: 156afc10bc16, 2025-03-11 @ 16:10
 4. changed cert validity period (datetime -> int): e1dd9891e766, 2025-03-11 @ 18:05
 5. Changed job_listing column pay -> monthly salary: 20a048b20f24, 2025-03-11 @ 18:30
+6. Set User.email field as unique: 4d63a5405296, 2025-03-18
