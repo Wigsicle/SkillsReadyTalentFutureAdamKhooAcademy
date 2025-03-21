@@ -47,8 +47,15 @@ function Courses() {
   // Handle joining a course
   const handleJoinCourse = async (courseId) => {
     try {
-      const token = authHandler.getToken();
-      const response = await joinCourse({ courseId, userId }, token.token);
+      const token = authHandler.getToken(); // Get token from localStorage
+      const courseProgressData = {
+        student_id: userId,  // Ensure userId is explicitly included
+        course_id: courseId, // Include the courseId
+        cleared: false,      // Assuming this is a placeholder, update it based on your requirements
+      };
+
+      // Call joinCourse API to join the course
+      const response = await joinCourse(courseProgressData, token.token);
 
       if (response.data) {
         alert("Successfully joined the course!");
@@ -58,8 +65,7 @@ function Courses() {
     } catch (error) {
       console.error("Error joining course:", error);
     }
-  };
-
+};
   return (
     <div className="container-fluid">
       <BreadCrumb title={"Courses"} homeRoute={"/"} />
