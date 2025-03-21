@@ -47,6 +47,9 @@ services:
       - job_database
       - account_service
       - assessment_service
+      - job_service
+      - course_service
+      - certificate_service
       
   # Account Service
   account_service:
