@@ -110,7 +110,7 @@ class Application(Base):
 
     applicant: Mapped["User"] = relationship("User", back_populates='applications')
     listing: Mapped["JobListing"] = relationship('JobListing', back_populates='applications')
-    industry: Mapped["Industry"] = relationship('Industry', back_populates='applications')
+    industry: Mapped["Industry"] = relationship("Industry", back_populates='applications')
     
     
 
