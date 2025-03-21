@@ -195,7 +195,7 @@ function Profile() {
                 </button>
 
                 {isEditing && (
-                    <button type="submit" className="btn btn-primary ms-2">
+                    <button type="submit" className="btn btn-dark ms-2">
                         Save Changes
                     </button>
                 )}

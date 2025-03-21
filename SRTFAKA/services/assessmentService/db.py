@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.hybrid import hybrid_property
 
-DATABASE_URL = "postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db"
+DATABASE_URL = "postgresql+psycopg2://postgres:password@job_database:5432/academy_db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

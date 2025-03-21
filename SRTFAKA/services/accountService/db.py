@@ -11,7 +11,7 @@ from apiGateway.base import Base, Country
 # from services.courseService.db import CourseProgress
 import traceback
 
-engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+engine = create_engine("postgresql+psycopg2://postgres:password@job_database:5432/academy_db")
 currentPath = os.path.dirname(os.path.abspath(__file__))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -332,7 +332,7 @@ function Assessments() {
                             {hasUserAttemptedAssessment(selectedAssessment?.assessmentId) ? (
                                 <p>Assessment already completed</p>
                             ) : (
-                                <button className="btn btn-primary" onClick={handleSubmit}>
+                                <button className="btn btn-dark" onClick={handleSubmit}>
                                     Submit Assessment
                                 </button>
                             )}

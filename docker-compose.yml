@@ -1,4 +1,9 @@
+
+# Run this outside the SRTFAKA directory
+version: '3.8'
+
 services:
+  # Job Database (Postgres with Citus extension)
   job_database:
     image: citusdata/citus
     restart: always
@@ -11,5 +16,152 @@ services:
       - acad_db:/data/postgres/jobs
     ports:
       - 5433:5432
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.2
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "academy_db"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  api_gateway:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./apiGateway/Dockerfile
+    container_name: apiGateway
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /
+    ports:
+      - 80:80
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.3
+    entrypoint: ["/entrypoint.sh"]
+    depends_on:
+      - job_database
+      - account_service
+      - assessment_service
+      
+  # Account Service
+  account_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./services/accountService/Dockerfile
+    container_name: accountService
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /SRTFAKA
+    command: ["python", "-m", "services.accountService.main"]
+    ports:
+      - 50051:50051
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.4
+    depends_on:
+      - job_database
+
+  # Assessment Service
+  assessment_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./services/assessmentService/Dockerfile
+    container_name: assessmentService
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /SRTFAKA
+    command: ["python", "-m", "services.assessmentService.main"]
+    ports:
+      - 50053:50053
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.5
+    depends_on:
+      - job_database
+
+  # Certificate Service
+  certificate_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./services/certificateService/Dockerfile
+    container_name: certificateService
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /SRTFAKA
+    command: ["python", "-m", "services.certificateService.main"]
+    ports:
+      - 50055:50055
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.6
+    depends_on:
+      - job_database
+
+  # Course Service
+  course_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./services/courseService/Dockerfile
+    container_name: courseService
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /SRTFAKA
+    command: ["python", "-m", "services.courseService.main"]
+    ports:
+      - 50052:50052
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.7
+    depends_on:
+      - job_database
+
+  # Job Service
+  job_service:
+    build:
+      context: ./SRTFAKA
+      dockerfile: ./services/jobService/Dockerfile
+    container_name: jobService
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./SRTFAKA/requirements.txt:/SRTFAKA/requirements.txt
+    working_dir: /SRTFAKA
+    command: ["python", "-m", "services.jobService.main"]
+    ports:
+      - 50054:50054
+    networks:
+      gateway_network:
+        ipv4_address: 172.18.0.8
+    depends_on:
+      - job_database
+
+
+
 volumes:
   acad_db:
+
+networks:
+  gateway_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.18.0.0/16"

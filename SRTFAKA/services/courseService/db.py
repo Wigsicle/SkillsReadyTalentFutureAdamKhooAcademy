@@ -15,7 +15,7 @@ from sqlalchemy.sql import text
 indFKey = 'industry.id'
 courseFKey = 'course.id'
 userFKey = 'user.id'
-engine = create_engine("postgresql+psycopg2://postgres:password@127.0.0.1:5433/academy_db")
+engine = create_engine("postgresql+psycopg2://postgres:password@job_database:5432/academy_db")
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 class Course(Base):
