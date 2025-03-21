@@ -78,11 +78,11 @@ alembic upgrade head
 ### Run Individual Modules Manually (Option 2)
 #### Run the codes in 2 separate cmd all in virtual environment
 - Run as a module from package 
-- python -m SRTFAKA.services.accountService.main
-- python -m services.courseService.main
-- python -m services.assessmentService.main
-- python -m services.jobService.main
-- python -m services.certificateService.main
+- cd SRTFAKA; python -m services.accountService.main
+- cd SRTFAKA; python -m services.courseService.main
+- cd SRTFAKA; python -m services.assessmentService.main
+- cd SRTFAKA; python -m services.jobService.main
+- cd SRTFAKA; python -m services.certificateService.main
 
 #### Run API Gateway in a separate powershell in virtual environment
 - uvicorn SRTFAKA.apiGateway.main:app --host 0.0.0.0 --port 80
