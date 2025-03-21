@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 import os
-from typing import Optional, Any, TYPE_CHECKING
+from typing import Optional, Any
 from sqlalchemy.orm import sessionmaker, mapped_column, relationship, Mapped, DeclarativeBase, Session
 from sqlalchemy import Integer, String, DateTime, ForeignKey, Time, JSON, Date, JSON, create_engine
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -21,10 +21,19 @@ def get_db():
     finally:
         db.close()  # Ensure session is closed
 
+"""
+    Minimal stub model for referencing the 'couse' and 'user' table. 
+    This prevents circular imports with the accountService.
+"""
 
-if TYPE_CHECKING:
-    from services.courseService.db import Course
-    from services.accountService.db import User
+class Course(Base):
+    __tablename__ = "course"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+class User(Base):
+    __tablename__ = "user"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
 
 class Certificate(Base):
     """
@@ -42,10 +51,7 @@ class Certificate(Base):
     additional_info: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True) # maps to a dictionary
     
     #FK
-    course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id'), nullable=True) # 1:1 
-
-    course: Mapped["Course"] = relationship("Course", back_populates='certificate')
-    issued_certs: Mapped["UserCertificate"] = relationship("UserCertificate", back_populates='cert_info')
+    course_id: Mapped[int] = mapped_column(Integer, ForeignKey('course.id'), nullable=True) # 1:1
     
 class UserCertificate(Base):
     __tablename__ = 'user_cert'
@@ -58,112 +64,149 @@ class UserCertificate(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=True)    # Use this to access user obj
     cert_id: Mapped[int] = mapped_column(Integer, ForeignKey('certificate.id'), nullable=False)
 
-    user: Mapped["User"] = relationship("User", back_populates='certs_attained')
-    cert_info: Mapped["Certificate"] = relationship("Certificate", back_populates='issued_certs')
+    #cert_info: Mapped[Certificate] = relationship(foreign_keys='certificate.id')
+     # Corrected Relationship
+    #cert_info: Mapped[Certificate] = relationship("Certificate", foreign_keys=[cert_id])
+    cert_info: Mapped["Certificate"] = relationship("Certificate", foreign_keys=[cert_id])
+
+#Base.metadata.create_all(engine)
+
+# =====================================
+#  **Helper Functions for Queries**
+# =====================================
+
+def create_certificate(
+    db: Session, 
+    name: str, 
+    course_id: Optional[int],  # Can be None
+    years_valid: Optional[int],  # Matches schema (nullable)
+    description: Optional[str],  # Nullable
+    additional_info: Optional[dict[str, Any]]  # Matches schema (nullable JSON)
+):
+    """Creates a new generic certificate in the database."""
+
+    if course_id:  # Only check if course_id is provided
+        #from db import Course  # Import inside function to avoid circular import
+        from sqlalchemy.exc import NoResultFound
+
+        try:
+            db.query(Course).filter_by(id=course_id).one()
+        except NoResultFound:
+            raise ValueError(f"⚠️ Course ID {course_id} does not exist!")
+
+    new_cert = Certificate(
+        name=name,
+        course_id=course_id,
+        years_valid=years_valid,
+        description=description,
+        additional_info=additional_info
+    )
+
+    db.add(new_cert)
+    db.commit()
+    db.refresh(new_cert)
+
+    # Debugging Logs
+    print(f"✅ Created certificate: {new_cert}")
+    print(f"🆔 Certificate ID: {new_cert.id}")  # Ensure ID is assigned
+    print(f"📜 Certificate attributes: {vars(new_cert)}")  # Full attribute dump
+
+    return new_cert
+
+
+
+def issue_certificate(
+    db: Session,
+    user_id: int,
+    cert_id: int,
+    issued_on: datetime,
+    expires_on: Optional[datetime] = None,
+    additional_info: Optional[dict[str, Any]] = None
+) -> UserCertificate:
+    """
+    Issues a new certificate to a user based on an existing certificate.
     
+    Args:
+        db (Session): The active database session.
+        user_id (int): The ID of the user receiving the certificate.
+        cert_id (int): The ID of the existing generic certificate.
+        issued_on (datetime): The datetime when the certificate is issued.
+        expires_on (Optional[datetime]): The datetime when the certificate expires (if applicable).
+        additional_info (Optional[dict[str, Any]]): Additional details to store as JSON.
     
-currentPath = os.path.dirname(os.path.abspath(__file__))
-class CertificateDB:
-    def __init__(self):
-        # SQLite database file
-        db_path = currentPath + '/certificates.db'
-        self.conn = sqlite3.connect(db_path)
-        self.conn.row_factory = sqlite3.Row  # Access rows as dictionaries
-        self.cursor = self.conn.cursor()
-
-        # SQL to create certificates table
-        create_table_sql = '''
-        CREATE TABLE IF NOT EXISTS certificates (
-            certificateId TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL,
-            courseId TEXT NOT NULL
-        )
-        '''
-        try:
-            self.cursor.execute(create_table_sql)
-            self.conn.commit()
-            print("Table 'certificates' created successfully.")
-        except sqlite3.Error as e:
-            print(f"Database error during table creation: {e}")
-            self.conn.rollback()
+    Returns:
+        UserCertificate: The newly issued user certificate.
     
-    def createCertificate(self, certificateObj):
-        """Insert a new certificate into the database."""
-        sql = '''INSERT INTO certificates (certificateId, name, courseId) 
-                 VALUES (?, ?, ?)'''
-        try:
-            self.cursor.execute(sql, certificateObj)
-            self.conn.commit()
-            return certificateObj[0]  # Return created certificate ID
-        except sqlite3.Error as e:
-            print(f"Database error during createCertificate: {e}")
-            self.conn.rollback()
-            return False
+    Raises:
+        ValueError: If the certificate with the given cert_id does not exist.
+    """
+    # Verify that the certificate exists
+    cert = db.query(Certificate).filter(Certificate.id == cert_id).first()
+    if not cert:
+        raise ValueError(f"Certificate with id {cert_id} does not exist!")
+    # If the caller did not provide an expires_on, but the certificate has years_valid, compute it
+    if expires_on is None and cert.years_valid:
+        expires_on = issued_on + relativedelta(years=cert.years_valid)
+    
+    # Create a new UserCertificate record
+    new_user_cert = UserCertificate(
+        user_id=user_id,
+        cert_id=cert_id,
+        issued_on=issued_on,
+        expires_on=expires_on,
+        additional_info=additional_info
+    )
+    
+    db.add(new_user_cert)
+    db.commit()
+    db.refresh(new_user_cert)
+    
+    # Debug logs
+    print(f"✅ Issued certificate {cert_id} to user {user_id}: {new_user_cert}")
+    
+    return new_user_cert
 
-    def updateCertificate(self, certificateObj):
-        """Update the amount of an existing certificate by certificateId."""
-        sql = '''UPDATE certificates
-                 SET name = ?, courseId=?
-                 WHERE certificateId = ?'''
-        try:
-            self.cursor.execute(sql, (certificateObj['name'], certificateObj['courseId'], certificateObj['certificateId']))
-            self.conn.commit()
-            return self.cursor.rowcount  # Number of rows affected
-        except sqlite3.Error as e:
-            print(f"Database error during updateCertificate: {e}")
-            self.conn.rollback()
-            return False
+def get_user_certificates(db: Session, user_id: int) -> list[UserCertificate]:
+    """
+    Retrieves all certificates associated with the specified user.
 
-    def getAllCertificate(self):
-        try:
-            sql = '''SELECT * FROM certificates'''
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
-            if not rows:
-                return None
+    Args:
+        db (Session): The active database session.
+        user_id (int): The ID of the user whose certificates are to be retrieved.
 
-            # Convert rows to a list of dictionaries with ISO 8601 timestamp strings
-            certificates = []
-            for row in rows:
-                row_dict = dict(row)
-                certificates.append(row_dict)
-            # sorted_rows = sorted(rows, key=lambda row: datetime.strptime(row['transactionDate'], "%d/%m/%Y"))
-            return certificates
-        except sqlite3.Error as e:
-            print(f"Database error during getCertificate: {e}")
-            return False
-        
-    # def getCertificate(self, name=None, courseId=None):
-    #     try:
-    #         # Start SQL query and parameters list
-    #         sql = "SELECT * FROM certificates WHERE 1=1"
-    #         params = []
+    Returns:
+        list[UserCertificate]: A list of UserCertificate objects for the given user.
+    """
+    # Optional: Verify the user actually exists. If you want to raise an error if not:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise ValueError(f"User with id {user_id} does not exist!")
 
-    #         # Dynamic conditions based on provided filters
-    #         if name:
-    #             sql += " AND name = ?"
-    #             params.append(name)
-            
-    #         if courseId:
-    #             sql += " AND courseId = ?"
-    #             params.append(courseId)
-        
-            
-    #         # Execute the query
-    #         self.cursor.execute(sql, tuple(params))
-    #         rows = self.cursor.fetchall()
+    # Query the user_cert table for all certificates belonging to this user.
+    user_certs = db.query(UserCertificate).filter(UserCertificate.user_id == user_id).all()
+    
+    # Debugging Logs
+    print(f"✅ Retrieved {len(user_certs)} certificates for user {user_id}")
 
-    #         # If no rows found, return None
-    #         if not rows:
-    #             return None
+    return user_certs
 
-    #         # Convert rows to a list of dictionaries
-    #         certificates = []
-    #         for row in rows:
-    #             row_dict = dict(row)
-    #             certificates.append(row_dict)
+def get_all_certificates(db: Session) -> list[Certificate]:
+    """
+    Retrieves all certificates from the database.
 
-    # return certificates
+    Args:
+        db (Session): The active database session.
+
+    Returns:
+        list[Certificate]: A list of all Certificate objects in the database.
+    """
+    # Query the Certificate table to get all certificates
+    certificates = db.query(Certificate).all()
+    
+    # Debugging Logs
+    print(f"✅ Retrieved {len(certificates)} certificates from the database.")
+
+    return certificates
 
 def update_certificate(
     db: Session,
@@ -289,5 +332,4 @@ def update_user_certificate(
     print(f"📜 New attributes: {vars(user_cert)}")
     
     return user_cert
-
 
